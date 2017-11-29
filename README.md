@@ -57,4 +57,4 @@ In the event the above does not work, please join us on our community slack to g
 
 
 ## License
-js-stellar-sdk is licensed under an Apache-2.0 license. See the [LICENSE](https://bullioncoin.githost.io/development/js-sdk/blob/exchange_node/LICENSE) file for details.
+js-stellar-sdk is licensed under an Apache-2.0 license.
