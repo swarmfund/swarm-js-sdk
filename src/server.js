@@ -2,6 +2,7 @@ import { AccountCallBuilder } from "./account_call_builder";
 import { AccountResponse } from "./account_response";
 import { Config } from "./config";
 import { LedgerCallBuilder } from "./ledger_call_builder";
+import { ReviewableRequestCallBuilder } from "./reviewable_request_call_builder";
 import { TransactionCallBuilder } from "./transaction_call_builder";
 import { OperationCallBuilder } from "./operation_call_builder";
 import { PaymentCallBuilder } from "./payment_call_builder";
@@ -26,7 +27,6 @@ import { OrderBookCallBuilder } from "./order_book_call_builder";
 import { PublicInfoCallBuilder } from "./public_info_call_builder";
 import { TradeCallBuilder } from "./trade_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
-import { AbxUserCallBuilder } from "./abx_users_call_builder";
 import { Account, hash, Operation, xdr } from "@tokend/js-base";
 import stellarBase from '@tokend/js-base';
 
@@ -160,6 +160,14 @@ export class Server {
      */
     ledgers() {
         return new LedgerCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link ReviewableRequestCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {ReviewableRequestCallBuilder}
+     */
+    reviewableRequests() {
+        return new ReviewableRequestCallBuilder(URI(this.serverURL));
     }
 
     /**

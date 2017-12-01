@@ -1,0 +1,31 @@
+import isUndefined from 'lodash/isUndefined';
+
+export function loadRequestWithRetry(testHelper, requestID, reviewerKP) {
+    return testHelper.server.reviewableRequests().reviewableRequest(requestID).callWithSignature(reviewerKP).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            console.log("received 404 for reviewable request - retring");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => loadRequestWithRetry(testHelper, requestID, reviewerKP));
+        }
+        throw err;
+    });
+}
+
+export function reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason) {
+    return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
+        let opts = {
+            requestID: requestID,
+            requestHash: request.hash,
+            requestType: request.details.request_type_i,
+            action: action,
+            reason: rejectReason,
+        };
+        let operation = StellarSdk.ReviewRequestBuilder.reviewRequest(opts);
+        return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
+    }).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            console.log("received 404 - retring");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason));
+        }
+        throw err;
+    });
+}
