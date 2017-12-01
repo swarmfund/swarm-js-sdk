@@ -11,7 +11,6 @@ import { FeeCallBuilder } from "./fee_call_builder";
 import { FeesOverviewCallBuilder } from "./fees_overview_call_builder";
 import { DefaultLimitsCallBuilder } from "./default_limits_call_builder";
 import { DocumentCallBuilder } from "./document_call_builder";
-import { CoinsEmissionRequestCallBuilder } from "./coins_emission_request_call_builder";
 import { ForfeitRequestCallBuilder } from "./forfeit_request_call_builder";
 import { RecoveryRequestCallBuilder } from "./recovery_request_call_builder";
 import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
@@ -192,14 +191,6 @@ export class Server {
      */
     operations() {
         return new OperationCallBuilder(URI(this.serverURL));
-    }
-
-    /**
-     * Returns new {@link CoinsEmissionRequestCallBuilder} object configured by a current Horizon server configuration.
-     * @returns {CoinsEmissionRequestCallBuilder}
-     */
-    emissionRequests() {
-        return new CoinsEmissionRequestCallBuilder(URI(this.serverURL));
     }
 
     forfeitRequests() {

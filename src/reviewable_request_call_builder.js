@@ -64,4 +64,14 @@ export class ReviewableRequestCallBuilder extends CallBuilder {
         return this;
     }
 
+    /**
+     * Filters reviewable requests by type
+     * @param {number} requestType xdr.ReviewableRequestType
+     * @returns {ReviewableRequestCallBuilder}
+     */
+    forType(requestType) {
+        this.url.addQuery('type', requestType);
+        return this;
+    }
+
 }

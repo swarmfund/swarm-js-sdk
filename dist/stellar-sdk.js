@@ -5517,23 +5517,23 @@ var StellarSdk =
 
 	var _ledger_call_builder = __webpack_require__(541);
 
-	var _transaction_call_builder = __webpack_require__(542);
+	var _reviewable_request_call_builder = __webpack_require__(542);
 
-	var _operation_call_builder = __webpack_require__(543);
+	var _transaction_call_builder = __webpack_require__(543);
 
-	var _payment_call_builder = __webpack_require__(544);
+	var _operation_call_builder = __webpack_require__(544);
 
-	var _user_call_builder = __webpack_require__(545);
+	var _payment_call_builder = __webpack_require__(545);
 
-	var _fee_call_builder = __webpack_require__(546);
+	var _user_call_builder = __webpack_require__(546);
 
-	var _fees_overview_call_builder = __webpack_require__(547);
+	var _fee_call_builder = __webpack_require__(547);
 
-	var _default_limits_call_builder = __webpack_require__(548);
+	var _fees_overview_call_builder = __webpack_require__(548);
 
-	var _document_call_builder = __webpack_require__(549);
+	var _default_limits_call_builder = __webpack_require__(549);
 
-	var _coins_emission_request_call_builder = __webpack_require__(550);
+	var _document_call_builder = __webpack_require__(550);
 
 	var _forfeit_request_call_builder = __webpack_require__(551);
 
@@ -5565,8 +5565,6 @@ var StellarSdk =
 
 	var _price_call_builder = __webpack_require__(565);
 
-	var _abx_users_call_builder = __webpack_require__(566);
-
 	var _tokendJsBase = __webpack_require__(130);
 
 	var _tokendJsBase2 = _interopRequireDefault(_tokendJsBase);
@@ -5574,7 +5572,7 @@ var StellarSdk =
 	var axios = __webpack_require__(476);
 	var toBluebird = __webpack_require__(503).resolve;
 	var URI = __webpack_require__(472);
-	var querystring = __webpack_require__(567);
+	var querystring = __webpack_require__(566);
 
 	var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 
@@ -5720,6 +5718,16 @@ var StellarSdk =
 	        }
 
 	        /**
+	         * Returns new {@link ReviewableRequestCallBuilder} object configured by a current Horizon server configuration.
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: "reviewableRequests",
+	        value: function reviewableRequests() {
+	            return new _reviewable_request_call_builder.ReviewableRequestCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
 	         * Returns new {@link TransactionCallBuilder} object configured by a current Horizon server configuration.
 	         * @returns {TransactionCallBuilder}
 	         */
@@ -5748,16 +5756,6 @@ var StellarSdk =
 	        key: "operations",
 	        value: function operations() {
 	            return new _operation_call_builder.OperationCallBuilder(URI(this.serverURL));
-	        }
-
-	        /**
-	         * Returns new {@link CoinsEmissionRequestCallBuilder} object configured by a current Horizon server configuration.
-	         * @returns {CoinsEmissionRequestCallBuilder}
-	         */
-	    }, {
-	        key: "emissionRequests",
-	        value: function emissionRequests() {
-	            return new _coins_emission_request_call_builder.CoinsEmissionRequestCallBuilder(URI(this.serverURL));
 	        }
 	    }, {
 	        key: "forfeitRequests",
@@ -5881,7 +5879,7 @@ var StellarSdk =
 	    }, {
 	        key: "abxUsers",
 	        value: function abxUsers() {
-	            return new _abx_users_call_builder.AbxUserCallBuilder(URI(this.serverURL));
+	            return new AbxUserCallBuilder(URI(this.serverURL));
 	        }
 
 	        /**
@@ -37029,7 +37027,7 @@ var StellarSdk =
 	                        opts.fee.lowerBound = "0";
 	                    }
 	                    if (isUndefined(opts.fee.upperBound)) {
-	                        opts.fee.upperBound = MAX_INT64_AMOUNT;
+	                        opts.fee.upperBound = BaseOperation.MAX_INT64_AMOUNT;
 	                    }
 
 	                    var feeData = {
@@ -48573,8 +48571,8 @@ var StellarSdk =
 	             * @param {object} opts
 	             * @param {string} opts.requestID - request ID
 	             * @param {string} opts.requestHash - Hash of the request to be reviewed
-	             * @param {xdr.ReviewableRequestType} opts.requestType - Type of the request to be reviewed
-	             * @param {xdr.ReviewRequestOpAction} opts.action - action to be performed over request
+	             * @param {number} opts.requestType - Type of the request to be reviewed (xdr.ReviewableRequestType)
+	             * @param {number} opts.action - action to be performed over request (xdr.ReviewRequestOpAction)
 	             * @param {string} opts.reason - Reject reason
 	             * @param {string} [opts.source] - The source account for the payment. Defaults to the transaction's source account.
 	             * @returns {xdr.ReviewRequestOp}
@@ -48824,6 +48822,8 @@ var StellarSdk =
 
 	var Operation = __webpack_require__(259).Operation;
 
+	var BaseOperation = __webpack_require__(350).BaseOperation;
+
 	var xdr = _interopRequire(__webpack_require__(131));
 
 	var BigNumber = _interopRequire(__webpack_require__(260));
@@ -48851,14 +48851,14 @@ var StellarSdk =
 	             */
 
 	            value: function build(opts) {
-	                if (!Operation.isValidAmount(opts.amount, false)) {
+	                if (!BaseOperation.isValidAmount(opts.amount, false)) {
 	                    throw new TypeError("amount must be of type String and represent a positive number");
 	                }
-	                if (!Operation.isValidString(opts.reference, 4, 64)) {
+	                if (!BaseOperation.isValidString(opts.reference, 4, 64)) {
 	                    throw new TypeError("reference must be 4-64 string");
 	                }
 
-	                if (!Operation.isValidAsset(opts.asset)) {
+	                if (!BaseOperation.isValidAsset(opts.asset)) {
 	                    throw new TypeError("asset is invalid");
 	                }
 
@@ -48866,7 +48866,7 @@ var StellarSdk =
 	                    throw new TypeError("opts.keyPair is invalid");
 	                }
 
-	                opts.amount = Operation._toUnsignedXDRAmount(opts.amount);
+	                opts.amount = BaseOperation._toUnsignedXDRAmount(opts.amount);
 	                var signature = opts.keyPair.signDecorated(this._getSignatureData(opts));
 	                return new xdr.PreIssuanceRequest({
 	                    reference: opts.reference,
@@ -48880,7 +48880,7 @@ var StellarSdk =
 	            value: function xdrFromData(data) {
 	                return new xdr.PreIssuanceRequest({
 	                    reference: data.reference,
-	                    amount: Operation._toUnsignedXDRAmount(data.amount),
+	                    amount: BaseOperation._toUnsignedXDRAmount(data.amount),
 	                    asset: data.asset,
 	                    signature: data.signature
 	                });
@@ -48889,7 +48889,7 @@ var StellarSdk =
 	        dataFromXdr: {
 	            value: function dataFromXdr(xdr) {
 	                var attributes = {};
-	                attributes.amount = Operation._fromXDRAmount(xdr.amount());
+	                attributes.amount = BaseOperation._fromXDRAmount(xdr.amount());
 	                attributes.reference = xdr.reference();
 	                attributes.asset = xdr.asset();
 	                attributes.signature = xdr.signature();
@@ -64197,6 +64197,124 @@ var StellarSdk =
 
 	var _call_builder = __webpack_require__(121);
 
+	var ReviewableRequestCallBuilder = (function (_CallBuilder) {
+	    _inherits(ReviewableRequestCallBuilder, _CallBuilder);
+
+	    /**
+	     * Creates a new {@link ReviewableRequestCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequests}.
+	     * @constructor
+	     * @extends CallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function ReviewableRequestCallBuilder(serverUrl) {
+	        _classCallCheck(this, ReviewableRequestCallBuilder);
+
+	        _get(Object.getPrototypeOf(ReviewableRequestCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('requests');
+	    }
+
+	    /**
+	     * Provides information on a single reviewable request.
+	     * @param id Reviewable request ID
+	     * @returns {LedgerCallBuilder}
+	     */
+
+	    _createClass(ReviewableRequestCallBuilder, [{
+	        key: 'reviewableRequest',
+	        value: function reviewableRequest(id) {
+	            this.filter.push(['requests', id.toString()]);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by asset
+	         * @param {string} asset For example: `USD`
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forAsset',
+	        value: function forAsset(asset) {
+	            this.url.addQuery('asset', asset);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by reviewer
+	         * @param {string} reviewer For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forReviewer',
+	        value: function forReviewer(reviewer) {
+	            this.url.addQuery('reviewer', reviewer);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by requestor
+	         * @param {string} requestor For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forRequestor',
+	        value: function forRequestor(requestor) {
+	            this.url.addQuery('requestor', requestor);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by state
+	         * @param {number} state For example: Pending: 1, Canceled: 2, Approved: 3, Rejected: 4, PermanentlyRejected: 5
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forState',
+	        value: function forState(state) {
+	            this.url.addQuery('state', state);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by type
+	         * @param {number} requestType xdr.ReviewableRequestType
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forType',
+	        value: function forType(requestType) {
+	            this.url.addQuery('type', requestType);
+	            return this;
+	        }
+	    }]);
+
+	    return ReviewableRequestCallBuilder;
+	})(_call_builder.CallBuilder);
+
+	exports.ReviewableRequestCallBuilder = ReviewableRequestCallBuilder;
+
+/***/ }),
+/* 543 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _call_builder = __webpack_require__(121);
+
 	var TransactionCallBuilder = (function (_CallBuilder) {
 	    _inherits(TransactionCallBuilder, _CallBuilder);
 
@@ -64302,7 +64420,7 @@ var StellarSdk =
 	exports.TransactionCallBuilder = TransactionCallBuilder;
 
 /***/ }),
-/* 543 */
+/* 544 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64410,7 +64528,7 @@ var StellarSdk =
 	exports.OperationCallBuilder = OperationCallBuilder;
 
 /***/ }),
-/* 544 */
+/* 545 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64526,7 +64644,7 @@ var StellarSdk =
 	exports.PaymentCallBuilder = PaymentCallBuilder;
 
 /***/ }),
-/* 545 */
+/* 546 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64599,7 +64717,7 @@ var StellarSdk =
 	exports.UserCallBuilder = UserCallBuilder;
 
 /***/ }),
-/* 546 */
+/* 547 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64663,7 +64781,7 @@ var StellarSdk =
 	exports.FeeCallBuilder = FeeCallBuilder;
 
 /***/ }),
-/* 547 */
+/* 548 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -64702,7 +64820,7 @@ var StellarSdk =
 	exports.FeesOverviewCallBuilder = FeesOverviewCallBuilder;
 
 /***/ }),
-/* 548 */
+/* 549 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64751,7 +64869,7 @@ var StellarSdk =
 	exports.DefaultLimitsCallBuilder = DefaultLimitsCallBuilder;
 
 /***/ }),
-/* 549 */
+/* 550 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -64798,115 +64916,6 @@ var StellarSdk =
 	})(_call_builder.CallBuilder);
 
 	exports.DocumentCallBuilder = DocumentCallBuilder;
-
-/***/ }),
-/* 550 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var _call_builder = __webpack_require__(121);
-
-	var CoinsEmissionRequestCallBuilder = (function (_CallBuilder) {
-	    _inherits(CoinsEmissionRequestCallBuilder, _CallBuilder);
-
-	    /**
-	     * Creates a new {@link CoinsEmissionRequestCallBuilder} pointed to server defined by serverUrl.
-	     *
-	     * Do not create this object directly, use {@link Server#coinsEmissionRequests}.
-	     * @constructor
-	     * @extends CallBuilder
-	     * @param {string} serverUrl Horizon server URL.
-	     */
-
-	    function CoinsEmissionRequestCallBuilder(serverUrl) {
-	        _classCallCheck(this, CoinsEmissionRequestCallBuilder);
-
-	        _get(Object.getPrototypeOf(CoinsEmissionRequestCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	        this.url.segment('coins_emission_requests');
-	    }
-
-	    /**
-	     * The coinsEmissionRequest details endpoint provides information on a single coins emission request. The request ID provided in the id
-	     * argument specifies which request to load.
-	     * @see [request Details]
-	     * @param {number} requestId Request ID
-	     * @returns {CoinsEmissionRequestCallBuilder}
-	     */
-
-	    _createClass(CoinsEmissionRequestCallBuilder, [{
-	        key: 'coinsEmissionRequest',
-	        value: function coinsEmissionRequest(requestId) {
-	            this.filter.push(['coins_emission_requests', requestId]);
-	            return this;
-	        }
-
-	        /**
-	         * This endpoint represents all coins emission requests that were included in valid transactions with asset.
-	         * @param {string} asset For example: `XAAU`
-	         * @returns {CoinsEmissionRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forAsset',
-	        value: function forAsset(asset) {
-	            this.url.addQuery('asset', asset);
-	            return this;
-	        }
-
-	        /**
-	         * This endpoint represents all coins emission requests that were included in valid transactions that initiated by a particular exchange.
-	         * @param {string} exchangeId For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-	         * @returns {CoinsEmissionRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forExchange',
-	        value: function forExchange(exchangeId) {
-	            this.url.addQuery('exchange', exchangeId);
-	            return this;
-	        }
-
-	        /**
-	         * This endpoint represents all coins emission requests that were included in valid transactions with state.
-	         * @param {int} state 1:PENDING, 2:ACCEPTED, 3:REJECTED
-	         * @returns {CoinsEmissionRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forState',
-	        value: function forState(state) {
-	            this.url.addQuery('state', state);
-	            return this;
-	        }
-
-	        /**
-	         * This endpoint represents all coins emission requests that were submitted with indicated reference.
-	         * @param {string} reference
-	         * @returns {CoinsEmissionRequestCallBuilder}
-	         */
-
-	    }, {
-	        key: 'forReference',
-	        value: function forReference(reference) {
-	            this.url.addQuery('reference', reference);
-	            return this;
-	        }
-	    }]);
-
-	    return CoinsEmissionRequestCallBuilder;
-	})(_call_builder.CallBuilder);
-
-	exports.CoinsEmissionRequestCallBuilder = CoinsEmissionRequestCallBuilder;
 
 /***/ }),
 /* 551 */
@@ -65737,69 +65746,12 @@ var StellarSdk =
 
 	'use strict';
 
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
+	exports.decode = exports.parse = __webpack_require__(567);
+	exports.encode = exports.stringify = __webpack_require__(568);
 
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var _call_builder = __webpack_require__(121);
-
-	var AbxUserCallBuilder = (function (_CallBuilder) {
-	    _inherits(AbxUserCallBuilder, _CallBuilder);
-
-	    /** Creates a new {@link AbxUserCallBuilder} pointed to server defined by serverUrl.
-	     *
-	     * Do not create this object directly, use {@link Server#abxUsers}.
-	     * @constructor
-	     * @extends CallBuilder
-	     * @param {string} serverUrl Horizon server URL.
-	     */
-
-	    function AbxUserCallBuilder(serverUrl) {
-	        _classCallCheck(this, AbxUserCallBuilder);
-
-	        _get(Object.getPrototypeOf(AbxUserCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	        this.url.segment('integrations/abx/users');
-	        return this;
-	    }
-
-	    /**
-	     * @param {string} integrationId Integration ID
-	     * @returns {AbxUserCallBuilder}
-	     */
-
-	    _createClass(AbxUserCallBuilder, [{
-	        key: 'forIntegrationId',
-	        value: function forIntegrationId(integrationId) {
-	            this.url.addQuery('integration_id', integrationId);
-	            return this;
-	        }
-	    }]);
-
-	    return AbxUserCallBuilder;
-	})(_call_builder.CallBuilder);
-
-	exports.AbxUserCallBuilder = AbxUserCallBuilder;
 
 /***/ }),
 /* 567 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	exports.decode = exports.parse = __webpack_require__(568);
-	exports.encode = exports.stringify = __webpack_require__(569);
-
-
-/***/ }),
-/* 568 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -65885,7 +65837,7 @@ var StellarSdk =
 
 
 /***/ }),
-/* 569 */
+/* 568 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
