@@ -25,6 +25,7 @@ export function loadBalanceForAsset(testHelper, accountKP, asset) {
 }
 
 export function loadBalanceIDForAsset(testHelper, accountKP, asset) {
+    console.log("Loading balance for asset: " + asset);
     return loadBalanceForAsset(testHelper, accountKP, asset).then(balance => {
         return balance.balance_id;
     })

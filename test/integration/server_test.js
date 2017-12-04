@@ -38,44 +38,18 @@ describe("Integration test", function () {
             });
     }
 
-
-
-
-    function createAsset(owner, issuer, assetCode) {
-        let opts = {
-            requestID: "0",
-            code: assetCode,
-            name: assetCode + " name",
-            preissuedAssetSigner: issuer,
-            description: "Description",
-            externalResourceLink: "https://myasset.com",
-            maxIssuanceAmount: "100000000",
-            policies: StellarSdk.xdr.AssetPolicy.assetTransferable().value,
-
-        };
-        let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
-        return server.submitOperation(operation, owner.accountId(), owner);
-    }
-
-    it("Create account", function (done) {
-        let newAccountKP = StellarSdk.Keypair.random();
-        accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0).then(() => {
-            done();
-        }).catch((err) => {
-            done(err);
-        });
-    });
-
     it("Create asset and perform issuance", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
         var preIssuedAmount = "10000.0000";
+        var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
-        console.log("Creating new account for issuance " + newAccountKP.accountId());
-        assetHelper.createAsset(testHelper, master, master.accountId(), assetCode)
-            .then(() => issuanceHelper.performPreIssuance(testHelper, master, master, assetCode, preIssuedAmount))
+        console.log("Creating new account for issuance " + syndicateKP.accountId());
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+        .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode))
+            .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
             .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP, assetCode))
-            .then(balanceID => issuanceHelper.issue(testHelper, master, balanceID, assetCode, preIssuedAmount))
+            .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount))
             .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP, assetCode))
             .then(balance => {
                 expect(balance.balance).to.be.equal(preIssuedAmount);

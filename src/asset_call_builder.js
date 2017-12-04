@@ -15,5 +15,25 @@ export class AssetCallBuilder extends CallBuilder {
         this.url.segment('assets');
     }
 
+    /**
+     * This endpoint represents assets filtered by asset owner
+     * @param {string} like GBF2LJ5VCZETXG6DJ3QT5KUT4FY5UCZHX4YAHOQIFBNF66QC7H26XRMQ
+     * @returns {AssetCallBuilder}
+     */
+    forOwner(assetOwnerAccountId) {
+        this.url.addQuery('owner', assetOwnerAccountId);
+        return this;
+    }
+
+    /**
+     * This endpoint represents asset filtered by asset code
+     * @param {string} like USD
+     * @returns {AssetCallBuilder}
+     */
+    byCode(assetCode) {
+        this.filter.push(['assets', assetCode]);
+        return this;
+    }
+
 
 }
