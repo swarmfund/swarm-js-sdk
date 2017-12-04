@@ -69,8 +69,12 @@ export class ReviewableRequestCallBuilder extends CallBuilder {
      * @param {number} requestType xdr.ReviewableRequestType
      * @returns {ReviewableRequestCallBuilder}
      */
-    forType(requestType) {
-        this.url.addQuery('type', requestType);
+    forType(...requestTypes) {
+        let typeMask = 0;
+        requestType.forEach(el => {
+            typeMask += 2 << el;
+        });
+        this.url.addQuery('type_mask', typeMask);
         return this;
     }
 
