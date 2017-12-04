@@ -64284,8 +64284,12 @@ var StellarSdk =
 	         */
 	    }, {
 	        key: 'forType',
-	        value: function forType(requestType) {
-	            this.url.addQuery('type', requestType);
+	        value: function forType() {
+	            var typeMask = 0;
+	            requestType.forEach(function (el) {
+	                typeMask += 2 << el;
+	            });
+	            this.url.addQuery('type_mask', typeMask);
 	            return this;
 	        }
 	    }]);
