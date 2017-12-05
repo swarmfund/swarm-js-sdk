@@ -1,5 +1,5 @@
 {
-    "name": "@tokend/js-sdk",
+    "name": "swarm-js-sdk",
     "version": "0.8.1",
     "description": "stellar-sdk is a library for working with the Stellar Horizon server.",
     "main": "lib/index.js",
@@ -80,7 +80,7 @@
         "eventsource": "^0.2.1",
         "jsdoc": "^3.4.1",
         "lodash": "^4.0.1",
-        "@tokend/js-base": "git+ssh://git@gitlab.com:swarmfund/js-base.git#58c98de3b02eb9eccfae04e7da7ff511404d1f66",
+        "swarm-js-base": "git+ssh://git@gitlab.com:swarmfund/js-base.git#hotfixes/package_rename",
         "toml": "^2.3.0"
     }
 }

@@ -64279,14 +64279,19 @@ var StellarSdk =
 
 	        /**
 	         * Filters reviewable requests by type
-	         * @param {number} requestType xdr.ReviewableRequestType
+	         * @param {number} requestTypes xdr.ReviewableRequestType
 	         * @returns {ReviewableRequestCallBuilder}
 	         */
 	    }, {
 	        key: 'forType',
 	        value: function forType() {
 	            var typeMask = 0;
-	            requestType.forEach(function (el) {
+
+	            for (var _len = arguments.length, requestTypes = Array(_len), _key = 0; _key < _len; _key++) {
+	                requestTypes[_key] = arguments[_key];
+	            }
+
+	            requestTypes.forEach(function (el) {
 	                typeMask += 2 << el;
 	            });
 	            this.url.addQuery('type_mask', typeMask);
