@@ -6203,7 +6203,7 @@ var StellarSdk =
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	    value: true
+	  value: true
 	});
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -6217,70 +6217,70 @@ var StellarSdk =
 	var _call_builder = __webpack_require__(121);
 
 	var AccountCallBuilder = (function (_CallBuilder) {
-	    _inherits(AccountCallBuilder, _CallBuilder);
+	  _inherits(AccountCallBuilder, _CallBuilder);
 
-	    /**
-	     * Creates a new {@link AccountCallBuilder} pointed to server defined by serverUrl.
-	     *
-	     * Do not create this object directly, use {@link Server#accounts}.
-	     * @see [All Accounts](https://www.stellar.org/developers/horizon/reference/accounts-all.html)
-	     * @constructor
-	     * @extends CallBuilder
-	     * @param {string} serverUrl Horizon server URL.
-	     */
+	  /**
+	   * Creates a new {@link AccountCallBuilder} pointed to server defined by serverUrl.
+	   *
+	   * Do not create this object directly, use {@link Server#accounts}.
+	   * @see [All Accounts](https://www.stellar.org/developers/horizon/reference/accounts-all.html)
+	   * @constructor
+	   * @extends CallBuilder
+	   * @param {string} serverUrl Horizon server URL.
+	   */
 
-	    function AccountCallBuilder(serverUrl) {
-	        _classCallCheck(this, AccountCallBuilder);
+	  function AccountCallBuilder(serverUrl) {
+	    _classCallCheck(this, AccountCallBuilder);
 
-	        _get(Object.getPrototypeOf(AccountCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	        this.url.segment('accounts');
+	    _get(Object.getPrototypeOf(AccountCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	    this.url.segment('accounts');
+	  }
+
+	  /**
+	   * Returns information and links relating to a single account.
+	   * The balances section in the returned JSON will also list all the trust lines this account has set up.
+	   *
+	   * @see [Account Details](https://www.stellar.org/developers/horizon/reference/accounts-single.html)
+	   * @param {string} id For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+	   * @returns {AccountCallBuilder}
+	   */
+
+	  _createClass(AccountCallBuilder, [{
+	    key: 'accountId',
+	    value: function accountId(id) {
+	      this.filter.push(['accounts', id]);
+	      return this;
 	    }
+	  }, {
+	    key: 'referrals',
+	    value: function referrals(accountId) {
+	      this.filter.push(['accounts', accountId, 'referrals']);
+	      return this;
+	    }
+	  }, {
+	    key: 'signer',
+	    value: function signer(accountId, signerId) {
+	      this.filter.push(['accounts', accountId, 'signers', signerId]);
+	      return this;
+	    }
+	  }, {
+	    key: 'accountSummary',
+	    value: function accountSummary(accountId, since, to) {
+	      this.filter.push(['accounts', accountId, 'summary']);
+	      this.url.addQuery('since', since);
+	      this.url.addQuery('to', to);
+	      return this;
+	    }
+	  }, {
+	    key: 'offer',
+	    value: function offer(accountId, offerId) {
+	      this.filter.push(['accounts', accountId, 'offers']);
+	      this.url.addQuery('offer_id', offerId);
+	      return this;
+	    }
+	  }]);
 
-	    /**
-	     * Returns information and links relating to a single account.
-	     * The balances section in the returned JSON will also list all the trust lines this account has set up.
-	     *
-	     * @see [Account Details](https://www.stellar.org/developers/horizon/reference/accounts-single.html)
-	     * @param {string} id For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-	     * @returns {AccountCallBuilder}
-	     */
-
-	    _createClass(AccountCallBuilder, [{
-	        key: 'accountId',
-	        value: function accountId(id) {
-	            this.filter.push(['accounts', id]);
-	            return this;
-	        }
-	    }, {
-	        key: 'referrals',
-	        value: function referrals(accountId) {
-	            this.filter.push(['accounts', accountId, 'referrals']);
-	            return this;
-	        }
-	    }, {
-	        key: 'signer',
-	        value: function signer(accountId, signerId) {
-	            this.filter.push(['accounts', accountId, 'signers', signerId]);
-	            return this;
-	        }
-	    }, {
-	        key: 'accountSummary',
-	        value: function accountSummary(accountId, since, to) {
-	            this.filter.push(['accounts', accountId, 'summary']);
-	            this.url.addQuery('since', since);
-	            this.url.addQuery('to', to);
-	            return this;
-	        }
-	    }, {
-	        key: 'offer',
-	        value: function offer(accountId, offerId) {
-	            this.filter.push(['accounts', accountId, 'offers']);
-	            this.url.addQuery('offer_id', offerId);
-	            return this;
-	        }
-	    }]);
-
-	    return AccountCallBuilder;
+	  return AccountCallBuilder;
 	})(_call_builder.CallBuilder);
 
 	exports.AccountCallBuilder = AccountCallBuilder;
