@@ -72,7 +72,7 @@ export class ReviewableRequestCallBuilder extends CallBuilder {
     forType(...requestTypes) {
         let typeMask = 0;
         requestTypes.forEach(el => {
-            typeMask += 2 << el;
+            typeMask += 1 << el;
         });
         this.url.addQuery('type_mask', typeMask);
         return this;

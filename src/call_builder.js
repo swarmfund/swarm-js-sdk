@@ -1,6 +1,6 @@
 import {NotFoundError, NetworkError, BadRequestError} from "./errors";
 import forEach from 'lodash/forEach';
-import { xdr, Account, hash } from "@tokend/js-base";
+import { xdr, Account, hash } from "swarm-js-base";
 
 let URI = require("urijs");
 let URITemplate = require("urijs").URITemplate;
