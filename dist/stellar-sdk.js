@@ -636,11 +636,11 @@ var StellarSdk =
 	  }
 	});
 
-	// expose classes and functions from @tokend/js-base
+	// expose classes and functions from 'swarm-js-base'
 
-	var _tokendJsBase = __webpack_require__(130);
+	var _swarmJsBase = __webpack_require__(130);
 
-	_defaults(exports, _interopExportWildcard(_tokendJsBase, _defaults));
+	_defaults(exports, _interopExportWildcard(_swarmJsBase, _defaults));
 
 	exports["default"] = module.exports;
 
@@ -5565,9 +5565,9 @@ var StellarSdk =
 
 	var _price_call_builder = __webpack_require__(565);
 
-	var _tokendJsBase = __webpack_require__(130);
+	var _swarmJsBase = __webpack_require__(130);
 
-	var _tokendJsBase2 = _interopRequireDefault(_tokendJsBase);
+	var _swarmJsBase2 = _interopRequireDefault(_swarmJsBase);
 
 	var axios = __webpack_require__(476);
 	var toBluebird = __webpack_require__(503).resolve;
@@ -5610,8 +5610,8 @@ var StellarSdk =
 	        value: function submitOperation(op, sourceID, signerKP) {
 	            var multiSigTx = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
 
-	            var source = new _tokendJsBase2["default"].Account(sourceID);
-	            var tx = new _tokendJsBase2["default"].TransactionBuilder(source).addOperation(op).build();
+	            var source = new _swarmJsBase2["default"].Account(sourceID);
+	            var tx = new _swarmJsBase2["default"].TransactionBuilder(source).addOperation(op).build();
 	            tx.sign(signerKP);
 	            if (!!multiSigTx) {
 	                return this.submitTransaction(tx, multiSigTx, signerKP);
@@ -6175,8 +6175,8 @@ var StellarSdk =
 	            var validUntil = Math.floor(new Date().getTime() / 1000 + SIGNATURE_VALID_SEC).toString();
 	            //temporary. should be fixed or refactored
 	            var signatureBase = "{ uri: '" + address + "', valid_untill: '" + validUntil.toString() + "'}";
-	            keypair = _tokendJsBase2["default"].Keypair.fromRawSeed(keypair._secretSeed);
-	            var data = (0, _tokendJsBase.hash)(signatureBase);
+	            keypair = _swarmJsBase2["default"].Keypair.fromRawSeed(keypair._secretSeed);
+	            var data = (0, _swarmJsBase.hash)(signatureBase);
 
 	            var signature = keypair.signDecorated(data);
 	            return {
@@ -6203,7 +6203,7 @@ var StellarSdk =
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	  value: true
+	    value: true
 	});
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -6217,70 +6217,70 @@ var StellarSdk =
 	var _call_builder = __webpack_require__(121);
 
 	var AccountCallBuilder = (function (_CallBuilder) {
-	  _inherits(AccountCallBuilder, _CallBuilder);
+	    _inherits(AccountCallBuilder, _CallBuilder);
 
-	  /**
-	   * Creates a new {@link AccountCallBuilder} pointed to server defined by serverUrl.
-	   *
-	   * Do not create this object directly, use {@link Server#accounts}.
-	   * @see [All Accounts](https://www.stellar.org/developers/horizon/reference/accounts-all.html)
-	   * @constructor
-	   * @extends CallBuilder
-	   * @param {string} serverUrl Horizon server URL.
-	   */
+	    /**
+	     * Creates a new {@link AccountCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#accounts}.
+	     * @see [All Accounts](https://www.stellar.org/developers/horizon/reference/accounts-all.html)
+	     * @constructor
+	     * @extends CallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
 
-	  function AccountCallBuilder(serverUrl) {
-	    _classCallCheck(this, AccountCallBuilder);
+	    function AccountCallBuilder(serverUrl) {
+	        _classCallCheck(this, AccountCallBuilder);
 
-	    _get(Object.getPrototypeOf(AccountCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	    this.url.segment('accounts');
-	  }
-
-	  /**
-	   * Returns information and links relating to a single account.
-	   * The balances section in the returned JSON will also list all the trust lines this account has set up.
-	   *
-	   * @see [Account Details](https://www.stellar.org/developers/horizon/reference/accounts-single.html)
-	   * @param {string} id For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-	   * @returns {AccountCallBuilder}
-	   */
-
-	  _createClass(AccountCallBuilder, [{
-	    key: 'accountId',
-	    value: function accountId(id) {
-	      this.filter.push(['accounts', id]);
-	      return this;
+	        _get(Object.getPrototypeOf(AccountCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('accounts');
 	    }
-	  }, {
-	    key: 'referrals',
-	    value: function referrals(accountId) {
-	      this.filter.push(['accounts', accountId, 'referrals']);
-	      return this;
-	    }
-	  }, {
-	    key: 'signer',
-	    value: function signer(accountId, signerId) {
-	      this.filter.push(['accounts', accountId, 'signers', signerId]);
-	      return this;
-	    }
-	  }, {
-	    key: 'accountSummary',
-	    value: function accountSummary(accountId, since, to) {
-	      this.filter.push(['accounts', accountId, 'summary']);
-	      this.url.addQuery('since', since);
-	      this.url.addQuery('to', to);
-	      return this;
-	    }
-	  }, {
-	    key: 'offer',
-	    value: function offer(accountId, offerId) {
-	      this.filter.push(['accounts', accountId, 'offers']);
-	      this.url.addQuery('offer_id', offerId);
-	      return this;
-	    }
-	  }]);
 
-	  return AccountCallBuilder;
+	    /**
+	     * Returns information and links relating to a single account.
+	     * The balances section in the returned JSON will also list all the trust lines this account has set up.
+	     *
+	     * @see [Account Details](https://www.stellar.org/developers/horizon/reference/accounts-single.html)
+	     * @param {string} id For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+	     * @returns {AccountCallBuilder}
+	     */
+
+	    _createClass(AccountCallBuilder, [{
+	        key: 'accountId',
+	        value: function accountId(id) {
+	            this.filter.push(['accounts', id]);
+	            return this;
+	        }
+	    }, {
+	        key: 'referrals',
+	        value: function referrals(accountId) {
+	            this.filter.push(['accounts', accountId, 'referrals']);
+	            return this;
+	        }
+	    }, {
+	        key: 'signer',
+	        value: function signer(accountId, signerId) {
+	            this.filter.push(['accounts', accountId, 'signers', signerId]);
+	            return this;
+	        }
+	    }, {
+	        key: 'accountSummary',
+	        value: function accountSummary(accountId, since, to) {
+	            this.filter.push(['accounts', accountId, 'summary']);
+	            this.url.addQuery('since', since);
+	            this.url.addQuery('to', to);
+	            return this;
+	        }
+	    }, {
+	        key: 'offer',
+	        value: function offer(accountId, offerId) {
+	            this.filter.push(['accounts', accountId, 'offers']);
+	            this.url.addQuery('offer_id', offerId);
+	            return this;
+	        }
+	    }]);
+
+	    return AccountCallBuilder;
 	})(_call_builder.CallBuilder);
 
 	exports.AccountCallBuilder = AccountCallBuilder;
@@ -6307,7 +6307,7 @@ var StellarSdk =
 
 	var _lodashForEach2 = _interopRequireDefault(_lodashForEach);
 
-	var _tokendJsBase = __webpack_require__(130);
+	var _swarmJsBase = __webpack_require__(130);
 
 	var URI = __webpack_require__(472);
 	var URITemplate = __webpack_require__(472).URITemplate;
@@ -6463,7 +6463,7 @@ var StellarSdk =
 	      }
 	      var validUntil = Math.floor(new Date().getTime() / 1000 + SIGNATURE_VALID_SEC).toString();
 	      var signatureBase = "{ uri: '" + url.resource() + "', valid_untill: '" + validUntil.toString() + "'}";
-	      var data = (0, _tokendJsBase.hash)(signatureBase);
+	      var data = (0, _swarmJsBase.hash)(signatureBase);
 	      var signature = keypair.signDecorated(data);
 	      return {
 	        headers: {
@@ -64025,7 +64025,7 @@ var StellarSdk =
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var _tokendJsBase = __webpack_require__(130);
+	var _swarmJsBase = __webpack_require__(130);
 
 	var _lodashForIn = __webpack_require__(540);
 
@@ -64049,7 +64049,7 @@ var StellarSdk =
 
 	        _classCallCheck(this, AccountResponse);
 
-	        this._baseAccount = new _tokendJsBase.Account(response.account_id);
+	        this._baseAccount = new _swarmJsBase.Account(response.account_id);
 	        // Extract response fields
 	        (0, _lodashForIn2["default"])(response, function (value, key) {
 	            _this[key] = value;
@@ -64292,7 +64292,7 @@ var StellarSdk =
 	            }
 
 	            requestTypes.forEach(function (el) {
-	                typeMask += 2 << el;
+	                typeMask += 1 << el;
 	            });
 	            this.url.addQuery('type_mask', typeMask);
 	            return this;

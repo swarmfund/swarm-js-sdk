@@ -26,8 +26,8 @@ import { OrderBookCallBuilder } from "./order_book_call_builder";
 import { PublicInfoCallBuilder } from "./public_info_call_builder";
 import { TradeCallBuilder } from "./trade_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
-import { Account, hash, Operation, xdr } from "@tokend/js-base";
-import stellarBase from '@tokend/js-base';
+import { Account, hash, Operation, xdr } from "swarm-js-base";
+import stellarBase from 'swarm-js-base';
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;

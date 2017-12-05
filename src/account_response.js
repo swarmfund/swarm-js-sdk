@@ -1,4 +1,4 @@
-import {Account as BaseAccount} from "@tokend/js-base";
+import {Account as BaseAccount} from "swarm-js-base";
 import forIn from "lodash/forIn";
 
 export class AccountResponse {
