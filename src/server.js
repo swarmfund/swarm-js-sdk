@@ -593,7 +593,7 @@ export class Server {
         };
     }
     _getURL(prefix) {
-        let filters = [];
+        let filters = [prefix];
         if (Config.isURLPrefix() === true) {
             filters = Config.getURLPrefixedPath(prefix);
         }
