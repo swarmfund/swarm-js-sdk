@@ -28,6 +28,11 @@ export class AccountCallBuilder extends CallBuilder {
       return this;
     }
 
+    balances (accountId) {
+      this.filter.push(['accounts', accountId, 'balances']);
+      return this;
+    }
+
     referrals(accountId) {
       this.filter.push(['accounts', accountId, 'referrals']);
       return this;

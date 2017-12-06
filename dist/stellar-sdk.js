@@ -6252,6 +6252,12 @@ var StellarSdk =
 	            return this;
 	        }
 	    }, {
+	        key: 'balances',
+	        value: function balances(accountId) {
+	            this.filter.push(['accounts', accountId, 'balances']);
+	            return this;
+	        }
+	    }, {
 	        key: 'referrals',
 	        value: function referrals(accountId) {
 	            this.filter.push(['accounts', accountId, 'referrals']);
