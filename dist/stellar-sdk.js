@@ -2077,7 +2077,8 @@ var StellarSdk =
 	var _lodashClone2 = _interopRequireDefault(_lodashClone);
 
 	var defaultConfig = {
-	  allowHttp: false
+	  allowHttp: false,
+	  serverURLPrefix: []
 	};
 
 	var config = (0, _lodashClone2['default'])(defaultConfig);
@@ -2134,6 +2135,57 @@ var StellarSdk =
 	    key: 'setDefault',
 	    value: function setDefault() {
 	      config = (0, _lodashClone2['default'])(defaultConfig);
+	    }
+
+	    /**
+	     * Sets `serverURLPrefix` globally. When set StellarSdk.CallBuilder will add this prefix
+	     * for each request to Horizon. Example:
+	     * `http://horizon.io/some/path` -> `http://horizon.io/my/pref/some/path`
+	     * @param {string} value - for example `/my/pref`
+	     * @static
+	     */
+	  }, {
+	    key: 'setURLPrefix',
+	    value: function setURLPrefix(value) {
+	      config.serverURLPrefix = value.split('/').filter(function (s) {
+	        return s !== '';
+	      });
+	    }
+
+	    /**
+	     * Returns the value of `serverURLPrefix`.
+	     * @static
+	     */
+	  }, {
+	    key: 'getURLPrefix',
+	    value: function getURLPrefix() {
+	      return config.serverURLPrefix;
+	    }
+
+	    /**
+	     * Returns the value of `serverURLPrefix`.
+	     * @param {string} value - for example `/my/pref`
+	     * @static
+	     */
+	  }, {
+	    key: 'getURLPrefixedPath',
+	    value: function getURLPrefixedPath(value) {
+	      var path = value.split('/').filter(function (s) {
+	        return s !== '';
+	      });
+	      return config.serverURLPrefix.concat(path.filter(function (item) {
+	        return config.serverURLPrefix.indexOf(item) < 0;
+	      }));
+	    }
+
+	    /**
+	     * Returns the true if `serverURLPrefix` not empty.
+	     * @static
+	     */
+	  }, {
+	    key: 'isURLPrefix',
+	    value: function isURLPrefix() {
+	      return config.serverURLPrefix.length > 0;
 	    }
 	  }]);
 
@@ -5594,6 +5646,11 @@ var StellarSdk =
 	        _classCallCheck(this, Server);
 
 	        this.serverURL = URI(serverURL);
+	        try {
+	            _config.Config.setURLPrefix(this.serverURL.path());
+	        } catch (err) {
+	            console.log(err);
+	        }
 
 	        var allowHttp = _config.Config.isAllowHttp();
 	        if (typeof opts.allowHttp !== 'undefined') {
@@ -5630,7 +5687,6 @@ var StellarSdk =
 	                console.error("DeprecationWarning: keypair is deprecated");
 	            }
 	            var path = "transactions";
-	            var endpoint = URI(this.serverURL).path(path).toString();
 	            var tx = transaction.toEnvelope().toXDR().toString("base64");
 
 	            var config = {
@@ -5640,7 +5696,7 @@ var StellarSdk =
 	                }
 	            };
 
-	            var promise = axios.post(endpoint, { tx: tx }, config).then(function (response) {
+	            var promise = axios.post(this._getURL(path), { tx: tx }, config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -5665,7 +5721,7 @@ var StellarSdk =
 	        value: function repeatTransaction(config, tx) {
 	            var path = 'transactions';
 
-	            var promise = axios.post(URI(this.serverURL).path(path).toString(), tx, config).then(function (response) {
+	            var promise = axios.post(this._getURL(path), tx, config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -5964,7 +6020,7 @@ var StellarSdk =
 	            var endpoint = "/transactions/" + txHash;
 	            var config = this._getConfig(endpoint, keypair);
 	            config.headers['content-type'] = 'application/json';
-	            var promise = axios.patch(URI(this.serverURL).path(endpoint).toString(), { state: 3 }, config).then(function (response) {
+	            var promise = axios.patch(this._getURL(endpoint), { state: 3 }, config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -5981,7 +6037,7 @@ var StellarSdk =
 	            var endpoint = "/transactions/" + txHash;
 	            var config = this._getConfig(endpoint, keypair);
 	            config.headers['content-type'] = 'application/json';
-	            var promise = axios["delete"](URI(this.serverURL).path(endpoint).toString(), config).then(function (response) {
+	            var promise = axios["delete"](this._getURL(endpoint), config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6046,7 +6102,7 @@ var StellarSdk =
 	        value: function addContact(params, keypair) {
 	            var prefix = "users/" + params.userId + "/contacts";
 	            var config = this._getConfig("/" + prefix, keypair);
-	            var promise = axios.post(URI(this.serverURL).path(prefix).toString(), querystring.stringify(params), config).then(function (response) {
+	            var promise = axios.post(this._getURL(prefix), querystring.stringify(params), config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6072,7 +6128,7 @@ var StellarSdk =
 	        value: function updateContact(params, keypair) {
 	            var prefix = "users/" + params.userId + "/contacts/" + params.account_id;
 	            var config = this._getConfig("/" + prefix, keypair);
-	            var promise = axios.patch(URI(this.serverURL).path(prefix).toString(), querystring.stringify(params), config).then(function (response) {
+	            var promise = axios.patch(this._getURL(prefix), querystring.stringify(params), config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6096,7 +6152,7 @@ var StellarSdk =
 	        value: function deleteContact(params, keypair) {
 	            var prefix = "users/" + params.userId + "/contacts/" + params.contactId;
 	            var config = this._getConfig("/" + prefix, keypair);
-	            var promise = axios["delete"](URI(this.serverURL).path(prefix).toString(), config).then(function (response) {
+	            var promise = axios["delete"](this._getURL(prefix), config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6114,7 +6170,7 @@ var StellarSdk =
 	            var prefix = "users/" + params.account_id + "/contacts/requests";
 	            var config = this._getConfig("/" + prefix, keypair);
 	            config.headers["Content-Type"] = "application/json";
-	            var promise = axios.post(URI(this.serverURL).path(prefix).toString(), requestData, config).then(function (response) {
+	            var promise = axios.post(this._getURL(prefix), requestData, config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6132,7 +6188,7 @@ var StellarSdk =
 	            var prefix = "users/" + params.account_id + "/contacts/requests/" + params.request_id;
 	            var config = this._getConfig("/" + prefix, keypair);
 	            config.headers["Content-Type"] = "application/json";
-	            var promise = axios.patch(URI(this.serverURL).path(prefix).toString(), requestData, config).then(function (response) {
+	            var promise = axios.patch(this._getURL(prefix), requestData, config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6157,7 +6213,7 @@ var StellarSdk =
 	                requestData = querystring.stringify(params);
 	            }
 
-	            var promise = axios.post(URI(this.serverURL).path(prefix).toString(), requestData, config).then(function (response) {
+	            var promise = axios.post(this._getURL(prefix), requestData, config).then(function (response) {
 	                return response.data;
 	            })["catch"](function (response) {
 	                if (response instanceof Error) {
@@ -6189,6 +6245,16 @@ var StellarSdk =
 	                timeout: SUBMIT_TRANSACTION_TIMEOUT
 	            };
 	        }
+	    }, {
+	        key: "_getURL",
+	        value: function _getURL(prefix) {
+	            var filters = [];
+	            if (_config.Config.isURLPrefix() === true) {
+	                filters = _config.Config.getURLPrefixedPath(prefix);
+	            }
+
+	            return URI(this.serverURL).segment(filters).toString();
+	        }
 	    }]);
 
 	    return Server;
@@ -6203,7 +6269,7 @@ var StellarSdk =
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
-	    value: true
+	  value: true
 	});
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
@@ -6217,76 +6283,76 @@ var StellarSdk =
 	var _call_builder = __webpack_require__(121);
 
 	var AccountCallBuilder = (function (_CallBuilder) {
-	    _inherits(AccountCallBuilder, _CallBuilder);
+	  _inherits(AccountCallBuilder, _CallBuilder);
 
-	    /**
-	     * Creates a new {@link AccountCallBuilder} pointed to server defined by serverUrl.
-	     *
-	     * Do not create this object directly, use {@link Server#accounts}.
-	     * @see [All Accounts](https://www.stellar.org/developers/horizon/reference/accounts-all.html)
-	     * @constructor
-	     * @extends CallBuilder
-	     * @param {string} serverUrl Horizon server URL.
-	     */
+	  /**
+	   * Creates a new {@link AccountCallBuilder} pointed to server defined by serverUrl.
+	   *
+	   * Do not create this object directly, use {@link Server#accounts}.
+	   * @see [All Accounts](https://www.stellar.org/developers/horizon/reference/accounts-all.html)
+	   * @constructor
+	   * @extends CallBuilder
+	   * @param {string} serverUrl Horizon server URL.
+	   */
 
-	    function AccountCallBuilder(serverUrl) {
-	        _classCallCheck(this, AccountCallBuilder);
+	  function AccountCallBuilder(serverUrl) {
+	    _classCallCheck(this, AccountCallBuilder);
 
-	        _get(Object.getPrototypeOf(AccountCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	        this.url.segment('accounts');
+	    _get(Object.getPrototypeOf(AccountCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	    this.url.segment('accounts');
+	  }
+
+	  /**
+	   * Returns information and links relating to a single account.
+	   * The balances section in the returned JSON will also list all the trust lines this account has set up.
+	   *
+	   * @see [Account Details](https://www.stellar.org/developers/horizon/reference/accounts-single.html)
+	   * @param {string} id For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
+	   * @returns {AccountCallBuilder}
+	   */
+
+	  _createClass(AccountCallBuilder, [{
+	    key: 'accountId',
+	    value: function accountId(id) {
+	      this.filter.push(['accounts', id]);
+	      return this;
 	    }
+	  }, {
+	    key: 'balances',
+	    value: function balances(accountId) {
+	      this.filter.push(['accounts', accountId, 'balances']);
+	      return this;
+	    }
+	  }, {
+	    key: 'referrals',
+	    value: function referrals(accountId) {
+	      this.filter.push(['accounts', accountId, 'referrals']);
+	      return this;
+	    }
+	  }, {
+	    key: 'signer',
+	    value: function signer(accountId, signerId) {
+	      this.filter.push(['accounts', accountId, 'signers', signerId]);
+	      return this;
+	    }
+	  }, {
+	    key: 'accountSummary',
+	    value: function accountSummary(accountId, since, to) {
+	      this.filter.push(['accounts', accountId, 'summary']);
+	      this.url.addQuery('since', since);
+	      this.url.addQuery('to', to);
+	      return this;
+	    }
+	  }, {
+	    key: 'offer',
+	    value: function offer(accountId, offerId) {
+	      this.filter.push(['accounts', accountId, 'offers']);
+	      this.url.addQuery('offer_id', offerId);
+	      return this;
+	    }
+	  }]);
 
-	    /**
-	     * Returns information and links relating to a single account.
-	     * The balances section in the returned JSON will also list all the trust lines this account has set up.
-	     *
-	     * @see [Account Details](https://www.stellar.org/developers/horizon/reference/accounts-single.html)
-	     * @param {string} id For example: `GDGQVOKHW4VEJRU2TETD6DBRKEO5ERCNF353LW5WBFW3JJWQ2BRQ6KDD`
-	     * @returns {AccountCallBuilder}
-	     */
-
-	    _createClass(AccountCallBuilder, [{
-	        key: 'accountId',
-	        value: function accountId(id) {
-	            this.filter.push(['accounts', id]);
-	            return this;
-	        }
-	    }, {
-	        key: 'balances',
-	        value: function balances(accountId) {
-	            this.filter.push(['accounts', accountId, 'balances']);
-	            return this;
-	        }
-	    }, {
-	        key: 'referrals',
-	        value: function referrals(accountId) {
-	            this.filter.push(['accounts', accountId, 'referrals']);
-	            return this;
-	        }
-	    }, {
-	        key: 'signer',
-	        value: function signer(accountId, signerId) {
-	            this.filter.push(['accounts', accountId, 'signers', signerId]);
-	            return this;
-	        }
-	    }, {
-	        key: 'accountSummary',
-	        value: function accountSummary(accountId, since, to) {
-	            this.filter.push(['accounts', accountId, 'summary']);
-	            this.url.addQuery('since', since);
-	            this.url.addQuery('to', to);
-	            return this;
-	        }
-	    }, {
-	        key: 'offer',
-	        value: function offer(accountId, offerId) {
-	            this.filter.push(['accounts', accountId, 'offers']);
-	            this.url.addQuery('offer_id', offerId);
-	            return this;
-	        }
-	    }]);
-
-	    return AccountCallBuilder;
+	  return AccountCallBuilder;
 	})(_call_builder.CallBuilder);
 
 	exports.AccountCallBuilder = AccountCallBuilder;
@@ -6314,6 +6380,8 @@ var StellarSdk =
 	var _lodashForEach2 = _interopRequireDefault(_lodashForEach);
 
 	var _swarmJsBase = __webpack_require__(130);
+
+	var _config = __webpack_require__(6);
 
 	var URI = __webpack_require__(472);
 	var URITemplate = __webpack_require__(472).URITemplate;
@@ -6352,6 +6420,17 @@ var StellarSdk =
 	      }
 	      if (this.filter.length === 1) {
 	        this.url.segment(this.filter[0]);
+	      }
+	    }
+
+	    /**
+	     * @private
+	     */
+	  }, {
+	    key: "checkPrefix",
+	    value: function checkPrefix() {
+	      if (_config.Config.isURLPrefix === true) {
+	        this.url.segment(_config.Config.getURLPrefix().concat(this.filter[0]));
 	      }
 	    }
 
@@ -6421,6 +6500,7 @@ var StellarSdk =
 	      var createEventSource = function createEventSource() {
 	        try {
 	          var config = _this3._getRequestConfig(URI(_this3.url), keypair);
+	          _this3.checkPrefix();
 	          es = new EventSource(_this3.url.toString(), config);
 	        } catch (err) {
 	          if (options.onerror) {
@@ -6532,6 +6612,10 @@ var StellarSdk =
 
 	      if (url.protocol() === '') {
 	        url = url.protocol(this.url.protocol());
+	      }
+
+	      if (_config.Config.isURLPrefix() === true) {
+	        url.segment(_config.Config.getURLPrefixedPath(url.path()));
 	      }
 
 	      // Temp fix for: https://github.com/stellar/js-stellar-sdk/issues/15

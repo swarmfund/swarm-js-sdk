@@ -1,6 +1,7 @@
 import {NotFoundError, NetworkError, BadRequestError} from "./errors";
 import forEach from 'lodash/forEach';
 import { xdr, Account, hash } from "swarm-js-base";
+import { Config } from "./config";
 
 let URI = require("urijs");
 let URITemplate = require("urijs").URITemplate;
@@ -37,6 +38,15 @@ export class CallBuilder {
   }
 
   /**
+   * @private
+   */
+  checkPrefix() {
+    if (Config.isURLPrefix === true) {
+      this.url.segment(Config.getURLPrefix().concat(this.filter[0]));
+    }
+  }
+
+  /**
    * Triggers a HTTP request using this builder's current configuration.
    * Returns a Promise that resolves to the server's response.
    * @returns {Promise}
@@ -52,8 +62,8 @@ export class CallBuilder {
   callWithSignature(keypair) {
     this.checkFilter();
     var config = this._getRequestConfig(this.url, keypair);
-  return this._sendNormalRequest(this.url, config)
-    .then(r => this._parseResponse(r));
+    return this._sendNormalRequest(this.url, config)
+      .then(r => this._parseResponse(r));
 }
   /**
    * Creates an EventSource that listens for incoming messages from the server. To stop listening for new
@@ -86,6 +96,7 @@ export class CallBuilder {
     var createEventSource = () => {
       try {
         var config = this._getRequestConfig(URI(this.url), keypair);
+        this.checkPrefix();
         es = new EventSource(this.url.toString(), config);
       } catch (err) {
         if (options.onerror) {
@@ -181,7 +192,11 @@ export class CallBuilder {
     if (url.protocol() === '') {
       url = url.protocol(this.url.protocol());
     }
-   
+
+    if (Config.isURLPrefix() === true) {
+      url.segment(Config.getURLPrefixedPath(url.path()));
+    }
+
     // Temp fix for: https://github.com/stellar/js-stellar-sdk/issues/15
     var promise = axios.get(url.toString(), config).then(function (response) {
       return response.data;
