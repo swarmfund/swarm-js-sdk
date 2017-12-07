@@ -47,6 +47,12 @@ export class Server {
      */
     constructor(serverURL, opts = {}) {
         this.serverURL = URI(serverURL);
+        try{
+            Config.setURLPrefix(this.serverURL.path());
+        } catch(err) {
+            console.log(err);
+        }
+        
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
@@ -80,7 +86,6 @@ export class Server {
             console.error("DeprecationWarning: keypair is deprecated");
         }
         let path = "transactions";
-        let endpoint = URI(this.serverURL).path(path).toString();
         let tx = transaction.toEnvelope().toXDR().toString("base64");
         
         let config = {
@@ -90,7 +95,7 @@ export class Server {
             }
         };
         
-        let promise = axios.post(endpoint, { tx }, config)
+        let promise = axios.post(this._getURL(path), { tx }, config)
             .then(response => response.data)
             .catch(response => {
                 if (response instanceof Error) {
@@ -115,7 +120,7 @@ export class Server {
       var path = 'transactions';
 
       let promise = axios.post(
-        URI(this.serverURL).path(path).toString(), tx, config)
+        this._getURL(path), tx, config)
             .then(function(response) {
               return response.data;
             })
@@ -367,7 +372,7 @@ export class Server {
         let endpoint = `/transactions/${txHash}`;
         let config = this._getConfig(endpoint, keypair);
         config.headers['content-type'] = 'application/json';
-        let promise = axios.patch(URI(this.serverURL).path(endpoint).toString(), { state: 3 }, config)
+        let promise = axios.patch(this._getURL(endpoint), { state: 3 }, config)
             .then(response => response.data)
             .catch(response => {
                 if (response instanceof Error) {
@@ -383,7 +388,7 @@ export class Server {
         let endpoint = `/transactions/${txHash}`;
         let config = this._getConfig(endpoint, keypair);
         config.headers['content-type'] = 'application/json';
-        let promise = axios.delete(URI(this.serverURL).path(endpoint).toString(), config)
+        let promise = axios.delete(this._getURL(endpoint), config)
             .then(response => response.data)
             .catch(response => {
                 if (response instanceof Error) {
@@ -440,8 +445,7 @@ export class Server {
     addContact(params, keypair) {
         let prefix = `users/${params.userId}/contacts`;
         let config = this._getConfig("/" + prefix, keypair);
-        let promise = axios.post(
-                URI(this.serverURL).path(prefix).toString(),
+        let promise = axios.post(this._getURL(prefix),
                 querystring.stringify(params), config)
             .then(function(response) {
                 return response.data;
@@ -468,8 +472,7 @@ export class Server {
     updateContact(params, keypair) {
         let prefix = `users/${params.userId}/contacts/${params.account_id}`;
         let config = this._getConfig("/" + prefix, keypair);
-        let promise = axios.patch(
-                URI(this.serverURL).path(prefix).toString(),
+        let promise = axios.patch(this._getURL(prefix),
                 querystring.stringify(params), config)
             .then(function(response) {
                 return response.data;
@@ -494,8 +497,7 @@ export class Server {
     deleteContact(params, keypair) {
         let prefix = `users/${params.userId}/contacts/${params.contactId}`;
         let config = this._getConfig("/" + prefix, keypair);
-        let promise = axios.delete(
-                URI(this.serverURL).path(prefix).toString(), config)
+        let promise = axios.delete(this._getURL(prefix), config)
             .then(function(response) {
                 return response.data;
             })
@@ -514,8 +516,7 @@ export class Server {
       let prefix = `users/${params.account_id}/contacts/requests`;
         let config = this._getConfig("/" + prefix, keypair);
         config.headers["Content-Type"] = "application/json";
-        let promise = axios.post(
-          URI(this.serverURL).path(prefix).toString(), requestData, config)
+        let promise = axios.post(this._getURL(prefix), requestData, config)
           .then(function(response) {
             return response.data;
           })
@@ -534,8 +535,7 @@ export class Server {
       let prefix = `users/${params.account_id}/contacts/requests/${params.request_id}`;
       let config = this._getConfig("/" + prefix, keypair);
       config.headers["Content-Type"] = "application/json";
-      let promise = axios.patch(
-        URI(this.serverURL).path(prefix).toString(), requestData, config)
+      let promise = axios.patch(this._getURL(prefix), requestData, config)
         .then(function(response) {
           return response.data;
         })
@@ -559,7 +559,7 @@ export class Server {
             requestData = querystring.stringify(params);
         }
 
-        let promise = axios.post(URI(this.serverURL).path(prefix).toString(), requestData, config)
+        let promise = axios.post(this._getURL(prefix), requestData, config)
             .then(function(response) {
                 return response.data;
             })
@@ -591,5 +591,13 @@ export class Server {
                     },
             timeout: SUBMIT_TRANSACTION_TIMEOUT,
         };
+    }
+    _getURL(prefix) {
+        let filters = [prefix];
+        if (Config.isURLPrefix() === true) {
+            filters = Config.getURLPrefixedPath(prefix);
+        }
+
+        return URI(this.serverURL).segment(filters).toString();
     }
 }

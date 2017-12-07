@@ -1,7 +1,8 @@
 import clone from 'lodash/clone';
 
 let defaultConfig = {
-  allowHttp: false
+  allowHttp: false,
+  serverURLPrefix: []
 };
 
 let config = clone(defaultConfig);
@@ -46,6 +47,45 @@ class Config {
    */
   static setDefault() {
     config = clone(defaultConfig);
+  }
+
+  /**
+   * Sets `serverURLPrefix` globally. When set StellarSdk.CallBuilder will add this prefix
+   * for each request to Horizon. Example:
+   * `http://horizon.io/some/path` -> `http://horizon.io/my/pref/some/path`
+   * @param {string} value - for example `/my/pref`
+   * @static
+   */
+  static setURLPrefix(value) {
+    config.serverURLPrefix = value.split('/').filter(s => s !=='');
+  }
+
+  /**
+   * Returns the value of `serverURLPrefix`.
+   * @static
+   */
+  static getURLPrefix() {
+    return config.serverURLPrefix;
+  }
+
+  /**
+   * Returns the value of `serverURLPrefix`.
+   * @param {string} value - for example `/my/pref`
+   * @static
+   */
+  static getURLPrefixedPath(value) {
+    let path = value.split('/').filter(s => s !=='');
+    return config.serverURLPrefix.concat(
+      path.filter(item => config.serverURLPrefix.indexOf(item) < 0)
+    );
+  }
+
+  /**
+   * Returns the true if `serverURLPrefix` not empty.
+   * @static
+   */
+  static isURLPrefix() {
+    return config.serverURLPrefix.length > 0;
   }
 }
 
