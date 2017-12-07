@@ -5648,6 +5648,9 @@ var StellarSdk =
 	        this.serverURL = URI(serverURL);
 	        try {
 	            _config.Config.setURLPrefix(this.serverURL.path());
+	            // it is necessary to delete the prefix after saving for the correct signature,
+	            // the prefix will be added before the call
+	            this.serverURL.segment([]);
 	        } catch (err) {
 	            console.log(err);
 	        }
@@ -6248,7 +6251,7 @@ var StellarSdk =
 	    }, {
 	        key: "_getURL",
 	        value: function _getURL(prefix) {
-	            var filters = [];
+	            var filters = [prefix];
 	            if (_config.Config.isURLPrefix() === true) {
 	                filters = _config.Config.getURLPrefixedPath(prefix);
 	            }
