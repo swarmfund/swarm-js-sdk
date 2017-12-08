@@ -9,6 +9,18 @@ export function createNewAccount(testHelper, accountId, accountType, accountPoli
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
 }
 
+export function createBalanceForAsset(testHelper, sourceKP, assetCode) {
+    let opts = {
+        destination: sourceKP.accountId(),
+        balanceId: StellarSdk.Keypair.random().balanceId(),
+        action: StellarSdk.xdr.ManageBalanceAction.manageBalanceCreate(),
+        asset: assetCode,
+    };
+
+    let operation = StellarSdk.Operation.manageBalance(opts);
+    return testHelper.server.submitOperation(operation, sourceKP.accountId(), sourceKP);
+}
+
 function findBalanceByAsset(balances, asset) {
     for (var i = 0; i < balances.length; i++) {
         if (balances[i].asset === asset) {
