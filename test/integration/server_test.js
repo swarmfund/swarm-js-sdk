@@ -13,7 +13,7 @@ describe("Integration test", function () {
 
     StellarSdk.Network.use(new StellarSdk.Network("Test SDF Network ; September 2015"))
     let server = new StellarSdk.Server('http://127.0.0.1:8000', { allowHttp: true });
-    let master = StellarSdk.Keypair.fromSecret("SCIMXOIWIB32R7JI6ISNYSCO2BFST5E6P3TLBM4TTLHH57IK6SJPGZT2");
+    let master = StellarSdk.Keypair.fromSecret("SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH");
 
     let testHelper = {
         master: master,
@@ -45,9 +45,10 @@ describe("Integration test", function () {
         var newAccountKP = StellarSdk.Keypair.random();
         console.log("Creating new account for issuance " + syndicateKP.accountId());
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
-        .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode))
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode))
             .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
             .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
+            .then(() => accountHelper.createBalanceForAsset(testHelper, newAccountKP, assetCode))
             .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP, assetCode))
             .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount))
             .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP, assetCode))
@@ -57,4 +58,14 @@ describe("Integration test", function () {
             })
             .catch(err => { done(err) });
     });
+
+    it("Update account from unverified to syndicate", function (done) {
+        var newAccountKP = StellarSdk.Keypair.random();
+        accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0)
+            .then(() => {
+                accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            })
+            .then(() => done())
+            .catch(err => done(err));
+    })
 })
