@@ -26,10 +26,10 @@ function createAsset(testHelper, owner, issuer, assetCode) {
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var id = result.result().results()[0].tr().manageAssetResult().success().requestId().toString();
-            time.Sleep()
             return reviewableRequestHelper.reviewRequest(testHelper, id, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "");
-        }).then(_ => {
-            console.log(assetCode, ' <-- Asset successfully created')
+        }).then(res => {
+            console.log(assetCode, ' <-- Asset successfully created');
+            return res;
         });
 }
 

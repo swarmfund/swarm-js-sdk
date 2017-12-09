@@ -5,7 +5,7 @@ const StellarSdk = require('../../lib/index');
 function loadRequestWithRetry (testHelper, requestID, reviewerKP) {
     return testHelper.server.reviewableRequests().reviewableRequest(requestID).callWithSignature(reviewerKP).catch(err => {
         if (!isUndefined(err.response) && err.response.status === 404) {
-            console.log("received 404 for reviewable request - retring");
+            console.log("received 404 for reviewable request - retrying");
             return new Promise(resolve => setTimeout(resolve, 2000)).then(() => loadRequestWithRetry(testHelper, requestID, reviewerKP));
         }
         throw err;
@@ -25,7 +25,7 @@ function reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason) 
         return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
     }).catch(err => {
         if (!isUndefined(err.response) && err.response.status === 404) {
-            console.log("received 404 - retring");
+            console.log("received 404 - retrying");
             return new Promise(resolve => setTimeout(resolve, 2000)).then(() => reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason));
         }
         throw err;

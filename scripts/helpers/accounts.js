@@ -9,7 +9,11 @@ function createNewAccount(testHelper, account) {
         accountPolicies: account.policies,
     };
     const operation = StellarSdk.Operation.createAccount(opts);
-    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
+    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
+        .then(res => {
+            console.log('Account created: ', account.accountId)
+            return res
+        })
 }
 
 function findBalanceByAsset(balances, asset) {
