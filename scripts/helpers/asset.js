@@ -1,6 +1,8 @@
-import * as reviewableRequestHelper from './review_request_helper'
+var reviewableRequestHelper = require('./review_request')
+const StellarSdk = require('../../lib/index');
 
-export function createAssetCreationRequest(testHelper, owner, issuer, assetCode) {
+
+function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy) {
     let opts = {
         requestID: "0",
         code: assetCode,
@@ -9,19 +11,26 @@ export function createAssetCreationRequest(testHelper, owner, issuer, assetCode)
         description: "Description",
         externalResourceLink: "https://myasset.com",
         maxIssuanceAmount: "100000000",
-        policies: StellarSdk.xdr.AssetPolicy.assetTransferable().value,
+        policies: policy,
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-
-export function createAsset(testHelper, owner, issuer, assetCode) {
-    return createAssetCreationRequest(testHelper, owner, issuer, assetCode)
+function createAsset(testHelper, owner, issuer, assetCode, policy) {
+    return createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var id = result.result().results()[0].tr().manageAssetResult().success().requestId().toString();
             return reviewableRequestHelper.reviewRequest(testHelper, id, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "");
+        }).then(res => {
+            console.log(assetCode, ' <-- Asset successfully created');
+            return res;
         });
+}
+
+module.exports = {
+    createAssetCreationRequest,
+    createAsset
 }
