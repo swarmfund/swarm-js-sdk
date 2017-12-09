@@ -1,19 +1,29 @@
 const StellarSdk = require('../../lib/index');
 
-
-function createNewAccount(testHelper, account) {
+function createNewAccount(testHelper, accountId, accountType, accountPolicies = undefined) {
     const opts = {
-        destination: account.accountId,
-        accountType: account.accountType,
+        destination: accountId,
+        accountType: accountType,
         source: testHelper.master.accountId(),
-        accountPolicies: account.policies,
+        accountPolicies: accountPolicies,
     };
     const operation = StellarSdk.Operation.createAccount(opts);
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
         .then(res => {
-            console.log('Account created: ', account.accountId)
+            console.log('Account created: ', accountId)
             return res
         })
+}
+function createBalanceForAsset(testHelper, sourceKP, assetCode) {
+  let opts = {
+    destination: sourceKP.accountId(),
+    balanceId: StellarSdk.Keypair.random().balanceId(),
+    action: StellarSdk.xdr.ManageBalanceAction.create(),
+    asset: assetCode,
+  };
+
+  let operation = StellarSdk.Operation.manageBalance(opts);
+  return testHelper.server.submitOperation(operation, sourceKP.accountId(), sourceKP);
 }
 
 function findBalanceByAsset(balances, asset) {
@@ -39,5 +49,7 @@ function loadBalanceIDForAsset(testHelper, accountId, asset) {
 
 module.exports = {
   createNewAccount,
+  createBalanceForAsset,
+  loadBalanceForAsset,
   loadBalanceIDForAsset
 }

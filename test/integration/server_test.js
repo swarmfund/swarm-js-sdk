@@ -1,9 +1,8 @@
-import * as feesHelper from './fees_helper'
-import * as reviewableRequestHelper from './review_request_helper'
-import * as issuanceHelper from './issuance_helper'
-import * as assetHelper from './asset_helper'
-import * as accountHelper from './accounts_helper'
-
+import * as feesHelper from '../../scripts/helpers/fees'
+import * as reviewableRequestHelper from '../../scripts/helpers/review_request'
+import * as issuanceHelper from '../../scripts/helpers/issuance'
+import * as assetHelper from '../../scripts/helpers/asset'
+import * as accountHelper from '../../scripts/helpers/accounts'
 
 describe("Integration test", function () {
     // We need to wait for a ledger to close
@@ -12,7 +11,7 @@ describe("Integration test", function () {
     this.slow(TIMEOUT / 2);
 
     StellarSdk.Network.use(new StellarSdk.Network("Test SDF Network ; September 2015"))
-    let server = new StellarSdk.Server('http://127.0.0.1:8000', { allowHttp: true });
+    let server = new StellarSdk.Server('http://18.195.18.3:8000', { allowHttp: true });
     let master = StellarSdk.Keypair.fromSecret("SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH");
 
     let testHelper = {
@@ -40,18 +39,19 @@ describe("Integration test", function () {
 
     it("Create asset and perform issuance", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
+        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value
         var preIssuedAmount = "10000.0000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
         console.log("Creating new account for issuance " + syndicateKP.accountId());
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
-            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode))
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
             .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
             .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => accountHelper.createBalanceForAsset(testHelper, newAccountKP, assetCode))
-            .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP, assetCode))
+            .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
             .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount))
-            .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP, assetCode))
+            .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
             .then(balance => {
                 expect(balance.balance).to.be.equal(preIssuedAmount);
                 done();

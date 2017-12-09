@@ -1,6 +1,6 @@
 const asset = require('./asset')
 const accounts = require('./accounts')
-const issuance = require('./issuance')
+const fees = require('./fees')
 
 function errorHandler(error) {
     console.info('Operation failed', error);
@@ -18,9 +18,10 @@ function errorHandler(error) {
 
 module.exports = {
     createAccount: accounts.createNewAccount,
-    loadBalanceIDForAsset: accounts.loadBalanceIDForAsset,
     createAsset: asset.createAsset,
     issue: issuance.issue,
+    setFees: fees.setFees,
+    loadBalanceIDForAsset: accounts.loadBalanceIDForAsset,
     performPreIssuance: issuance.performPreIssuance,
     errorHandler: errorHandler
 }

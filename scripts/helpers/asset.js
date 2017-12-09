@@ -2,7 +2,7 @@ var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
 
-function createAssetCreationRequest(testHelper, owner, issuer, assetCode) {
+function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy) {
     let opts = {
         requestID: "0",
         code: assetCode,
@@ -11,18 +11,15 @@ function createAssetCreationRequest(testHelper, owner, issuer, assetCode) {
         description: "Description",
         externalResourceLink: "https://myasset.com",
         maxIssuanceAmount: "100000000",
-        policies: 3,
-        // policies: StellarSdk.xdr.AssetPolicy.assetTransferable().value +
-        // StellarSdk.xdr.AssetPolicy.baseAsset().value,
+        policies: policy,
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-
-function createAsset(testHelper, owner, issuer, assetCode) {
-    return createAssetCreationRequest(testHelper, owner, issuer, assetCode)
+function createAsset(testHelper, owner, issuer, assetCode, policy) {
+    return createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var id = result.result().results()[0].tr().manageAssetResult().success().requestId().toString();

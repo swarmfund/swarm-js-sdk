@@ -22,7 +22,9 @@ function performPreIssuance(testHelper, assetOwnerKP, preIssuanceKP, assetCode, 
         .then(res => {
             console.log('PerformedPreIssuance: ', amount, assetCode)
             return res
-        })
+        }).catch(err => {
+            console.log(err.response.data.extras)
+        });
 }
 
 function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
@@ -42,8 +44,6 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
 }
 
 module.exports = {
-    loadRequestWithRetry,
-    reviewRequest,
     createPreIssuanceRequest,
     performPreIssuance,
     issue

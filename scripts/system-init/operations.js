@@ -23,15 +23,19 @@ const accounts = [
     },
 ]
 
+
 const tokensForIssuance = [
     {code: 'SUN', amount: '100000', emit: '1500'},
     {code: 'USD', amount: '100000', emit: '1500'},
 ]
 
+const baseAssetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value +
+  StellarSdk.xdr.AssetPolicy.baseAsset().value
+
 module.exports = {
     createAssets: () => {
         return tokensForIssuance.map(asset =>
-             helpers.createAsset(config, config.master, config.master.accountId(), asset.code)
+             helpers.createAsset(config, config.master, config.master.accountId(), asset.code, baseAssetPolicy)
             )
     },
     preEmitCoins: () => {
@@ -40,8 +44,9 @@ module.exports = {
         )
     },
     createAccount: () => { 
-        return accounts.map(a => helpers.createAccount(config, a))
+        return accounts.map(a => helpers.createAccount(config, a.accountId, a.accountType, a.policy))
     },
+
     issueTokens: () => {
         return accounts.map(a => {
             return tokensForIssuance.map(asset => {
