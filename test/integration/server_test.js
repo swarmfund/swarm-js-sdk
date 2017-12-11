@@ -11,8 +11,8 @@ describe("Integration test", function () {
     this.slow(TIMEOUT / 2);
 
     StellarSdk.Network.use(new StellarSdk.Network("Test SDF Network ; September 2015"))
-    let server = new StellarSdk.Server('http://18.195.18.3:8000', { allowHttp: true });
-    let master = StellarSdk.Keypair.fromSecret("SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH");
+    let server = new StellarSdk.Server('http://localhost:8000', { allowHttp: true });
+    let master = StellarSdk.Keypair.fromSecret("SDIKYNARUTHPXIWETHQI2GV7D4NH2HU7YMY4SVKDMD37BLJK2I7QXDOS");
 
     let testHelper = {
         master: master,
@@ -43,9 +43,10 @@ describe("Integration test", function () {
         var preIssuedAmount = "10000.0000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
+        var logoId = 'sfskdfhi3wihsef8i.png';
         console.log("Creating new account for issuance " + syndicateKP.accountId());
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
-            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy, logoId))
             .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
             .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => accountHelper.createBalanceForAsset(testHelper, newAccountKP, assetCode))
