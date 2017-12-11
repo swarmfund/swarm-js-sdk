@@ -9,7 +9,7 @@
         "preversion": "gulp test",
         "version": "gulp build",
         "postversion": "git push && git push --tags",
-        "system-init":"node ./scripts/system-init/main.js"
+        "system-init": "node ./scripts/system-init/main.js"
     },
     "keywords": [
         "stellar"
@@ -80,7 +80,7 @@
         "eventsource": "^0.2.1",
         "jsdoc": "^3.4.1",
         "lodash": "^4.0.1",
-        "swarm-js-base": "git+ssh://git@gitlab.com:swarmfund/js-base.git#30fcf674faed2fe353a3e7295033e7c680585cfe",
+        "swarm-js-base": "git+ssh://git@gitlab.com/swarmfund/js-base.git#2178407b203552986c46ca38d12875bec0042e5b",
         "toml": "^2.3.0",
         "urijs": "^1.16.0"
     }
