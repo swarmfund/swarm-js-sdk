@@ -3,6 +3,7 @@ import * as reviewableRequestHelper from '../../scripts/helpers/review_request'
 import * as issuanceHelper from '../../scripts/helpers/issuance'
 import * as assetHelper from '../../scripts/helpers/asset'
 import * as accountHelper from '../../scripts/helpers/accounts'
+import * as withdrawHelper from '../../scripts/helpers/withdraw'
 
 describe("Integration test", function () {
     // We need to wait for a ledger to close
@@ -11,7 +12,7 @@ describe("Integration test", function () {
     this.slow(TIMEOUT / 2);
 
     StellarSdk.Network.use(new StellarSdk.Network("Test SDF Network ; September 2015"))
-    let server = new StellarSdk.Server('http://18.195.18.3:8000', { allowHttp: true });
+    let server = new StellarSdk.Server('http://127.0.0.1:8000', { allowHttp: true });
     let master = StellarSdk.Keypair.fromSecret("SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH");
 
     let testHelper = {
@@ -39,7 +40,7 @@ describe("Integration test", function () {
 
     it("Create asset and perform issuance", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
-        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value
+        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value |  StellarSdk.xdr.AssetPolicy.withdrawable().value;
         var preIssuedAmount = "10000.0000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
@@ -47,15 +48,30 @@ describe("Integration test", function () {
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
             .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
-            .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
+            .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
             .then(() => accountHelper.createBalanceForAsset(testHelper, newAccountKP, assetCode))
             .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
             .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount))
             .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
             .then(balance => {
                 expect(balance.balance).to.be.equal(preIssuedAmount);
-                done();
+                
             })
+            // withdraw all the assets available with auto conversion to BTC
+            .then(() => {
+                let autoConversionAsset = "BTC" + Math.floor(Math.random() * 1000);
+                return assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), autoConversionAsset, 0)
+                .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
+                .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
+                .then(balanceID => {
+                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, "Random external details", autoConversionAsset)
+                })
+                .then(requestID => {
+                    return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value, 
+                    "", "Updated external details")
+                })
+            }) 
+            .then(() => done())
             .catch(err => { done(err) });
     });
 

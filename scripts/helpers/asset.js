@@ -12,6 +12,7 @@ function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy
         externalResourceLink: "https://myasset.com",
         maxIssuanceAmount: "100000000",
         policies: policy,
+        logoId: "logoID"
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
@@ -30,7 +31,21 @@ function createAsset(testHelper, owner, issuer, assetCode, policy) {
         });
 }
 
+function createAssetPair(testHelper, baseAsset, quoteAsset) {
+    let operation = StellarSdk.Operation.manageAssetPair({
+        action: StellarSdk.xdr.ManageAssetPairAction.create(),
+        base: baseAsset,
+        quote: quoteAsset,
+        policies: 0,
+        physicalPriceCorrection: "0",
+        maxPriceStep: "0",
+        physicalPrice: "1",
+    });
+    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
+}
+
 module.exports = {
     createAssetCreationRequest,
-    createAsset
+    createAsset,
+    createAssetPair
 }
