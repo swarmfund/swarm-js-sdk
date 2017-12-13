@@ -10,6 +10,7 @@ const passphrases = {
 }
 
 const urls = {
+    swarmLocal: 'http://127.0.0.1:8000',
     swarmDev: 'http://18.195.18.3:8000',
     swarmStaging: 'https://staging.api.sun.swarm.fund'
 }
