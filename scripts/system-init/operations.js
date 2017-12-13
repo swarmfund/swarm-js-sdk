@@ -23,26 +23,41 @@ const accounts = [
     },
 ]
 
-
-const tokensForIssuance = [
-    {code: 'SUN', amount: '100000', emit: '1500'},
-    {code: 'USD', amount: '100000', emit: '1500'},
-]
-
 const baseAssetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value +
   StellarSdk.xdr.AssetPolicy.baseAsset().value
+
+const tokensForIssuance = [
+    {code: 'SUN', policy: baseAssetPolicy, maxAmount: "100000000", amount: '100000', emit: '1500' },
+    {code: 'USD', policy: baseAssetPolicy, maxAmount: "0"  },
+    {code: 'BTC', policy: 0, maxAmount: "0" },
+    {code: 'ETH', policy: 0, maxAmount: "0" },
+]
+
+const assetPairs = [
+    { base: 'BTC', quote: 'SUN', policy: 0 },
+    { base: 'ETH', quote: 'SUN', policy: 0 },
+]
 
 module.exports = {
     createAssets: () => {
         return tokensForIssuance.map(asset =>
-             helpers.createAsset(config, config.master, config.master.accountId(), asset.code, baseAssetPolicy)
+             helpers.createAsset(config, config.master, config.master.accountId(), asset.code, asset.policy, asset.maxAmount)
             )
     },
-    preEmitCoins: () => {
-        return tokensForIssuance.map(asset =>
-            helpers.performPreIssuance(config, config.master, config.master, asset.code, asset.amount)
-        )
+
+    createAssetPairs: () => {
+        return assetPairs.map(pair => helpers.createAssetPair(config, pair.base, pair.quote))
     },
+
+    preEmitCoins: () => {
+        return tokensForIssuance.map(asset => {
+            if (asset.maxAmount === "0") {
+                return Promise.resolve()
+            }
+            return helpers.performPreIssuance(config, config.master, config.master, asset.code, asset.amount)
+        })
+    },
+
     createAccount: () => { 
         return accounts.map(a => helpers.createAccount(config, a.accountId, a.accountType, a.policy))
     },
@@ -50,6 +65,9 @@ module.exports = {
     issueTokens: () => {
         return accounts.map(a => {
             return tokensForIssuance.map(asset => {
+                if (asset.maxAmount === "0") {
+                    return Promise.resolve()
+                }
                 return helpers.loadBalanceIDForAsset(config, a.accountId, asset.code)
                     .then(bId => helpers.issue(config, config.master, bId, asset.code, asset.emit))
             })

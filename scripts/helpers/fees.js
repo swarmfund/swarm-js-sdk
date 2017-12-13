@@ -22,6 +22,7 @@ function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset) {
             return testHelper.server.submitTransaction(tx);
         });
 }
+
 module.exports = {
   setFees
 }
