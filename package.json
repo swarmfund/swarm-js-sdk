@@ -9,7 +9,7 @@
         "preversion": "gulp test",
         "version": "gulp build",
         "postversion": "git push && git push --tags",
-        "system-init":"node ./scripts/system-init/main.js"
+        "system-init": "node ./scripts/system-init/main.js"
     },
     "keywords": [
         "stellar"
