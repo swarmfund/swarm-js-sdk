@@ -97,24 +97,23 @@ export class Server {
                 'content-type': 'application/json',
             }
         };
-        
+
+        const repeatDetails = {
+            config: config,
+            tx: tx
+        };
+
         let promise = axios.post(this._getURL(path), { tx }, config)
             .then(response => response.data)
-            .catch(response => {
-                if (response instanceof Error) {
-                    const details = response.response;
-                    if (details.status === 403 && details.request.response.indexOf('Two factor verification') !== -1) {
-                        response.tfaData = {
-                          config: config,
-                          tx: response.config.data,
-                          token: details.data.extras.token
-                        };
-                        return Promise.reject(response);
+            .catch(error => {
+                if (error instanceof Error) {
+                    const details = error.response;
+                    if (details.status === 403) {
+                        error.repeatDetails = repeatDetails;
                     }
-                    return Promise.reject(response);
-                } else {
-                    return Promise.reject(response.data);
+                    return Promise.reject(error);
                 }
+                return Promise.reject(error.data);
             });
         return toBluebird(promise);
     }
@@ -123,7 +122,7 @@ export class Server {
       var path = 'transactions';
 
       let promise = axios.post(
-        this._getURL(path), tx, config)
+        this._getURL(path), { tx }, config)
             .then(function(response) {
               return response.data;
             })
