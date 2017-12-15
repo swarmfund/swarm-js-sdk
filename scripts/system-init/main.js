@@ -1,10 +1,13 @@
 const helpers = require('./../helpers');
 const operations = require('./operations');
 
-
+// Promise.resolve()
 Promise.all(operations.createAssets())
     .then(_ => {
         console.log('Assets created')
+        return Promise.all(operations.createAssetPairs())
+    }).then(_ => {
+        console.log('Asset pairs created')
         return Promise.all(operations.preEmitCoins())
     }).then(_ => {
         console.log('Coins pre-emitted')

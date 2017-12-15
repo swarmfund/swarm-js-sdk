@@ -21,6 +21,7 @@ function errorHandler(error) {
 module.exports = {
     createAccount: accounts.createNewAccount,
     createAsset: asset.createAsset,
+    createAssetPair: asset.createAssetPair,
     issue: issuance.issue,
     setFees: fees.setFees,
     loadBalanceIDForAsset: accounts.loadBalanceIDForAsset,

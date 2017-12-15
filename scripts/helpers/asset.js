@@ -2,7 +2,8 @@ var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
 
-function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy) {
+function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy=0, maxIssuanceAmount="100000000") {
+    console.log(assetCode,maxIssuanceAmount)
     let opts = {
         requestID: "0",
         code: assetCode,
@@ -10,20 +11,24 @@ function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy
         preissuedAssetSigner: issuer,
         description: "Description",
         externalResourceLink: "https://myasset.com",
-        maxIssuanceAmount: "100000000",
+        maxIssuanceAmount: maxIssuanceAmount,
         policies: policy,
-        logoId: "logoID"
+        logoId: assetCode + " Logo"
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-function createAsset(testHelper, owner, issuer, assetCode, policy) {
-    return createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy)
+function createAsset(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount) {
+    return createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
-            var id = result.result().results()[0].tr().manageAssetResult().success().requestId().toString();
+            var success = result.result().results()[0].tr().manageAssetResult().success()
+            if (success.fulfilled() === true) {
+                return 'Asset created'
+            }
+            var id = success.requestId().toString();
             return reviewableRequestHelper.reviewRequest(testHelper, id, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "");
         }).then(res => {
             console.log(assetCode, ' <-- Asset successfully created');
