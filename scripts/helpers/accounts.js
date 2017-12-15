@@ -17,7 +17,6 @@ function createNewAccount(testHelper, accountId, accountType, accountPolicies = 
 function createBalanceForAsset(testHelper, sourceKP, assetCode) {
   let opts = {
     destination: sourceKP.accountId(),
-    balanceId: StellarSdk.Keypair.random().balanceId(),
     action: StellarSdk.xdr.ManageBalanceAction.create(),
     asset: assetCode,
   };
