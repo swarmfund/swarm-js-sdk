@@ -5,6 +5,7 @@ function withdraw(testHelper, source, balance, amount, externalDetails, destAsse
     const opts = {
         balance: balance,
         amount: amount,
+        universalAmount: "0",
         fee: {
             fixed: "0",
             percent: "0"
