@@ -19,6 +19,7 @@ function errorHandler(error) {
 }
 
 module.exports = {
+    addSuperAdmin: accounts.addSuperAdmin,
     createAccount: accounts.createNewAccount,
     createAsset: asset.createAsset,
     createAssetPair: asset.createAssetPair,

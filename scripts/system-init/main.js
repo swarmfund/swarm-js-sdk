@@ -17,4 +17,7 @@ Promise.all(operations.createAssets())
         return Promise.all(operations.issueTokens())
     }).then(_ => {
         console.log('Tokens Issued')
+        return Promise.all(operations.addAdmins())
+    }).then(_ => {
+        console.log('Admins added')
     }).catch(helpers.errorHandler);

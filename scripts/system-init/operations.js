@@ -72,6 +72,8 @@ module.exports = {
                     .then(bId => helpers.issue(config, config.master, bId, asset.code, asset.emit))
             })
         })
-    }
+    },
+
+    addAdmins: () => config.admins.map((a, i) => helpers.addSuperAdmin(config.master.accountId(), config.master, a, i))
 }
 
