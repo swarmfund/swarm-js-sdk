@@ -17,6 +17,7 @@ import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
 import { ContactsCallBuilder } from "./contacts_call_builder";
 import { ContactRequestCallBuilder } from './contact_request_call_builder';
 import { AssetCallBuilder } from "./asset_call_builder";
+import { AssetPairCallBuilder } from "./asset_pair_call_builder";
 import { BalanceCallBuilder } from "./balance_call_builder";
 import { ExchangeCallBuilder } from "./exchange_call_builder";
 import { TrustCallBuilder } from "./trust_call_builder";
@@ -49,13 +50,13 @@ export class Server {
         this.serverURL = URI(serverURL);
         try{
             Config.setURLPrefix(this.serverURL.path());
-            // it is necessary to delete the prefix after saving for the correct signature, 
+            // it is necessary to delete the prefix after saving for the correct signature,
             // the prefix will be added before the call
             this.serverURL.segment([]);
         } catch(err) {
             console.log(err);
         }
-        
+
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
@@ -90,7 +91,7 @@ export class Server {
         }
         let path = "transactions";
         let tx = transaction.toEnvelope().toXDR().toString("base64");
-        
+
         let config = {
             timeout: SUBMIT_TRANSACTION_TIMEOUT,
             headers: {
@@ -216,6 +217,10 @@ export class Server {
         return new AssetCallBuilder(URI(this.serverURL));
     }
 
+    assetPairs () {
+        return new AssetPairCallBuilder(URI(this.serverURL));
+    }
+
     balances() {
         return new BalanceCallBuilder(URI(this.serverURL));
     }
@@ -243,7 +248,7 @@ export class Server {
     trades() {
         return new TradeCallBuilder(URI(this.serverURL));
     }
-    
+
     prices() {
         return new PriceCallBuilder(URI(this.serverURL));
     }
@@ -358,7 +363,7 @@ export class Server {
                 return new AccountResponse(res);
             });
     }
-    
+
     /* User POST Requests to the Horizon */
     // TODO: Add JsDoc
     approveRegistration(userData, transaction, keypair) {
@@ -425,7 +430,7 @@ export class Server {
         let prefix = `users/${params.accountId}/documents/${params.type}`;
         return this._sendUserPostRequest(params, prefix, keypair);
     }
-    
+
     deleteWallet(username, keypair) {
         let prefix = "users/unverified/delete";
         return this._sendUserPostRequest({ username: username }, prefix, keypair);
@@ -461,7 +466,7 @@ export class Server {
             });
         return toBluebird(promise);
     }
-    
+
     /**
      * Store user verification document
      * @param {object} params
