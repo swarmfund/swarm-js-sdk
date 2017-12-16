@@ -33,15 +33,15 @@ const passphrases = {
 const urls = {
     swarmLocal: 'http://127.0.0.1:8000',
     dev: 'http://18.195.18.3:8000',
-    staging: 'https://staging.api.sun.swarm.fund'
+    staging: 'http://staging.api.sun.swarm.fund'
 }
 
-const env = 'dev'
-// const env = 'staging'
+// const env = 'dev'
+const env = 'staging'
 
 const config = {
     url: urls[env],
-    networkPassphrase: passphrases[[env]],
+    networkPassphrase: passphrases[env],
     master: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
     issuance: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
 }
