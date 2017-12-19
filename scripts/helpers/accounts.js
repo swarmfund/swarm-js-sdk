@@ -14,6 +14,7 @@ function createNewAccount(testHelper, accountId, accountType, accountPolicies = 
             return res
         })
 }
+
 function createBalanceForAsset(testHelper, sourceKP, assetCode) {
   let opts = {
     destination: sourceKP.accountId(),
@@ -49,9 +50,30 @@ function loadBalanceIDForAsset(testHelper, accountId, asset) {
     })
 }
 
+
+function addSuperAdmin(sourceAccId, keypair, accId, i=0) {
+    console.log("Add SuperAdmin: ", accId, i)
+    var source = new StellarSdk.Account(sourceAccId)
+    var tx = new StellarSdk.TransactionBuilder(source)
+        .addOperation(StellarSdk.Operation.setOptions({
+            signer: {
+                pubKey: accId,
+                weight: 228,
+                signerType: 2147483647,
+                identity: 10 + i,
+                name: 'Admin ' + i,
+            }
+        }))
+        .build();
+
+    tx.sign(keypair);
+    return config.server.submitTransaction(tx)
+}
+
 module.exports = {
   createNewAccount,
   createBalanceForAsset,
   loadBalanceForAsset,
-  loadBalanceIDForAsset
+  loadBalanceIDForAsset,
+  addSuperAdmin
 }

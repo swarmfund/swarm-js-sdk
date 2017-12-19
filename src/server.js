@@ -17,6 +17,7 @@ import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
 import { ContactsCallBuilder } from "./contacts_call_builder";
 import { ContactRequestCallBuilder } from './contact_request_call_builder';
 import { AssetCallBuilder } from "./asset_call_builder";
+import { AssetPairCallBuilder } from "./asset_pair_call_builder";
 import { BalanceCallBuilder } from "./balance_call_builder";
 import { ExchangeCallBuilder } from "./exchange_call_builder";
 import { TrustCallBuilder } from "./trust_call_builder";
@@ -49,13 +50,13 @@ export class Server {
         this.serverURL = URI(serverURL);
         try{
             Config.setURLPrefix(this.serverURL.path());
-            // it is necessary to delete the prefix after saving for the correct signature, 
+            // it is necessary to delete the prefix after saving for the correct signature,
             // the prefix will be added before the call
             this.serverURL.segment([]);
         } catch(err) {
             console.log(err);
         }
-        
+
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
@@ -90,31 +91,30 @@ export class Server {
         }
         let path = "transactions";
         let tx = transaction.toEnvelope().toXDR().toString("base64");
-        
+
         let config = {
             timeout: SUBMIT_TRANSACTION_TIMEOUT,
             headers: {
                 'content-type': 'application/json',
             }
         };
-        
+
+        const repeatDetails = {
+            config: config,
+            tx: tx
+        };
+
         let promise = axios.post(this._getURL(path), { tx }, config)
             .then(response => response.data)
-            .catch(response => {
-                if (response instanceof Error) {
-                    const details = response.response;
-                    if (details.status === 403 && details.request.response.indexOf('Two factor verification') !== -1) {
-                        response.tfaData = {
-                          config: config,
-                          tx: response.config.data,
-                          token: details.data.extras.token
-                        };
-                        return Promise.reject(response);
+            .catch(error => {
+                if (error instanceof Error) {
+                    const details = error.response;
+                    if (details.status === 403) {
+                        error.repeatDetails = repeatDetails;
                     }
-                    return Promise.reject(response);
-                } else {
-                    return Promise.reject(response.data);
+                    return Promise.reject(error);
                 }
+                return Promise.reject(error.data);
             });
         return toBluebird(promise);
     }
@@ -123,7 +123,7 @@ export class Server {
       var path = 'transactions';
 
       let promise = axios.post(
-        this._getURL(path), tx, config)
+        this._getURL(path), { tx }, config)
             .then(function(response) {
               return response.data;
             })
@@ -217,6 +217,10 @@ export class Server {
         return new AssetCallBuilder(URI(this.serverURL));
     }
 
+    assetPairs () {
+        return new AssetPairCallBuilder(URI(this.serverURL));
+    }
+
     balances() {
         return new BalanceCallBuilder(URI(this.serverURL));
     }
@@ -244,7 +248,7 @@ export class Server {
     trades() {
         return new TradeCallBuilder(URI(this.serverURL));
     }
-    
+
     prices() {
         return new PriceCallBuilder(URI(this.serverURL));
     }
@@ -359,7 +363,7 @@ export class Server {
                 return new AccountResponse(res);
             });
     }
-    
+
     /* User POST Requests to the Horizon */
     // TODO: Add JsDoc
     approveRegistration(userData, transaction, keypair) {
@@ -426,7 +430,7 @@ export class Server {
         let prefix = `users/${params.accountId}/documents/${params.type}`;
         return this._sendUserPostRequest(params, prefix, keypair);
     }
-    
+
     deleteWallet(username, keypair) {
         let prefix = "users/unverified/delete";
         return this._sendUserPostRequest({ username: username }, prefix, keypair);
@@ -462,7 +466,7 @@ export class Server {
             });
         return toBluebird(promise);
     }
-    
+
     /**
      * Store user verification document
      * @param {object} params
