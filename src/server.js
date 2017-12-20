@@ -27,6 +27,7 @@ import { OrderBookCallBuilder } from "./order_book_call_builder";
 import { PublicInfoCallBuilder } from "./public_info_call_builder";
 import { TradeCallBuilder } from "./trade_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
+import { WithdrawalCallBuilder } from "./withdrawal_call_builder";
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 
@@ -175,6 +176,14 @@ export class Server {
      */
     reviewableRequests() {
         return new ReviewableRequestCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link WithdrawalCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {WithdrawalCallBuilder}
+     */
+    withdrawals() {
+        return new WithdrawalCallBuilder(URI(this.serverURL));
     }
 
     /**
