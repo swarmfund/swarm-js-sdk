@@ -36,7 +36,7 @@ const tokensForIssuance = [
 const assetPairs = [
     { base: 'BTC', quote: 'SUN', policy: 0, price: "19842" },
     { base: 'ETH', quote: 'SUN', policy: 0, price: "842"},
-    { base: 'SUN', quote: 'USD', policy: 0, price: "42"},
+    { base: 'SUN', quote: 'USD', policy: 0, price: "1"},
 ]
 
 module.exports = {
