@@ -27,12 +27,13 @@ function performPreIssuance(testHelper, assetOwnerKP, preIssuanceKP, assetCode, 
         });
 }
 
-function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
+function issue(testHelper, requestor, receiverBalanceID, asset, amount, externalDetails) {
     const opts = {
         asset: asset,
         amount: amount,
         receiver: receiverBalanceID,
         reference: StellarSdk.Keypair.random().accountId(),
+        externalDetails: externalDetails,
     };
 
     const op = StellarSdk.CreateIssuanceRequestBuilder.createIssuanceRequest(opts);
