@@ -2,7 +2,7 @@
 
 ##### Thresholds
 Each operation has threshold — some "weight" a signer needs to have to submit it.
-For example, Forfeit operation has medium threshold.
+For example, Payment operation has high threshold.
 There are 3 types: low, medium, high.
 Thresholds are used along with another feature — account signers (keys to perform specific operations on behalf of exchange). Each signer has its weight.
 

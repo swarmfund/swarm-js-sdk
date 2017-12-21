@@ -11,7 +11,7 @@
 
 It provides:
 - a networking layer API for Horizon endpoints.
-- facilities for building and signing transactions, for communicating with a Stellar Horizon instance, and for submitting transactions or querying network history.
+- facilities for building and signing transactions, for communicating with the Horizon instance, and for submitting transactions or querying network history.
 
 
 > **Warning!** Node version of `js-base` (`js-sdk` dependency) package is using [`ed25519`](https://www.npmjs.com/package/ed25519) package, a native implementation of [Ed25519](https://ed25519.cr.yp.to/) in Node.js, as an [optional dependency](https://docs.npmjs.com/files/package.json#optionaldependencies). This means that if for any reason installation of this package fails, `js-base` (and `js-sdk`) will fallback to the much slower implementation contained in [`tweetnacl`](https://www.npmjs.com/package/tweetnacl).
@@ -21,13 +21,13 @@ It provides:
 
 ## Quick start
 
-Using npm to include js-stellar-sdk in your own project:
+Using npm to include js-sdk in your own project:
 ```shell
 npm install --save js-sdk
 ```
 
-For browsers, [use Bower to install js-stellar-sdk](#to-use-in-the-browser). It exports a
-variable `StellarSdk`. The example below assumes you have `stellar-sdk.js`
+For browsers, [use Bower to install js-sdk](#to-use-in-the-browser). It exports a
+variable `StellarSdk`. The example below assumes you have `js-sdk.js`
 relative to your html file.
 
 ```html
@@ -51,7 +51,7 @@ relative to your html file.
 
 #### Help! I'm having trouble installing the SDK on Windows
 
-Unfortunately, the Stellar platform development team mostly works on OS X and Linux, and so sometimes bugs creep through that are specific to windows.  When installing stellar-sdk on windows, you might see an error that looks similar to the following:
+Unfortunately, the Stellar platform development team mostly works on OS X and Linux, and so sometimes bugs creep through that are specific to windows.  When installing js-sdk on windows, you might see an error that looks similar to the following:
 
 ```shell
 error MSB8020: The build tools for v120 (Platform Toolset = 'v120 ') cannot be found. To build using the v120 build tools, please install v120 build tools.  Alternatively, you may upgrade to the current Visual Studio tools by selecting the Project menu or right-click the solution, and then selecting "Retarget solution"
