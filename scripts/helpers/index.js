@@ -3,6 +3,7 @@ const accounts = require('./accounts')
 const fees = require('./fees')
 const issuance = require('./issuance')
 const withdraw = require('./withdraw')
+const sale = require('./sale')
 
 function errorHandler(error) {
     console.info('Operation failed', error);
@@ -25,4 +26,5 @@ module.exports = {
     issuance,
     errorHandler,
     createWithdrawRequest: withdraw,
+    sale,
 }

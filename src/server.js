@@ -30,6 +30,7 @@ import { PriceCallBuilder } from "./price_call_builder";
 import { WithdrawalCallBuilder } from "./withdrawal_call_builder";
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
+import isUndefined from 'lodash/isUndefined';
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;
@@ -110,7 +111,7 @@ export class Server {
             .catch(error => {
                 if (error instanceof Error) {
                     const details = error.response;
-                    if (details.status === 403) {
+                    if (!isUndefined(details) && details.status === 403) {
                         error.repeatDetails = repeatDetails;
                     }
                     return Promise.reject(error);
