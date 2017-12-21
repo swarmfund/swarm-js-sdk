@@ -18,13 +18,15 @@ function createNewAccount(testHelper, accountId, accountType, accountPolicies = 
 function createBalanceForAsset(testHelper, sourceKP, assetCode) {
   let opts = {
     destination: sourceKP.accountId(),
-    balanceId: StellarSdk.Keypair.random().balanceId(),
     action: StellarSdk.xdr.ManageBalanceAction.create(),
     asset: assetCode,
   };
-
-  let operation = StellarSdk.Operation.manageBalance(opts);
-  return testHelper.server.submitOperation(operation, sourceKP.accountId(), sourceKP);
+  const operation = StellarSdk.Operation.manageBalance(opts);
+  return testHelper.server.submitOperation(operation, sourceKP.accountId(), sourceKP)
+      .then(res => {
+          console.log('Balance created for ',  sourceKP.accountId())
+          return res
+      })
 }
 
 function findBalanceByAsset(balances, asset) {
