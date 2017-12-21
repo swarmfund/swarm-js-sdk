@@ -31,6 +31,7 @@ import { WithdrawalCallBuilder } from "./withdrawal_call_builder";
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 import isUndefined from 'lodash/isUndefined';
+import {AssetPairCallBuilder} from "./asset_pair_call_builder";
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;
@@ -225,6 +226,10 @@ export class Server {
 
     assets() {
         return new AssetCallBuilder(URI(this.serverURL));
+    }
+
+    assetPairs () {
+        return new AssetPairCallBuilder(URI(this.serverURL));
     }
 
     assetPairs () {
