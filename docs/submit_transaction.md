@@ -1,10 +1,9 @@
----
-title: submitTransaction()
----
+# submitTransaction()
+
 
 ## Overview
 
-You can build a transaction locally (see [this example](../readme.md#building-transactions)), but after you build it you have to submit it to the Stellar network.  js-sdk has a function `submitTransaction()` that sends your transaction to the Horizon server (via the `transactions_create` endpoint) to be broadcast to the Stellar network.
+You can build a transaction locally (see [this example](../readme.md#building-transactions)), but after you build it you have to submit it to the Horizon server.  js-sdk has a function `submitTransaction()` that sends your transaction to the Horizon server (via the `transactions_create` endpoint).
 
 ## Methods
 

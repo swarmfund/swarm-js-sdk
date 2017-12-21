@@ -3,11 +3,16 @@
 The JavaScript SDK facilitates client integration with the `Horizon API server` and submission of  transactions. It has two main uses: [querying Horizon](#querying-horizon) and [building, signing, and submitting transactions to the System network](#building-transactions).
 
 # Table of content
-1. Base Classes:
+1. Basic info:
+    - [Keypair](./base/keypair.md)
+    - [Sign](./base/sign.md)
+    - [Weights](./base/weights.md)
+
+2. Base Classes:
     - [Call Builder](./call_builder.md)
     - [Server](./server.md)
 
-2. CallBuilders
+3. Call Builders
     - [Accounts](./accounts.md)
     - [Ledgers](./ledgers.md)
     - [Operations](./operations.md)
@@ -16,10 +21,11 @@ The JavaScript SDK facilitates client integration with the `Horizon API server` 
     - [Transactions](./transactions.md)
     - [Withdrawal](./withdrawal.md)
 
-5. [Examples](./examples.md)
-    - [Load Account](./load_account.md)
-    - [Submit Transaction](./submit_transaction.md)
-
+4. [Examples](./examples/README.md)
+    - [Creating a payment Transaction](./examples/README.md#creating-a-payment-transaction)
+    - [Loading a payment](./examples/README.md#loading-a-payments)
+    - [Loading an account's transaction history](./examples/README.md#loading-an-accounts-transaction-history)
+    - [Streaming payment events](./examples/README.md#streaming-payment-events)
 
 
 # Querying Horizon

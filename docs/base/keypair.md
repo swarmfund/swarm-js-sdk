@@ -15,21 +15,21 @@ Keys are used to manage account.
 ### Generate keypair
 
 ```javascript
-let keyPair = StellarSdk.Keypair.random();
+let keyPair = JsSdk.Keypair.random();
 let accountID = keyPair.accountId(); // public key of keypair
 let seed = keyPair.seed(); // secret seed of keypair
 ```
 
 ### Restore keypair
 ```javascript
-let keyPair = StellarSdk.Keypair.fromSeed(seed);
+let keyPair = JsSdk.Keypair.fromSeed(seed);
 ```
 
 ### Sign data
 Details described in [`Signing`](./sign.md)
 
 ```javascript
-let keyPair = StellarSdk.Keypair.random();
+let keyPair = JsSdk.Keypair.random();
 let data = 'Hello world';
 let signature = keyPair.sign(data)
 ```
@@ -42,7 +42,7 @@ The difference between [`sign`](#sign-data) and `signDecorated` is that in the `
 - Example:
 
     ```javascript
-        let keyPair = StellarSdk.Keypair.random();
+        let keyPair = JsSdk.Keypair.random();
         let data = 'Hello world';
         let decoratedSignature = keyPair.signDecorated(data)
     ```

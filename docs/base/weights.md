@@ -19,7 +19,7 @@ let opts = {
   highThreshold,
   masterWeight
 };
-let op = StellarSdk.Operation.setOptions(opts);
+let op = JsSdk.Operation.setOptions(opts);
 server.submitOperation(op, sourceID, signerKP);
 ```
 
