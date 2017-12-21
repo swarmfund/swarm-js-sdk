@@ -1,4 +1,4 @@
-const asset = require('./asset')
+const assets = require('./asset')
 const accounts = require('./accounts')
 const fees = require('./fees')
 const issuance = require('./issuance')
@@ -19,14 +19,10 @@ function errorHandler(error) {
 }
 
 module.exports = {
-    addSuperAdmin: accounts.addSuperAdmin,
-    createAccount: accounts.createNewAccount,
-    createAsset: asset.createAsset,
-    createAssetPair: asset.createAssetPair,
-    issue: issuance.issue,
-    setFees: fees.setFees,
-    loadBalanceIDForAsset: accounts.loadBalanceIDForAsset,
-    performPreIssuance: issuance.performPreIssuance,
-    errorHandler: errorHandler,
+    assets,
+    accounts,
+    fees,
+    issuance,
+    errorHandler,
     createWithdrawRequest: withdraw,
 }

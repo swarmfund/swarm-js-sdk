@@ -36,7 +36,7 @@ function createAsset(testHelper, owner, issuer, assetCode, policy, maxIssuanceAm
         });
 }
 
-function createAssetPair(testHelper, baseAsset, quoteAsset) {
+function createAssetPair(testHelper, baseAsset, quoteAsset, physicalPrice = "1") {
     let operation = StellarSdk.Operation.manageAssetPair({
         action: StellarSdk.xdr.ManageAssetPairAction.create(),
         base: baseAsset,
@@ -44,7 +44,7 @@ function createAssetPair(testHelper, baseAsset, quoteAsset) {
         policies: 0,
         physicalPriceCorrection: "0",
         maxPriceStep: "0",
-        physicalPrice: "1",
+        physicalPrice: physicalPrice,
     });
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
 }

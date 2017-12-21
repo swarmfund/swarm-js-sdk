@@ -1,5 +1,6 @@
 const StellarSdk = require('../../lib/index');
 var admins = {
+    local: [],
     dev: [
         'GBTRUMWH23MNME2TR6RBW3KOQPRIXGRDZPI3HVVUF5S32JQ6MM2NC4VF',
         'GDTEA7JYI2TNJF7ZIMCBGGJLGDSH3MOUZK5N4ZTEILQYSP4FS2SC6MYL',
@@ -21,23 +22,26 @@ var admins = {
 }
 
 const masterSeeds = {
+    local: 'SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH',
     dev: 'SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH',
     staging: 'SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH',
 }
 
 const passphrases = {
+    local: 'Test SDF Network ; September 2015',
     dev: 'Test SDF Network ; September 2015',
     staging: 'SUN Staging Network ; December 2017'
 }
 
 const urls = {
-    swarmLocal: 'http://127.0.0.1:8000',
+    local: 'http://127.0.0.1:8000',
     dev: 'http://18.195.18.3:8000',
     staging: 'http://staging.api.sun.swarm.fund'
 }
 
-// const env = 'dev'
-const env = 'staging'
+// const env = 'local'
+const env = 'dev'
+// const env = 'staging'
 
 const config = {
     url: urls[env],
