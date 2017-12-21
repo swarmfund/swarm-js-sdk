@@ -1,33 +1,33 @@
 import { AccountCallBuilder } from "./account_call_builder";
 import { AccountResponse } from "./account_response";
-import { Config } from "./config";
-import { LedgerCallBuilder } from "./ledger_call_builder";
-import { ReviewableRequestCallBuilder } from "./reviewable_request_call_builder";
-import { TransactionCallBuilder } from "./transaction_call_builder";
-import { OperationCallBuilder } from "./operation_call_builder";
-import { PaymentCallBuilder } from "./payment_call_builder";
-import { UserCallBuilder } from "./user_call_builder";
-import { FeeCallBuilder } from "./fee_call_builder";
-import { FeesOverviewCallBuilder } from "./fees_overview_call_builder";
-import { DefaultLimitsCallBuilder } from "./default_limits_call_builder";
-import { DocumentCallBuilder } from "./document_call_builder";
-import { ForfeitRequestCallBuilder } from "./forfeit_request_call_builder";
-import { RecoveryRequestCallBuilder } from "./recovery_request_call_builder";
-import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
-import { ContactsCallBuilder } from "./contacts_call_builder";
-import { ContactRequestCallBuilder } from './contact_request_call_builder';
 import { AssetCallBuilder } from "./asset_call_builder";
 import { AssetPairCallBuilder } from "./asset_pair_call_builder";
 import { BalanceCallBuilder } from "./balance_call_builder";
-import { ExchangeCallBuilder } from "./exchange_call_builder";
-import { TrustCallBuilder } from "./trust_call_builder";
+import { ContactsCallBuilder } from "./contacts_call_builder";
+import { ContactRequestCallBuilder } from './contact_request_call_builder';
+import { DefaultLimitsCallBuilder } from "./default_limits_call_builder";
+import { DocumentCallBuilder } from "./document_call_builder";
+import { FeeCallBuilder } from "./fee_call_builder";
+import { FeesOverviewCallBuilder } from "./fees_overview_call_builder";
+import { ForfeitRequestCallBuilder } from "./forfeit_request_call_builder";
+import { LedgerCallBuilder } from "./ledger_call_builder";
 import { NotificationsCallBuilder } from "./notifications_call_builder";
 import { OfferCallBuilder } from "./offer_call_builder";
+import { OperationCallBuilder } from "./operation_call_builder";
 import { OrderBookCallBuilder } from "./order_book_call_builder";
-import { PublicInfoCallBuilder } from "./public_info_call_builder";
-import { TradeCallBuilder } from "./trade_call_builder";
+import { PaymentCallBuilder } from "./payment_call_builder";
+import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
+import { PublicInfoCallBuilder } from "./public_info_call_builder";
+import { RecoveryRequestCallBuilder } from "./recovery_request_call_builder";
+import { ReviewableRequestCallBuilder } from "./reviewable_request_call_builder";
+import { TradeCallBuilder } from "./trade_call_builder";
+import { TransactionCallBuilder } from "./transaction_call_builder";
+import { UserCallBuilder } from "./user_call_builder";
 import { WithdrawalCallBuilder } from "./withdrawal_call_builder";
+
+import { Config } from "./config";
+
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 import isUndefined from 'lodash/isUndefined';
@@ -71,6 +71,14 @@ export class Server {
         }
     }
 
+    /**
+     * Create {@link Base.Transaction} and submit to the Horizon server.
+     *
+     * @param {Base.Operation} op - The operation to submit.
+     * @param {string} sourceID - The accountID of the transaction initiator (source).
+     * @param {Base.Keypair} signerKP - The keypair of the source account signer.
+     * @return {Promise}
+     */
     submitOperation(op, sourceID, signerKP, multiSigTx = false) {
         let source = new stellarBase.Account(sourceID);
         let tx = new stellarBase.TransactionBuilder(source)
@@ -83,6 +91,12 @@ export class Server {
         return this.submitTransaction(tx);
     }
 
+    /**
+     * Submit transaction to the Horizon server.
+     *
+     * @param {Base.Transaction} transaction - The transaction to submit.
+     * @return {Promise}
+     */
     submitTransaction(transaction, multiSigTx, keypair) {
         // proper call is submitTransactions(tx),
         // backend will handle pending flow auto-magically.
@@ -197,14 +211,6 @@ export class Server {
     }
 
     /**
-     * Returns new {@link PendingTransactionCallBuilder} object configured by a current Horizon server configuration.
-     * and account id
-     * @returns {PendingTransactionCallBuilder}
-     */
-    pendingTransactions(accountId) {
-        return new PendingTransactionCallBuilder(URI(this.serverURL), accountId);
-    }
-    /**
      * Returns new {@link OperationCallBuilder} object configured by a current Horizon server configuration.
      * @returns {OperationCallBuilder}
      */
@@ -212,18 +218,34 @@ export class Server {
         return new OperationCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link ForfeitRequestCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {ForfeitRequestCallBuilder}
+     */
     forfeitRequests() {
         return new ForfeitRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link RecoveryRequestCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {RecoveryRequestCallBuilder}
+     */
     recoveryRequests() {
         return new RecoveryRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link PaymentRequestCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {PaymentRequestCallBuilder}
+     */
     paymentRequests() {
         return new PaymentRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link AssetCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {AssetCallBuilder}
+     */
     assets() {
         return new AssetCallBuilder(URI(this.serverURL));
     }
@@ -232,71 +254,68 @@ export class Server {
         return new AssetPairCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link AssetPairCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {AssetPairCallBuilder}
+     */
     assetPairs () {
         return new AssetPairCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link BalanceCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {BalanceCallBuilder}
+     */
     balances() {
         return new BalanceCallBuilder(URI(this.serverURL));
     }
 
-    exchanges() {
-        return new ExchangeCallBuilder(URI(this.serverURL));
-    }
-
-    trusts() {
-        return new TrustCallBuilder(URI(this.serverURL));
-    }
-
+    /**
+     * Returns new {@link OrderBookCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {OrderBookCallBuilder}
+     */
     orderBooks() {
         return new OrderBookCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link OfferCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {OfferCallBuilder}
+     */
     offers() {
         return new OfferCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link NotificationsCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {NotificationsCallBuilder}
+     */
     notifications () {
         return new NotificationsCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link TradeCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {TradeCallBuilder}
+     */
     trades() {
         return new TradeCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link PriceCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {PriceCallBuilder}
+     */
     prices() {
         return new PriceCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link PublicInfoCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {PublicInfoCallBuilder}
+     */
     publicInfo() {
         return new PublicInfoCallBuilder(URI(this.serverURL));
-    }
-
-    /**
-     * The Stellar Network allows payments to be made between assets through path payments. A path payment specifies a
-     * series of assets to route a payment through, from source asset (the asset debited from the payer) to destination
-     * asset (the asset credited to the payee).
-     *
-     * A path search is specified using:
-     *
-     * * The destination address
-     * * The source address
-     * * The asset and amount that the destination account should receive
-     *
-     * As part of the search, horizon will load a list of assets available to the source address and will find any
-     * payment paths from those source assets to the desired destination asset. The search's amount parameter will be
-     * used to determine if there a given path can satisfy a payment of the desired amount.
-     *
-     * Returns new {@link PathCallBuilder} object configured with the current Horizon server configuration.
-     *
-     * @param {string} source The sender's account ID. Any returned path will use a source that the sender can hold.
-     * @param {string} destination The destination account ID that any returned path should use.
-     * @param {Asset} destinationAsset The destination asset.
-     * @param {string} destinationAmount The amount, denominated in the destination asset, that any returned path should be able to satisfy.
-     * @returns {@link PathCallBuilder}
-     */
-    paths(source, destination, destinationAsset, destinationAmount) {
-        return new PathCallBuilder(URI(this.serverURL), source, destination, destinationAsset, destinationAmount);
     }
 
     /**
@@ -308,28 +327,13 @@ export class Server {
     }
 
     /**
-     * Returns new {@link EffectCallBuilder} object configured with the current Horizon server configuration.
-     * @returns {EffectCallBuilder}
-     */
-    effects() {
-        return new EffectCallBuilder(URI(this.serverURL));
-    }
-
-    /**
-     * Returns new {@link AbxUserCallBuilder} object configured with the current Horizon server configuration.
-     * @returns {AbxUserCallBuilder}
-     */
-    abxUsers() {
-        return new AbxUserCallBuilder(URI(this.serverURL));
-    }
-
-    /**
-     * Returns new {@link RegRequestCallBuilder} object configured with the current Horizon server configuration.
+     * Returns new {@link UserCallBuilder} object configured with the current Horizon server configuration.
      * @returns {UserCallBuilder}
      */
     users() {
         return new UserCallBuilder(URI(this.serverURL));
     }
+
      /**
      * Returns new {@link FeeCallBuilder} object configured with the current Horizon server configuration.
      * @returns {FeeCallBuilder}
@@ -337,6 +341,7 @@ export class Server {
     fees() {
         return new FeeCallBuilder(URI(this.serverURL));
     }
+
      /**
      * Returns new {@link FeesOverviewCallBuilder} object configured with the current Horizon server configuration.
      * @returns {FeesOverviewCallBuilder}
@@ -345,6 +350,10 @@ export class Server {
        return new FeesOverviewCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link DefaultLimitsCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {DefaultLimitsCallBuilder}
+     */
     defaultLimits() {
         return new DefaultLimitsCallBuilder(URI(this.serverURL));
     }
@@ -370,6 +379,13 @@ export class Server {
                 return new AccountResponse(res);
             });
     }
+
+    /**
+     * Fetches an account's most current state in the ledger and then creates and returns an {@link Account} object.
+     * @param {string} accountId - The account to load.
+     * @param {Keypair} keypair - The keypair for signing the request.
+     * @returns {Promise} Returns a promise to the {@link AccountResponse} object with populated sequence number.
+     */
     loadAccountWithSign(accountId, keypair) {
         return this.accounts()
             .accountId(accountId)
