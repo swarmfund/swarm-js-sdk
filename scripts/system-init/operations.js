@@ -60,7 +60,7 @@ module.exports = {
     },
 
     createAccount: () => { 
-        return accounts.map(a => helpers.accounts.createAccount(config, a.accountId, a.accountType, a.policy))
+        return accounts.map(a => helpers.accounts.createNewAccount(config, a.accountId, a.accountType, a.policy))
     },
 
     issueTokens: () => {

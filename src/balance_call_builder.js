@@ -15,11 +15,6 @@ export class BalanceCallBuilder extends CallBuilder {
         this.url.segment('balances');
     }
 
-    forExchange(exchangeId) {
-        this.url.addQuery('exchange', exchangeId);
-        return this;
-    }
-
     forAccount(accountId) {
         this.url.addQuery('account', accountId);
         return this;
