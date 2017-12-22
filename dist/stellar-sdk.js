@@ -5615,20 +5615,22 @@ var StellarSdk =
 
 	var _withdrawal_call_builder = __webpack_require__(568);
 
+	var _sales_call_builder = __webpack_require__(569);
+
 	var _config = __webpack_require__(6);
 
 	var _swarmJsBase = __webpack_require__(130);
 
 	var _swarmJsBase2 = _interopRequireDefault(_swarmJsBase);
 
-	var _lodashIsUndefined = __webpack_require__(569);
+	var _lodashIsUndefined = __webpack_require__(570);
 
 	var _lodashIsUndefined2 = _interopRequireDefault(_lodashIsUndefined);
 
 	var axios = __webpack_require__(479);
 	var toBluebird = __webpack_require__(506).resolve;
 	var URI = __webpack_require__(475);
-	var querystring = __webpack_require__(570);
+	var querystring = __webpack_require__(571);
 
 	var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 
@@ -5803,6 +5805,16 @@ var StellarSdk =
 	        key: "reviewableRequests",
 	        value: function reviewableRequests() {
 	            return new _reviewable_request_call_builder.ReviewableRequestCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
+	         * Returns new {@link SalesCallBuilder} object configured by a current Horizon server configuration.
+	         * @returns {SalesCallBuilder}
+	         */
+	    }, {
+	        key: "sales",
+	        value: function sales() {
+	            return new _sales_call_builder.SalesCallBuilder(URI(this.serverURL));
 	        }
 
 	        /**
@@ -66635,6 +66647,103 @@ var StellarSdk =
 
 /***/ }),
 /* 569 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x2, _x3, _x4) { var _again = true; _function: while (_again) { var object = _x2, property = _x3, receiver = _x4; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x2 = parent; _x3 = property; _x4 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _call_builder = __webpack_require__(121);
+
+	var SalesCallBuilder = (function (_CallBuilder) {
+	  _inherits(SalesCallBuilder, _CallBuilder);
+
+	  /**
+	   * Creates a new {@link SalesCallBuilder} pointed to server defined by serverUrl.
+	   *
+	   * Do not create this object directly, use {@link Server#sales}.
+	   * @constructor
+	   * @extends CallBuilder
+	   * @param {string} serverUrl Horizon server URL.
+	   */
+
+	  function SalesCallBuilder(serverUrl) {
+	    _classCallCheck(this, SalesCallBuilder);
+
+	    _get(Object.getPrototypeOf(SalesCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	    this.url.segment('sales');
+	  }
+
+	  /**
+	   * Provides information on a single sale.
+	   * @param {string} id Sale ID
+	   * @returns {SalesCallBuilder}
+	   */
+
+	  _createClass(SalesCallBuilder, [{
+	    key: 'sale',
+	    value: function sale(id) {
+	      this.filter.push(['sales', id.toString()]);
+	      return this;
+	    }
+
+	    /**
+	     * Filters sales by asset
+	     * @param {string} asset For example: `USD`
+	     * @returns {SalesCallBuilder}
+	     */
+	  }, {
+	    key: 'forAsset',
+	    value: function forAsset(asset) {
+	      this.url.addQuery('asset', asset);
+	      return this;
+	    }
+
+	    /**
+	     * Filters sales by owner
+	     * @param {string} owner For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
+	     * @returns {SalesCallBuilder}
+	     */
+
+	  }, {
+	    key: 'forOwner',
+	    value: function forOwner(owner) {
+	      this.url.addQuery('owner', owner);
+	      return this;
+	    }
+
+	    /**
+	     * Filters sales by open state
+	     * @param {boolean} openOnly
+	     * @return {SalesCallBuilder}
+	     */
+	  }, {
+	    key: 'openOnly',
+	    value: function openOnly() {
+	      var _openOnly = arguments.length <= 0 || arguments[0] === undefined ? true : arguments[0];
+
+	      this.url.addQuery('open_only', _openOnly);
+	      return this;
+	    }
+	  }]);
+
+	  return SalesCallBuilder;
+	})(_call_builder.CallBuilder);
+
+	exports.SalesCallBuilder = SalesCallBuilder;
+
+/***/ }),
+/* 570 */
 /***/ (function(module, exports) {
 
 	/**
@@ -66662,17 +66771,17 @@ var StellarSdk =
 
 
 /***/ }),
-/* 570 */
+/* 571 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.decode = exports.parse = __webpack_require__(571);
-	exports.encode = exports.stringify = __webpack_require__(572);
+	exports.decode = exports.parse = __webpack_require__(572);
+	exports.encode = exports.stringify = __webpack_require__(573);
 
 
 /***/ }),
-/* 571 */
+/* 572 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -66758,7 +66867,7 @@ var StellarSdk =
 
 
 /***/ }),
-/* 572 */
+/* 573 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
