@@ -6,15 +6,18 @@ import * as accountHelper from '../../scripts/helpers/accounts'
 import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 
+let config = require('../../scripts/config');
+
 describe("Integration test", function () {
     // We need to wait for a ledger to close
     const TIMEOUT = 60 * 20000;
     this.timeout(TIMEOUT);
     this.slow(TIMEOUT / 2);
 
-    StellarSdk.Network.use(new StellarSdk.Network("Test SDF Network ; September 2015"))
-    let server = new StellarSdk.Server('http://127.0.0.1:8000', { allowHttp: true });
-    let master = StellarSdk.Keypair.fromSecret("SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH");
+    let env = 'dev';
+    let currentConfig = config.getConfig(env);
+    let server = currentConfig.server;
+    let master = currentConfig.master;
 
     let testHelper = {
         master: master,

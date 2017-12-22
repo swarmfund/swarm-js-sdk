@@ -79,6 +79,7 @@ export class Server {
      * @return {Promise}
      */
     submitOperation(op, sourceID, signerKP, multiSigTx = false) {
+        console.warn('DeprecationWarning: submitOperation is deprecated. Consider using submitOperationGroup instead');
         let source = new stellarBase.Account(sourceID);
         let tx = new stellarBase.TransactionBuilder(source)
           .addOperation(op)
@@ -88,6 +89,23 @@ export class Server {
             return this.submitTransaction(tx, multiSigTx, signerKP);
         }
         return this.submitTransaction(tx);
+    }
+
+    /**
+     * Create {@link Base.Transaction} and submit to the Horizon server.
+     *
+     * @param {Array} operations - The operation to submit.
+     * @param {string} sourceID - The accountID of the transaction initiator (source).
+     * @param {Base.Keypair} signerKP - The keypair of the source account signer.
+     * @return {Promise}
+     */
+    submitOperationGroup (operations, sourceID, signerKP) {
+      const source = new stellarBase.Account(sourceID);
+      const transactionBuilder = new stellarBase.TransactionBuilder(source);
+      operations.forEach(operation => transactionBuilder.addOperation(operation));
+      const transaction = transactionBuilder.build();
+      transaction.sign(signerKP);
+      return this.submitTransaction(transaction);
     }
 
     /**
