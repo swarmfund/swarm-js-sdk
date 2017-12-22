@@ -25,7 +25,7 @@ import { TradeCallBuilder } from "./trade_call_builder";
 import { TransactionCallBuilder } from "./transaction_call_builder";
 import { UserCallBuilder } from "./user_call_builder";
 import { WithdrawalCallBuilder } from "./withdrawal_call_builder";
-
+import { SalesCallBuilder } from "./sales_call_builder";
 import { Config } from "./config";
 
 import { Account, hash, Operation, xdr } from "swarm-js-base";
@@ -191,6 +191,14 @@ export class Server {
      */
     reviewableRequests() {
         return new ReviewableRequestCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link SalesCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {SalesCallBuilder}
+     */
+    sales() {
+        return new SalesCallBuilder(URI(this.serverURL));
     }
 
     /**
