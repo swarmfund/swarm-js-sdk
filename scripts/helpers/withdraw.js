@@ -1,6 +1,6 @@
 const StellarSdk = require('../../lib/index');
 
-function withdraw(testHelper, source, balance, amount, externalDetails, destAsset) {
+function withdraw(testHelper, source, balance, amount, destAsset) {
     // TODO add fees calculations and convert to destAsset
     const opts = {
         balance: balance,
@@ -9,7 +9,7 @@ function withdraw(testHelper, source, balance, amount, externalDetails, destAsse
             fixed: "0",
             percent: "0"
         },
-        externalDetails: externalDetails,
+        externalDetails: "some external details",
         destAsset: destAsset,
         expectedDestAssetAmount: amount
     };

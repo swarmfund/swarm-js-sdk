@@ -53,7 +53,7 @@ describe("Integration test", function () {
             .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
             .then(() => accountHelper.createBalanceForAsset(testHelper, newAccountKP, assetCode))
             .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
-            .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount, externalDetails))
+            .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount))
             .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
             .then(balance => {
                 expect(balance.balance).to.be.equal(preIssuedAmount);
@@ -66,7 +66,7 @@ describe("Integration test", function () {
                 .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
                 .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
                 .then(balanceID => {
-                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, "Random external details", autoConversionAsset)
+                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
                 })
                 .then(requestID => {
                     return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value, 

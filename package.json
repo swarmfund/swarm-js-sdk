@@ -82,7 +82,7 @@
         "eventsource": "^0.2.1",
         "jsdoc": "^3.4.1",
         "lodash": "^4.0.1",
-        "swarm-js-base": "git+ssh://git@gitlab.com:swarmfund/js-base.git#f7f8be5ebfc06e58a9de033e8abe1850827e947b",
+        "swarm-js-base": "git+ssh://git@gitlab.com:swarmfund/js-base.git#1106429236fc7b61eed397c32820a582923ae44a",
         "toml": "^2.3.0",
         "urijs": "^1.16.0"
     }
