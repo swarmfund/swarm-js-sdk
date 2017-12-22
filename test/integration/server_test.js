@@ -48,7 +48,6 @@ describe("Integration test", function () {
         var preIssuedAmount = "10000.0000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
-        let externalDetails = "External details";
         console.log("Creating new account for issuance " + syndicateKP.accountId());
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
