@@ -306,14 +306,6 @@ export class Server {
     }
 
     /**
-     * Returns new {@link PublicInfoCallBuilder} object configured with the current Horizon server configuration.
-     * @returns {PublicInfoCallBuilder}
-     */
-    publicInfo() {
-        return new PublicInfoCallBuilder(URI(this.serverURL));
-    }
-
-    /**
      * Returns new {@link PaymentCallBuilder} object configured with the current Horizon server configuration.
      * @returns {PaymentCallBuilder}
      */
