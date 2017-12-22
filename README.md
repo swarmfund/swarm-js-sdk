@@ -24,35 +24,7 @@ It provides:
   `dev` - branch with features deployed to dev env;
   `staging` - branch with features deployed to staging env;
 
-## Quick start
-
-Using npm to include js-sdk in your own project:
-```shell
-npm install --save js-sdk
-```
-
-For browsers, [use Bower to install js-sdk](#to-use-in-the-browser). It exports a
-variable `StellarSdk`. The example below assumes you have `js-sdk.js`
-relative to your html file.
-
-```html
-<script src="js-sdk.js"></script>
-<script>console.log(JsSdk);</script>
-
-```
-
 ## Install
-
-### To use as a module in a Node.js project
-1. Install it using npm:
-  ```shell
-  npm install --save js-sdk
-  ```
-
-2. require/import it in your JavaScript:
-  ```js
-  var JsSdk = require('js-sdk');
-  ```
 
 #### Help! I'm having trouble installing the SDK on Windows
 
