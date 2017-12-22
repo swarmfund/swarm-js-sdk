@@ -15,8 +15,11 @@ function createPreIssuanceRequest(testHelper, assetOwnerKP, preIssuanceKP, asset
 function performPreIssuance(testHelper, assetOwnerKP, preIssuanceKP, assetCode, amount) {
     return createPreIssuanceRequest(testHelper, assetOwnerKP, preIssuanceKP, assetCode, amount)
         .then(response => {
-            var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
-            var id = result.result().results()[0].tr().createPreIssuanceRequestResult().success().requestId().toString();
+            let result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
+            let fulfilled = result.result().results()[0].tr().createPreIssuanceRequestResult().success().fulfilled();
+            if (fulfilled)
+                return response;
+            let id = result.result().results()[0].tr().createPreIssuanceRequestResult().success().requestId().toString();
             return reviewableRequestHelper.reviewRequest(testHelper, id, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "");
         })
         .then(res => {

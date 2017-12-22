@@ -1,11 +1,12 @@
 {
     "name": "swarm-js-sdk",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "description": "stellar-sdk is a library for working with the Stellar Horizon server.",
     "main": "lib/index.js",
     "scripts": {
         "test": "babel-node ./node_modules/gulp/bin/gulp.js test:node",
         "docs": "./node_modules/.bin/jsdoc ./src/ -d docs/ -r ./docs/readme.md",
+        "md-docs": "sh ./gendocs.sh",
         "preversion": "gulp test",
         "version": "gulp build",
         "postversion": "git push && git push --tags",
@@ -52,6 +53,7 @@
         "gulp-webpack": "^1.3.1",
         "isparta": "^3.1.0",
         "istanbul": "~0.3.2",
+        "jsdoc-to-markdown": "^3.0.3",
         "jshint-stylish": "^1.0.1",
         "karma": "^0.13.2",
         "karma-chai": "^0.1.0",

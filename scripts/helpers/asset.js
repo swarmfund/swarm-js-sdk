@@ -2,7 +2,7 @@ var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
 
-function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy=0, maxIssuanceAmount="100000000") {
+function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy=0, maxIssuanceAmount="100000000", initialPreissuedAmount = "0") {
     console.log(assetCode,maxIssuanceAmount)
     let opts = {
         requestID: "0",
@@ -13,7 +13,8 @@ function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy
         externalResourceLink: "https://myasset.com",
         maxIssuanceAmount: maxIssuanceAmount,
         policies: policy,
-        logoId: assetCode + " Logo"
+        logoId: assetCode + " Logo",
+        initialPreissuedAmount: initialPreissuedAmount,
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
@@ -36,7 +37,7 @@ function createAsset(testHelper, owner, issuer, assetCode, policy, maxIssuanceAm
         });
 }
 
-function createAssetPair(testHelper, baseAsset, quoteAsset) {
+function createAssetPair(testHelper, baseAsset, quoteAsset, physicalPrice = "1") {
     let operation = StellarSdk.Operation.manageAssetPair({
         action: StellarSdk.xdr.ManageAssetPairAction.create(),
         base: baseAsset,
@@ -44,7 +45,7 @@ function createAssetPair(testHelper, baseAsset, quoteAsset) {
         policies: 0,
         physicalPriceCorrection: "0",
         maxPriceStep: "0",
-        physicalPrice: "1",
+        physicalPrice: physicalPrice,
     });
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
 }

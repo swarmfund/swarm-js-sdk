@@ -4,6 +4,7 @@ import * as issuanceHelper from '../../scripts/helpers/issuance'
 import * as assetHelper from '../../scripts/helpers/asset'
 import * as accountHelper from '../../scripts/helpers/accounts'
 import * as withdrawHelper from '../../scripts/helpers/withdraw'
+import * as saleHelper from '../../scripts/helpers/sale'
 
 describe("Integration test", function () {
     // We need to wait for a ledger to close
@@ -84,5 +85,21 @@ describe("Integration test", function () {
             })
             .then(() => done())
             .catch(err => done(err));
-    })
+    });
+
+    it("Create sale for asset", function(done) {
+        var syndicateKP = StellarSdk.Keypair.random();
+        var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
+        var quoteAsset = "USD" + Math.floor(Math.random() * 1000);
+        var startTime = Math.round((new Date()).getTime() / 1000);
+        var maxIssuanceAmount = "500";
+        var price = "4.5";
+        var softCap = "2250";
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+        .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount))
+        .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), quoteAsset, 0))
+        .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60*10 + "", price, softCap, "20000"))
+        .then(() => done())
+        .catch(err => done(err));
+    });
 })
