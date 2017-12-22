@@ -48,6 +48,7 @@ const config = {
     networkPassphrase: passphrases[env],
     master: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
     issuance: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
+    admins: admins[env],
 }
 
 StellarSdk.Network.use(new StellarSdk.Network(config.networkPassphrase))

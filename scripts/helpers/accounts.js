@@ -51,7 +51,7 @@ function loadBalanceIDForAsset(testHelper, accountId, asset) {
 }
 
 
-function addSuperAdmin(sourceAccId, keypair, accId, i=0) {
+function addSuperAdmin(testHelper, sourceAccId, keypair, accId, i=0) {
     console.log("Add SuperAdmin: ", accId, i)
     var source = new StellarSdk.Account(sourceAccId)
     var tx = new StellarSdk.TransactionBuilder(source)
@@ -67,7 +67,7 @@ function addSuperAdmin(sourceAccId, keypair, accId, i=0) {
         .build();
 
     tx.sign(keypair);
-    return config.server.submitTransaction(tx)
+    return testHelper.server.submitTransaction(tx)
 }
 
 module.exports = {

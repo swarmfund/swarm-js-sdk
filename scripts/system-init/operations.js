@@ -75,6 +75,6 @@ module.exports = {
         })
     },
 
-    addAdmins: () => config.admins.map((a, i) => helpers.accounts.addSuperAdmin(config.master.accountId(), config.master, a, i))
+    addAdmins: () => config.admins.map((a, i) => helpers.accounts.addSuperAdmin(config, config.master.accountId(), config.master, a, i))
 }
 
