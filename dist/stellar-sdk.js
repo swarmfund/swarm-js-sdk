@@ -5685,6 +5685,7 @@ var StellarSdk =
 	        value: function submitOperation(op, sourceID, signerKP) {
 	            var multiSigTx = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
 
+	            console.warn('DeprecationWarning: submitOperation is deprecated. Consider using submitOperationGroup instead');
 	            var source = new _swarmJsBase2["default"].Account(sourceID);
 	            var tx = new _swarmJsBase2["default"].TransactionBuilder(source).addOperation(op).build();
 	            tx.sign(signerKP);
@@ -5692,6 +5693,27 @@ var StellarSdk =
 	                return this.submitTransaction(tx, multiSigTx, signerKP);
 	            }
 	            return this.submitTransaction(tx);
+	        }
+
+	        /**
+	         * Create {@link Base.Transaction} and submit to the Horizon server.
+	         *
+	         * @param {Array} operations - The operation to submit.
+	         * @param {string} sourceID - The accountID of the transaction initiator (source).
+	         * @param {Base.Keypair} signerKP - The keypair of the source account signer.
+	         * @return {Promise}
+	         */
+	    }, {
+	        key: "submitOperationGroup",
+	        value: function submitOperationGroup(operations, sourceID, signerKP) {
+	            var source = new _swarmJsBase2["default"].Account(sourceID);
+	            var transactionBuilder = new _swarmJsBase2["default"].TransactionBuilder(source);
+	            operations.forEach(function (operation) {
+	                return transactionBuilder.addOperation(operation);
+	            });
+	            var transaction = transactionBuilder.build();
+	            transaction.sign(signerKP);
+	            return this.submitTransaction(transaction);
 	        }
 
 	        /**
@@ -5955,16 +5977,6 @@ var StellarSdk =
 	        key: "prices",
 	        value: function prices() {
 	            return new _price_call_builder.PriceCallBuilder(URI(this.serverURL));
-	        }
-
-	        /**
-	         * Returns new {@link PublicInfoCallBuilder} object configured with the current Horizon server configuration.
-	         * @returns {PublicInfoCallBuilder}
-	         */
-	    }, {
-	        key: "publicInfo",
-	        value: function publicInfo() {
-	            return new _public_info_call_builder.PublicInfoCallBuilder(URI(this.serverURL));
 	        }
 
 	        /**
