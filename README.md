@@ -7,7 +7,7 @@
 4. [Documentation](./docs/README.md)
 
 ## Overview
-**JS SDK** is a client-side Javascript library for communicating with a Horizon server. It is used for building apps either on Node.js or in the browser.
+**JS SDK** is a client-side Javascript library for communicating with a Horizon server forked from [js-stellar-sdk](https://github.com/stellar/js-stellar-sdk). It is used for building apps either on Node.js or in the browser.
 
 It provides:
 - a networking layer API for Horizon endpoints.
@@ -18,6 +18,11 @@ It provides:
 >
 > If you are using `js-sdk`/`js-base` in a browser you can ignore this. However, for production backend deployments you should definitely be using `ed25519`. If `ed25519` is successfully installed and working `StellarSdk.FastSigning` variable will be equal `true`. Otherwise it will be `false`.
 
+### Branches
+
+  `master` - branch with latest feature;
+  `dev` - branch with features deployed to dev env;
+  `staging` - branch with features deployed to staging env;
 
 ## Quick start
 
