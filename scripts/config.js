@@ -1,4 +1,6 @@
-const StellarSdk = require('../../lib/index');
+let masterSeeds = require('./master_seeds');
+const StellarSdk = require('../lib/index');
+
 var admins = {
     local: [],
     dev: [
@@ -21,12 +23,6 @@ var admins = {
     ]
 }
 
-const masterSeeds = {
-    local: 'SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH',
-    dev: 'SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH',
-    staging: 'SBMFQCGDVJBC2NYBRPURK3ISC4XJGGOLHMGHF7MIHVXE2DIQSMY6NYRH',
-}
-
 const passphrases = {
     local: 'Test SDF Network ; September 2015',
     dev: 'Test SDF Network ; September 2015',
@@ -39,19 +35,21 @@ const urls = {
     staging: 'http://staging.api.sun.swarm.fund'
 }
 
-// const env = 'local'
-const env = 'dev'
-// const env = 'staging'
+//env is one of the {'local', 'dev', 'staging'}
 
-const config = {
-    url: urls[env],
-    networkPassphrase: passphrases[env],
-    master: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
-    issuance: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
-    admins: admins[env],
-}
+module.exports = {
+    getConfig: function (env) {
+        const config = {
+            url: urls[env],
+            networkPassphrase: passphrases[env],
+            master: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
+            issuance: StellarSdk.Keypair.fromSecret(masterSeeds[env]),
+            admins: admins[env],
+        };
 
-StellarSdk.Network.use(new StellarSdk.Network(config.networkPassphrase))
-config.server = new StellarSdk.Server(config.url, { allowHttp: true })
+        StellarSdk.Network.use(new StellarSdk.Network(config.networkPassphrase));
+        config.server = new StellarSdk.Server(config.url, { allowHttp: true });
 
-module.exports = config
+        return config
+    }
+};

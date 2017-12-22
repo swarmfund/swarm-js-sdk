@@ -1,6 +1,9 @@
-const config = require('./config')
+const config = require('../config')
 const helpers = require('./../helpers')
 const StellarSdk = require('../../lib/index');
+
+let env = 'dev';
+let currentConfig = config.getConfig(env);
 
 const accounts = [
     {
@@ -42,12 +45,12 @@ const assetPairs = [
 module.exports = {
     createAssets: () => {
         return tokensForIssuance.map(asset =>
-             helpers.assets.createAsset(config, config.master, config.master.accountId(), asset.code, asset.policy, asset.maxAmount)
+             helpers.assets.createAsset(currentConfig, currentConfig.master, currentConfig.master.accountId(), asset.code, asset.policy, asset.maxAmount)
             )
     },
 
     createAssetPairs: () => {
-        return assetPairs.map(pair => helpers.assets.createAssetPair(config, pair.base, pair.quote, pair.price))
+        return assetPairs.map(pair => helpers.assets.createAssetPair(currentConfig, pair.base, pair.quote, pair.price))
     },
 
     preEmitCoins: () => {
@@ -55,12 +58,12 @@ module.exports = {
             if (asset.maxAmount === "0") {
                 return Promise.resolve()
             }
-            return helpers.issuance.performPreIssuance(config, config.master, config.master, asset.code, asset.amount)
+            return helpers.issuance.performPreIssuance(currentConfig, currentConfig.master, currentConfig.master, asset.code, asset.amount)
         })
     },
 
     createAccount: () => { 
-        return accounts.map(a => helpers.accounts.createNewAccount(config, a.accountId, a.accountType, a.policy))
+        return accounts.map(a => helpers.accounts.createNewAccount(currentConfig, a.accountId, a.accountType, a.policy))
     },
 
     issueTokens: () => {
@@ -69,12 +72,12 @@ module.exports = {
                 if (asset.maxAmount === "0") {
                     return Promise.resolve()
                 }
-                return helpers.accounts.loadBalanceIDForAsset(config, a.accountId, asset.code)
-                    .then(bId => helpers.issuance.issue(config, config.master, bId, asset.code, asset.emit))
+                return helpers.accounts.loadBalanceIDForAsset(currentConfig, a.accountId, asset.code)
+                    .then(bId => helpers.issuance.issue(currentConfig, currentConfig.master, bId, asset.code, asset.emit))
             })
         })
     },
 
-    addAdmins: () => config.admins.map((a, i) => helpers.accounts.addSuperAdmin(config, config.master.accountId(), config.master, a, i))
+    addAdmins: () => currentConfig.admins.map((a, i) => helpers.accounts.addSuperAdmin(currentConfig, currentConfig.master.accountId(), currentConfig.master, a, i))
 }
 
