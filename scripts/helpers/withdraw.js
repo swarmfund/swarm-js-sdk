@@ -9,7 +9,7 @@ function withdraw(testHelper, source, balance, amount, destAsset) {
             fixed: "0",
             percent: "0"
         },
-        externalDetails: "some external details",
+        externalDetails: { a: "some external details" },
         destAsset: destAsset,
         expectedDestAssetAmount: amount
     };
