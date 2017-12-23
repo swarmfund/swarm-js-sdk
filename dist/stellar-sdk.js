@@ -49331,11 +49331,11 @@ var StellarSdk =
 
 	                attrs.fee = BaseOperation.feeToXdr(opts.fee);
 
-	                if (!BaseOperation.isValidString(opts.externalDetails)) {
-	                    throw new Error("opts.externalDetails is invalid");
+	                if (isUndefined(opts.externalDetails)) {
+	                    throw new Error("externalDetails is invalid");
 	                }
 
-	                attrs.externalDetails = opts.externalDetails;
+	                attrs.externalDetails = JSON.stringify(opts.externalDetails);
 
 	                if (!BaseOperation.isValidAsset(opts.destAsset)) {
 	                    throw new Error("opts.destAsset is invalid");
@@ -49373,7 +49373,7 @@ var StellarSdk =
 	                result.fee = {
 	                    fixed: BaseOperation._fromXDRAmount(request.fee().fixed()),
 	                    percent: BaseOperation._fromXDRAmount(request.fee().percent()) };
-	                result.externalDetails = request.externalDetails();
+	                result.externalDetails = JSON.parse(request.externalDetails());
 	                result.details = {
 	                    type: request.details()["switch"](),
 	                    autoConversion: {
