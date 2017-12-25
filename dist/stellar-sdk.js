@@ -49187,7 +49187,7 @@ var StellarSdk =
 	             * @param {string} opts.amount - amount to be issued
 	             * @param {string} opts.receiver - balance ID of the receiver
 	             * @param {string} opts.reference - Reference of the request
-	             * @param {string} opts.externalDetails - External details needed for PSIM to process withdraw operation
+	             * @param {object} opts.externalDetails - External details needed for PSIM to process withdraw operation
 	             * @param {string} [opts.source] - The source account for the payment. Defaults to the transaction's source account.
 	             * @returns {xdr.CreateIssuanceRequestOp}
 	             */
@@ -49302,7 +49302,7 @@ var StellarSdk =
 	             * @param {object} opts.fee - fee to be charged
 	             * @param {string} opts.fee.fixed - fixed fee to be charged
 	             * @param {string} opts.fee.percent - percent fee to be charged
-	             * @param {string} opts.externalDetails - External details needed for PSIM to process withdraw operation
+	             * @param {object} opts.externalDetails - External details needed for PSIM to process withdraw operation
 	             * @param {string} opts.destAsset - Asset in which specifed amount will be autoconverted
 	             * @param {string} opts.expectedDestAssetAmount - Expected dest asset amount
 	             * @param {string} [opts.source] - The source account for the payment. Defaults to the transaction's source account.
