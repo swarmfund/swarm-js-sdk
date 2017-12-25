@@ -36,6 +36,7 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
         amount: amount,
         receiver: receiverBalanceID,
         reference: StellarSdk.Keypair.random().accountId(),
+        externalDetails: { a: "some external details" },
     };
 
     const op = StellarSdk.CreateIssuanceRequestBuilder.createIssuanceRequest(opts);

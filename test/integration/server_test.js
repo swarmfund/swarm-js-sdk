@@ -68,7 +68,7 @@ describe("Integration test", function () {
                 .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
                 .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
                 .then(balanceID => {
-                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, "Random external details", autoConversionAsset)
+                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
                 })
                 .then(requestID => {
                     return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value, 
