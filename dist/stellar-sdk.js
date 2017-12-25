@@ -5605,32 +5605,30 @@ var StellarSdk =
 
 	var _recovery_request_call_builder = __webpack_require__(562);
 
-	var _reviewable_request_call_builder = __webpack_require__(563);
+	var _trade_call_builder = __webpack_require__(563);
 
-	var _trade_call_builder = __webpack_require__(564);
+	var _transaction_call_builder = __webpack_require__(564);
 
-	var _transaction_call_builder = __webpack_require__(565);
+	var _user_call_builder = __webpack_require__(565);
 
-	var _user_call_builder = __webpack_require__(566);
-
-	var _withdrawal_call_builder = __webpack_require__(567);
-
-	var _sales_call_builder = __webpack_require__(568);
+	var _sales_call_builder = __webpack_require__(566);
 
 	var _config = __webpack_require__(6);
+
+	var _reviewable_requestsReviewable_requests_helper = __webpack_require__(567);
 
 	var _swarmJsBase = __webpack_require__(130);
 
 	var _swarmJsBase2 = _interopRequireDefault(_swarmJsBase);
 
-	var _lodashIsUndefined = __webpack_require__(569);
+	var _lodashIsUndefined = __webpack_require__(574);
 
 	var _lodashIsUndefined2 = _interopRequireDefault(_lodashIsUndefined);
 
 	var axios = __webpack_require__(478);
 	var toBluebird = __webpack_require__(505).resolve;
 	var URI = __webpack_require__(474);
-	var querystring = __webpack_require__(570);
+	var querystring = __webpack_require__(575);
 
 	var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 
@@ -5820,16 +5818,6 @@ var StellarSdk =
 	        }
 
 	        /**
-	         * Returns new {@link ReviewableRequestCallBuilder} object configured by a current Horizon server configuration.
-	         * @returns {ReviewableRequestCallBuilder}
-	         */
-	    }, {
-	        key: "reviewableRequests",
-	        value: function reviewableRequests() {
-	            return new _reviewable_request_call_builder.ReviewableRequestCallBuilder(URI(this.serverURL));
-	        }
-
-	        /**
 	         * Returns new {@link SalesCallBuilder} object configured by a current Horizon server configuration.
 	         * @returns {SalesCallBuilder}
 	         */
@@ -5840,13 +5828,13 @@ var StellarSdk =
 	        }
 
 	        /**
-	         * Returns new {@link WithdrawalCallBuilder} object configured by a current Horizon server configuration.
-	         * @returns {WithdrawalCallBuilder}
+	         * Returns new {@link ReviewableRequestsHelper} helper object to build specific reviewable requests call builders
+	         * @returns {ReviewableRequestCallBuilder}
 	         */
 	    }, {
-	        key: "withdrawals",
-	        value: function withdrawals() {
-	            return new _withdrawal_call_builder.WithdrawalCallBuilder(URI(this.serverURL));
+	        key: "reviewableRequestsHelper",
+	        value: function reviewableRequestsHelper() {
+	            return new _reviewable_requestsReviewable_requests_helper.ReviewableRequestsHelper(URI(this.serverURL));
 	        }
 
 	        /**
@@ -65902,133 +65890,6 @@ var StellarSdk =
 
 	var _call_builder = __webpack_require__(121);
 
-	var ReviewableRequestCallBuilder = (function (_CallBuilder) {
-	    _inherits(ReviewableRequestCallBuilder, _CallBuilder);
-
-	    /**
-	     * Creates a new {@link ReviewableRequestCallBuilder} pointed to server defined by serverUrl.
-	     *
-	     * Do not create this object directly, use {@link Server#reviewableRequests}.
-	     * @constructor
-	     * @extends CallBuilder
-	     * @param {string} serverUrl Horizon server URL.
-	     */
-
-	    function ReviewableRequestCallBuilder(serverUrl) {
-	        _classCallCheck(this, ReviewableRequestCallBuilder);
-
-	        _get(Object.getPrototypeOf(ReviewableRequestCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	        this.url.segment('requests');
-	    }
-
-	    /**
-	     * Provides information on a single reviewable request.
-	     * @param id Reviewable request ID
-	     * @returns {LedgerCallBuilder}
-	     */
-
-	    _createClass(ReviewableRequestCallBuilder, [{
-	        key: 'reviewableRequest',
-	        value: function reviewableRequest(id) {
-	            this.filter.push(['requests', id.toString()]);
-	            return this;
-	        }
-
-	        /**
-	         * Filters reviewable requests by asset
-	         * @param {string} asset For example: `USD`
-	         * @returns {ReviewableRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forAsset',
-	        value: function forAsset(asset) {
-	            this.url.addQuery('asset', asset);
-	            return this;
-	        }
-
-	        /**
-	         * Filters reviewable requests by reviewer
-	         * @param {string} reviewer For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
-	         * @returns {ReviewableRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forReviewer',
-	        value: function forReviewer(reviewer) {
-	            this.url.addQuery('reviewer', reviewer);
-	            return this;
-	        }
-
-	        /**
-	         * Filters reviewable requests by requestor
-	         * @param {string} requestor For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
-	         * @returns {ReviewableRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forRequestor',
-	        value: function forRequestor(requestor) {
-	            this.url.addQuery('requestor', requestor);
-	            return this;
-	        }
-
-	        /**
-	         * Filters reviewable requests by state
-	         * @param {number} state For example: Pending: 1, Canceled: 2, Approved: 3, Rejected: 4, PermanentlyRejected: 5
-	         * @returns {ReviewableRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forState',
-	        value: function forState(state) {
-	            this.url.addQuery('state', state);
-	            return this;
-	        }
-
-	        /**
-	         * Filters reviewable requests by type
-	         * @param {number} requestTypes xdr.ReviewableRequestType
-	         * @returns {ReviewableRequestCallBuilder}
-	         */
-	    }, {
-	        key: 'forType',
-	        value: function forType() {
-	            var typeMask = 0;
-
-	            for (var _len = arguments.length, requestTypes = Array(_len), _key = 0; _key < _len; _key++) {
-	                requestTypes[_key] = arguments[_key];
-	            }
-
-	            requestTypes.forEach(function (el) {
-	                typeMask += 1 << el;
-	            });
-	            this.url.addQuery('type_mask', typeMask);
-	            return this;
-	        }
-	    }]);
-
-	    return ReviewableRequestCallBuilder;
-	})(_call_builder.CallBuilder);
-
-	exports.ReviewableRequestCallBuilder = ReviewableRequestCallBuilder;
-
-/***/ }),
-/* 564 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var _call_builder = __webpack_require__(121);
-
 	var TradeCallBuilder = (function (_CallBuilder) {
 	    _inherits(TradeCallBuilder, _CallBuilder);
 
@@ -66054,7 +65915,7 @@ var StellarSdk =
 	exports.TradeCallBuilder = TradeCallBuilder;
 
 /***/ }),
-/* 565 */
+/* 564 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66178,7 +66039,7 @@ var StellarSdk =
 	exports.TransactionCallBuilder = TransactionCallBuilder;
 
 /***/ }),
-/* 566 */
+/* 565 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66251,89 +66112,7 @@ var StellarSdk =
 	exports.UserCallBuilder = UserCallBuilder;
 
 /***/ }),
-/* 567 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	    value: true
-	});
-
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var _call_builder = __webpack_require__(121);
-
-	var WithdrawalCallBuilder = (function (_CallBuilder) {
-	    _inherits(WithdrawalCallBuilder, _CallBuilder);
-
-	    /**
-	     * Creates a new {@link WithdrawalCallBuilder} pointed to server defined by serverUrl.
-	     *
-	     * Do not create this object directly, use {@link Server#withdrawals}.
-	     * @constructor
-	     * @extends CallBuilder
-	     * @param {string} serverUrl Horizon server URL.
-	     */
-
-	    function WithdrawalCallBuilder(serverUrl) {
-	        _classCallCheck(this, WithdrawalCallBuilder);
-
-	        _get(Object.getPrototypeOf(WithdrawalCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
-	        this.url.segment('request/withdrawals');
-	    }
-
-	    /**
-	     * Filters withdrawals by destination asset.
-	     * @param {string} asset For example: `BTC`
-	     * @returns {WithdrawalCallBuilder}
-	     */
-
-	    _createClass(WithdrawalCallBuilder, [{
-	        key: 'forDestAsset',
-	        value: function forDestAsset(asset) {
-	            this.url.addQuery('to_asset', asset);
-	            return this;
-	        }
-
-	        /**
-	         * Filters withdrawals by requester.
-	         * @param {string} requester For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
-	         * @returns {WithdrawalCallBuilder}
-	         */
-	    }, {
-	        key: 'forRequester',
-	        value: function forRequester(requester) {
-	            this.url.addQuery('requester', requester);
-	            return this;
-	        }
-
-	        /**
-	         * Filters withdrawals by state.
-	         * @param {number} state For example: Pending: 1, Canceled: 2, Approved: 3, Rejected: 4, PermanentlyRejected: 5
-	         * @returns {WithdrawalCallBuilder}
-	         */
-	    }, {
-	        key: 'forState',
-	        value: function forState(state) {
-	            this.url.addQuery('state', state);
-	            return this;
-	        }
-	    }]);
-
-	    return WithdrawalCallBuilder;
-	})(_call_builder.CallBuilder);
-
-	exports.WithdrawalCallBuilder = WithdrawalCallBuilder;
-
-/***/ }),
-/* 568 */
+/* 566 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -66430,7 +66209,489 @@ var StellarSdk =
 	exports.SalesCallBuilder = SalesCallBuilder;
 
 /***/ }),
+/* 567 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var _asset_requests_call_builder = __webpack_require__(568);
+
+	var _preissuance_requests_call_builder = __webpack_require__(570);
+
+	var _issuance_requests_call_builder = __webpack_require__(571);
+
+	var _withdrawal_requests_call_builder = __webpack_require__(572);
+
+	var _sales_requests_call_builder = __webpack_require__(573);
+
+	var URI = __webpack_require__(474);
+
+	var ReviewableRequestsHelper = (function () {
+	    /**
+	     * Creates a new {@link ReviewableRequestsHelper} which provides methods 
+	     * to build specific reviewable request call builders
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper}.
+	     * @constructor
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function ReviewableRequestsHelper(serverURL) {
+	        _classCallCheck(this, ReviewableRequestsHelper);
+
+	        this.serverURL = URI(serverURL);
+	    }
+
+	    /**
+	     * Returns new {@link AssetRequestsCallBuilder} object configured by a current Horizon server configuration.
+	     * @returns {AssetRequestsCallBuilder}
+	     */
+
+	    _createClass(ReviewableRequestsHelper, [{
+	        key: "assets",
+	        value: function assets() {
+	            return new _asset_requests_call_builder.AssetRequestsCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
+	        * Returns new {@link PreissuanceRequestsCallBuilder} object configured by a current Horizon server configuration.
+	        * @returns {PreissuanceRequestsCallBuilder}
+	        */
+	    }, {
+	        key: "preissuances",
+	        value: function preissuances() {
+	            return new _preissuance_requests_call_builder.PreissuanceRequestsCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
+	         * Returns new {@link IssuanceRequestsCallBuilder} object configured by a current Horizon server configuration.
+	         * @returns {IssuanceRequestsCallBuilder}
+	         */
+	    }, {
+	        key: "issuances",
+	        value: function issuances() {
+	            return new _issuance_requests_call_builder.IssuanceRequestsCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
+	        * Returns new {@link WithdrawalRequestsCallBuilder} object configured by a current Horizon server configuration.
+	        * @returns {WithdrawalRequestsCallBuilder}
+	        */
+	    }, {
+	        key: "withdrawals",
+	        value: function withdrawals() {
+	            return new _withdrawal_requests_call_builder.WithdrawalRequestsCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
+	         * Returns new {@link SaleRequestsCallBuilder} object configured by a current Horizon server configuration.
+	         * @returns {SaleRequestsCallBuilder}
+	         */
+	    }, {
+	        key: "sales",
+	        value: function sales() {
+	            return new _sales_requests_call_builder.SaleRequestsCallBuilder(URI(this.serverURL));
+	        }
+	    }]);
+
+	    return ReviewableRequestsHelper;
+	})();
+
+	exports.ReviewableRequestsHelper = ReviewableRequestsHelper;
+
+/***/ }),
+/* 568 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(569);
+
+	var AssetRequestsCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(AssetRequestsCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link AssetRequestCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#assets}.
+	     * @constructor
+	     * @extends ReviewableRequestCallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function AssetRequestsCallBuilder(serverUrl) {
+	        _classCallCheck(this, AssetRequestsCallBuilder);
+
+	        _get(Object.getPrototypeOf(AssetRequestsCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/assets');
+	    }
+
+	    /**
+	     * Filters asset creation 
+	     * @param {string} asset For example: `BTC`
+	     * @returns {AssetRequestsCallBuilder}
+	     */
+
+	    _createClass(AssetRequestsCallBuilder, [{
+	        key: 'forAssetCode',
+	        value: function forAssetCode(asset) {
+	            this.url.addQuery('asset', asset);
+	            return this;
+	        }
+	    }]);
+
+	    return AssetRequestsCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.AssetRequestsCallBuilder = AssetRequestsCallBuilder;
+
+/***/ }),
 /* 569 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _call_builder = __webpack_require__(121);
+
+	var ReviewableRequestCallBuilder = (function (_CallBuilder) {
+	    _inherits(ReviewableRequestCallBuilder, _CallBuilder);
+
+	    /**
+	     * Creates a new {@link ReviewableRequestCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use ReviewableRequests subclasses.
+	     * @constructor
+	     * @extends CallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function ReviewableRequestCallBuilder(serverUrl) {
+	        _classCallCheck(this, ReviewableRequestCallBuilder);
+
+	        _get(Object.getPrototypeOf(ReviewableRequestCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	    }
+
+	    /**
+	     * Provides information on a single reviewable request. Note: does not check request type.
+	     * @param id Reviewable request ID
+	     * @returns {LedgerCallBuilder}
+	     */
+
+	    _createClass(ReviewableRequestCallBuilder, [{
+	        key: 'reviewableRequest',
+	        value: function reviewableRequest(id) {
+	            this.filter.push(['requests', id.toString()]);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by reviewer
+	         * @param {string} reviewer For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forReviewer',
+	        value: function forReviewer(reviewer) {
+	            this.url.addQuery('reviewer', reviewer);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by requestor
+	         * @param {string} requestor For example: `GDRYPVZ63SR7V2G46GKRGABJD3XPDNWQ4B4PQPJBTTDUEAKH5ZECPTSN`
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forRequestor',
+	        value: function forRequestor(requestor) {
+	            this.url.addQuery('requestor', requestor);
+	            return this;
+	        }
+
+	        /**
+	         * Filters reviewable requests by state
+	         * @param {number} state For example: Pending: 1, Canceled: 2, Approved: 3, Rejected: 4, PermanentlyRejected: 5
+	         * @returns {ReviewableRequestCallBuilder}
+	         */
+	    }, {
+	        key: 'forState',
+	        value: function forState(state) {
+	            this.url.addQuery('state', state);
+	            return this;
+	        }
+	    }]);
+
+	    return ReviewableRequestCallBuilder;
+	})(_call_builder.CallBuilder);
+
+	exports.ReviewableRequestCallBuilder = ReviewableRequestCallBuilder;
+
+/***/ }),
+/* 570 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(569);
+
+	var PreissuanceRequestsCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(PreissuanceRequestsCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link PreissuanceRequestsCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#preissuance}.
+	     * @constructor
+	     * @extends ReviewableRequestCallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function PreissuanceRequestsCallBuilder(serverUrl) {
+	        _classCallCheck(this, PreissuanceRequestsCallBuilder);
+
+	        _get(Object.getPrototypeOf(PreissuanceRequestsCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/preissuances');
+	    }
+
+	    /**
+	     * Filters asset creation 
+	     * @param {string} asset For example: `BTC`
+	     * @returns {PreissuanceRequestsCallBuilder}
+	     */
+
+	    _createClass(PreissuanceRequestsCallBuilder, [{
+	        key: 'forAssetCode',
+	        value: function forAssetCode(asset) {
+	            this.url.addQuery('asset', asset);
+	            return this;
+	        }
+	    }]);
+
+	    return PreissuanceRequestsCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.PreissuanceRequestsCallBuilder = PreissuanceRequestsCallBuilder;
+
+/***/ }),
+/* 571 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(569);
+
+	var IssuanceRequestsCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(IssuanceRequestsCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link IssuanceRequestCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#issuances}.
+	     * @constructor
+	     * @extends CallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function IssuanceRequestsCallBuilder(serverUrl) {
+	        _classCallCheck(this, IssuanceRequestsCallBuilder);
+
+	        _get(Object.getPrototypeOf(IssuanceRequestsCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/issuances');
+	    }
+
+	    /**
+	     * Filters asset creation 
+	     * @param {string} asset For example: `BTC`
+	     * @returns {IssuanceRequestsCallBuilder}
+	     */
+
+	    _createClass(IssuanceRequestsCallBuilder, [{
+	        key: 'forAssetCode',
+	        value: function forAssetCode(asset) {
+	            this.url.addQuery('asset', asset);
+	            return this;
+	        }
+	    }]);
+
+	    return IssuanceRequestsCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.IssuanceRequestsCallBuilder = IssuanceRequestsCallBuilder;
+
+/***/ }),
+/* 572 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(569);
+
+	var WithdrawalRequestsCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(WithdrawalRequestsCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link WithdrawalRequestsCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#withdrwals}.
+	     * @constructor
+	     * @extends ReviewableRequestCallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function WithdrawalRequestsCallBuilder(serverUrl) {
+	        _classCallCheck(this, WithdrawalRequestsCallBuilder);
+
+	        _get(Object.getPrototypeOf(WithdrawalRequestsCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/withdrawals');
+	    }
+
+	    /**
+	     * Filters withdrawals by destination asset.
+	     * @param {string} asset For example: `BTC`
+	     * @returns {WithdrawalRequestsCallBuilder}
+	     */
+
+	    _createClass(WithdrawalRequestsCallBuilder, [{
+	        key: 'forDestAsset',
+	        value: function forDestAsset(asset) {
+	            this.url.addQuery('dest_asset_code', asset);
+	            return this;
+	        }
+	    }]);
+
+	    return WithdrawalRequestsCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.WithdrawalRequestsCallBuilder = WithdrawalRequestsCallBuilder;
+
+/***/ }),
+/* 573 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(569);
+
+	var SaleRequestsCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(SaleRequestsCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link SaleRequestsCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#sales}.
+	     * @constructor
+	     * @extends ReviewableRequestCallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function SaleRequestsCallBuilder(serverUrl) {
+	        _classCallCheck(this, SaleRequestsCallBuilder);
+
+	        _get(Object.getPrototypeOf(SaleRequestsCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/sales');
+	    }
+
+	    /**
+	     * Filters withdrawals by base asset.
+	     * @param {string} asset For example: `BTC`
+	     * @returns {SaleRequestsCallBuilder}
+	     */
+
+	    _createClass(SaleRequestsCallBuilder, [{
+	        key: 'forBaseAsset',
+	        value: function forBaseAsset(asset) {
+	            this.url.addQuery('base_asset', asset);
+	            return this;
+	        }
+	    }]);
+
+	    return SaleRequestsCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.SaleRequestsCallBuilder = SaleRequestsCallBuilder;
+
+/***/ }),
+/* 574 */
 /***/ (function(module, exports) {
 
 	/**
@@ -66458,17 +66719,17 @@ var StellarSdk =
 
 
 /***/ }),
-/* 570 */
+/* 575 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.decode = exports.parse = __webpack_require__(571);
-	exports.encode = exports.stringify = __webpack_require__(572);
+	exports.decode = exports.parse = __webpack_require__(576);
+	exports.encode = exports.stringify = __webpack_require__(577);
 
 
 /***/ }),
-/* 571 */
+/* 576 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -66554,7 +66815,7 @@ var StellarSdk =
 
 
 /***/ }),
-/* 572 */
+/* 577 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.

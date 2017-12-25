@@ -20,13 +20,12 @@ import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
 import { PublicInfoCallBuilder } from "./public_info_call_builder";
 import { RecoveryRequestCallBuilder } from "./recovery_request_call_builder";
-import { ReviewableRequestCallBuilder } from "./reviewable_request_call_builder";
 import { TradeCallBuilder } from "./trade_call_builder";
 import { TransactionCallBuilder } from "./transaction_call_builder";
 import { UserCallBuilder } from "./user_call_builder";
-import { WithdrawalCallBuilder } from "./withdrawal_call_builder";
 import { SalesCallBuilder } from "./sales_call_builder";
 import { Config } from "./config";
+import { ReviewableRequestsHelper } from "./reviewable_requests/reviewable_requests_helper";
 
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
@@ -204,14 +203,6 @@ export class Server {
     }
 
     /**
-     * Returns new {@link ReviewableRequestCallBuilder} object configured by a current Horizon server configuration.
-     * @returns {ReviewableRequestCallBuilder}
-     */
-    reviewableRequests() {
-        return new ReviewableRequestCallBuilder(URI(this.serverURL));
-    }
-
-    /**
      * Returns new {@link SalesCallBuilder} object configured by a current Horizon server configuration.
      * @returns {SalesCallBuilder}
      */
@@ -220,11 +211,11 @@ export class Server {
     }
 
     /**
-     * Returns new {@link WithdrawalCallBuilder} object configured by a current Horizon server configuration.
-     * @returns {WithdrawalCallBuilder}
+     * Returns new {@link ReviewableRequestsHelper} helper object to build specific reviewable requests call builders
+     * @returns {ReviewableRequestCallBuilder}
      */
-    withdrawals() {
-        return new WithdrawalCallBuilder(URI(this.serverURL));
+    reviewableRequestsHelper() {
+        return new ReviewableRequestsHelper(URI(this.serverURL));
     }
 
     /**
