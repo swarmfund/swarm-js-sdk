@@ -47,6 +47,17 @@ export class SalesCallBuilder extends CallBuilder {
   }
 
   /**
+   * Filters sales by name
+   * @param {string} name For example: `awesome sale`
+   * @returns {SalesCallBuilder}
+   */
+
+  forName(owner) {
+    this.url.addQuery('name', name);
+    return this;
+  }
+
+  /**
    * Filters sales by open state
    * @param {boolean} openOnly
    * @return {SalesCallBuilder}
