@@ -66196,7 +66196,7 @@ var StellarSdk =
 
 	  }, {
 	    key: 'forName',
-	    value: function forName(owner) {
+	    value: function forName(name) {
 	      this.url.addQuery('name', name);
 	      return this;
 	    }

@@ -52,7 +52,7 @@ export class SalesCallBuilder extends CallBuilder {
    * @returns {SalesCallBuilder}
    */
 
-  forName(owner) {
+  forName(name) {
     this.url.addQuery('name', name);
     return this;
   }
