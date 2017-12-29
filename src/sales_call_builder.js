@@ -30,8 +30,8 @@ export class SalesCallBuilder extends CallBuilder {
    * @param {string} asset For example: `USD`
    * @returns {SalesCallBuilder}
    */
-  forAsset(asset) {
-    this.url.addQuery('asset', asset);
+  forBaseAsset(asset) {
+    this.url.addQuery('base_asset', asset);
     return this;
   }
 
