@@ -26,7 +26,7 @@ function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmoun
 }
 
 function participateInSale(testHelper, source, baseAsset, quoteAmount) {
-    return testHelper.server.sales().forAsset(baseAsset).callWithSignature(source).then(sales => {
+    return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(source).then(sales => {
         return sales.records[0];
     }).then(sale => {
         let baseAmount = Number.parseFloat(quoteAmount)/Number.parseFloat(sale.price);

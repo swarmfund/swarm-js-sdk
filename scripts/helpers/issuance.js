@@ -1,5 +1,7 @@
 const StellarSdk = require('../../lib/index');
 var reviewableRequestHelper = require('./review_request')
+var accountHelper = require('./accounts')
+
 
 function createPreIssuanceRequest(testHelper, assetOwnerKP, preIssuanceKP, assetCode, amount) {
     var preIssuanceRequest = StellarSdk.PreIssuanceRequest.build({
@@ -47,8 +49,16 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
       });
 }
 
+// fundAccount - creates new balance and issues funds to it
+function fundAccount(testHelper, accountToBeFundedKP, assetCode, assetOwnerKP, amount) {
+    return accountHelper.createBalanceForAsset(testHelper, accountToBeFundedKP, assetCode)
+        .then(() => accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode))
+        .then(balanceID => issue(testHelper, assetOwnerKP, balanceID, assetCode, amount))
+}
+
 module.exports = {
     createPreIssuanceRequest,
     performPreIssuance,
-    issue
+    issue,
+    fundAccount
 }
