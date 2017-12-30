@@ -37,7 +37,14 @@ function createSale(testHelper, owner, baseAsset, quoteAsset, startTime, endTime
         });
 }
 
+
+function checkSaleState(testHelper) {
+    let operation = StellarSdk.SaleRequestBuilder.checkSaleState({});
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
+}
+
 module.exports = {
     createSaleCreationRequest,
-    createSale
+    createSale,
+    checkSaleState
 }

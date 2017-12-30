@@ -21,8 +21,8 @@ function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-function createAsset(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount) {
-    return createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount)
+function createAsset(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount, initialPreissuedAmount = "0") {
+    return createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount, initialPreissuedAmount)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var success = result.result().results()[0].tr().manageAssetResult().success()

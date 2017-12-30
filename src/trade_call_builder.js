@@ -11,4 +11,9 @@ export class TradeCallBuilder extends CallBuilder {
         this.url.addQuery('quote_asset', quoteAsset);
         return this;
     }
+
+    orderBookID(orderBookID) {
+        this.url.addQuery('order_book_id', orderBookID);
+        return this;
+    }
 }

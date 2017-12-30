@@ -5,6 +5,7 @@ import * as assetHelper from '../../scripts/helpers/asset'
 import * as accountHelper from '../../scripts/helpers/accounts'
 import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
+import * as offerHelper from '../../scripts/helpers/offer'
 
 let config = require('../../scripts/config');
 
@@ -14,7 +15,7 @@ describe("Integration test", function () {
     this.timeout(TIMEOUT);
     this.slow(TIMEOUT / 2);
 
-    let env = 'dev';
+    let env = 'local';
     let currentConfig = config.getConfig(env);
     let server = currentConfig.server;
     let master = currentConfig.master;
@@ -44,7 +45,7 @@ describe("Integration test", function () {
 
     it("Create asset and perform issuance", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
-        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value |  StellarSdk.xdr.AssetPolicy.withdrawable().value;
+        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value;
         var preIssuedAmount = "10000.0000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
@@ -53,28 +54,26 @@ describe("Integration test", function () {
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
             .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
             .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
-            .then(() => accountHelper.createBalanceForAsset(testHelper, newAccountKP, assetCode))
-            .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
-            .then(balanceID => issuanceHelper.issue(testHelper, syndicateKP, balanceID, assetCode, preIssuedAmount))
+            .then(() => issuanceHelper.fundAccount(testHelper, newAccountKP, assetCode, syndicateKP, preIssuedAmount))
             .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
             .then(balance => {
                 expect(balance.balance).to.be.equal(preIssuedAmount);
-                
+
             })
             // withdraw all the assets available with auto conversion to BTC
             .then(() => {
                 let autoConversionAsset = "BTC" + Math.floor(Math.random() * 1000);
                 return assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), autoConversionAsset, 0)
-                .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
-                .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
-                .then(balanceID => {
+                    .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
+                    .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
+                    .then(balanceID => {
                     return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
-                })
-                .then(requestID => {
-                    return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value, 
-                    "", "Updated external details")
-                })
-            }) 
+                    })
+                    .then(requestID => {
+                        return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                            "", "Updated external details")
+                    })
+            })
             .then(() => done())
             .catch(err => { done(err) });
     });
@@ -89,19 +88,26 @@ describe("Integration test", function () {
             .catch(err => done(err));
     });
 
-    it("Create sale for asset", function(done) {
+    it("Create sale for asset", function (done) {
         var syndicateKP = StellarSdk.Keypair.random();
         var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
         var quoteAsset = "USD" + Math.floor(Math.random() * 1000);
         var startTime = Math.round((new Date()).getTime() / 1000);
-        var maxIssuanceAmount = "500";
-        var price = "4.5";
-        var softCap = "2250";
+        var price = 4.5;
+        var softCap = 2250;
+        var hardCap = 4500;
+        var maxIssuanceAmount = hardCap / price;
+        var saleParticipantKP = StellarSdk.Keypair.random();
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
-        .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount))
-        .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), quoteAsset, 0))
-        .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60*10 + "", price, softCap, "20000"))
-        .then(() => done())
-        .catch(err => done(err));
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount.toString(), maxIssuanceAmount.toString()))
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), quoteAsset, 0, hardCap.toString(), hardCap.toString()))
+            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60 * 10 + "", price.toString(), softCap.toString(), hardCap.toString()))
+            .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
+            .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, syndicateKP, hardCap.toString()))
+            .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
+            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, hardCap.toString()))
+            .then(() => saleHelper.checkSaleState(testHelper))
+            .then(() => done())
+            .catch(err => done(err));
     });
 })
