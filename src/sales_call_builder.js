@@ -30,8 +30,8 @@ export class SalesCallBuilder extends CallBuilder {
    * @param {string} asset For example: `USD`
    * @returns {SalesCallBuilder}
    */
-  forAsset(asset) {
-    this.url.addQuery('asset', asset);
+  forBaseAsset(asset) {
+    this.url.addQuery('base_asset', asset);
     return this;
   }
 
@@ -43,6 +43,17 @@ export class SalesCallBuilder extends CallBuilder {
 
   forOwner(owner) {
     this.url.addQuery('owner', owner);
+    return this;
+  }
+
+  /**
+   * Filters sales by name
+   * @param {string} name For example: `awesome sale`
+   * @returns {SalesCallBuilder}
+   */
+
+  forName(name) {
+    this.url.addQuery('name', name);
     return this;
   }
 
