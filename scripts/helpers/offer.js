@@ -1,5 +1,5 @@
 const StellarSdk = require('../../lib/index');
-import * as accountHelper from './accounts'
+var accountHelper = require('./accounts')
 
 
 
