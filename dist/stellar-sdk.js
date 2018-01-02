@@ -66664,6 +66664,19 @@ var StellarSdk =
 	      this.url.addQuery('open_only', _openOnly);
 	      return this;
 	    }
+
+	    /**
+	     * Filters sales by name
+	     * @param {string} name For example: `awesome sale`
+	     * @returns {SalesCallBuilder}
+	     */
+
+	  }, {
+	    key: 'forName',
+	    value: function forName(name) {
+	      this.url.addQuery('name', name);
+	      return this;
+	    }
 	  }]);
 
 	  return SalesCallBuilder;

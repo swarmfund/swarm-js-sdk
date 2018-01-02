@@ -55,4 +55,16 @@ export class SalesCallBuilder extends CallBuilder {
     this.url.addQuery('open_only', openOnly);
     return this;
   }
+
+  /**
+   * Filters sales by name
+   * @param {string} name For example: `awesome sale`
+   * @returns {SalesCallBuilder}
+   */
+
+  forName(name) {
+    this.url.addQuery('name', name);
+    return this;
+  }
+  
 }
