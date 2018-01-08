@@ -57,13 +57,92 @@ export class SalesCallBuilder extends CallBuilder {
   }
 
   /**
+   * Filter sales which will start soon.
+   * @param {boolean} upcoming
+   * @return {SalesCallBuilder}
+   */
+  upcoming(upcoming = true) {
+    this.url.addQuery('upcoming', upcoming);
+    return this;
+  }
+
+  /**
+   * Filter sales in which the current сap exceeds soft cap.
+   * @param {boolean} reachedSoftCap
+   * @return {SalesCallBuilder}
+   */
+  reachedSoftCap(reachedSoftCap = true) {
+    this.url.addQuery('reached_soft_cap', reachedSoftCap);
+    return this;
+  }
+
+  /**
    * Filters sales by name
    * @param {string} name For example: `awesome sale`
    * @returns {SalesCallBuilder}
    */
-
   forName(name) {
     this.url.addQuery('name', name);
+    return this;
+  }
+
+  /**
+   * Filter sales in which the current сap exceeds 
+   * the specified percentage `bound` of the soft cap.
+   * @param {Number} bound - percent value from 0 to 100
+   */
+  nearlyFunded(bound = 90) {
+    if (bound < 0 || bound > 100) {
+      throw new Error("bound value is out of range 0 <= x <= 100");
+    }
+
+    this.url.addQuery('nearly_funded', bound);
+    return this;
+  }
+
+  /**
+   * Filter sales in which the current сap exceeds `goalValue`.
+   * @param {number} goalValue - lower bound of the current cap.
+   * @returns {SalesCallBuilder}
+   */
+  withGoalValue(goalValue = 0) {
+    this.url.addQuery('goal_value', goalValue);
+    return this;
+  }
+
+  /**
+   * Sort types:
+   * 1 - most founded;
+   * 2 - end time.
+   * 3 - popularity;
+   * NOTE! If `sort_by` flag set, paging params 
+   * will be ignored, and pagination will not work.
+   */
+  
+   /**
+   * Sort sales in order when sale with 
+   * bigger current cap will be first.
+   */
+  sortByMostFounded() {
+    this.url.addQuery('sort_by', 1);
+    return this;
+  }
+
+  /**
+   * Sort sales in order when sale with 
+   * the closest end time will be first.
+   */
+  sortByEndType() {
+    this.url.addQuery('sort_by', 2);
+    return this;
+  }
+
+  /**
+   * Sort sales in the order when a sale with 
+   * a large number of unique investors will be the first.
+   */
+  sortByPopularity() {
+    this.url.addQuery('sort_by', 3);
     return this;
   }
   
