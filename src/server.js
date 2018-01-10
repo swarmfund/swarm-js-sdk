@@ -1,33 +1,35 @@
 import { AccountCallBuilder } from "./account_call_builder";
 import { AccountResponse } from "./account_response";
-import { Config } from "./config";
-import { LedgerCallBuilder } from "./ledger_call_builder";
-import { ReviewableRequestCallBuilder } from "./reviewable_request_call_builder";
-import { TransactionCallBuilder } from "./transaction_call_builder";
-import { OperationCallBuilder } from "./operation_call_builder";
-import { PaymentCallBuilder } from "./payment_call_builder";
-import { UserCallBuilder } from "./user_call_builder";
-import { FeeCallBuilder } from "./fee_call_builder";
-import { FeesOverviewCallBuilder } from "./fees_overview_call_builder";
-import { DefaultLimitsCallBuilder } from "./default_limits_call_builder";
-import { DocumentCallBuilder } from "./document_call_builder";
-import { ForfeitRequestCallBuilder } from "./forfeit_request_call_builder";
-import { RecoveryRequestCallBuilder } from "./recovery_request_call_builder";
-import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
+import { AssetCallBuilder } from "./asset_call_builder";
+import { AssetPairCallBuilder } from "./asset_pair_call_builder";
+import { BalanceCallBuilder } from "./balance_call_builder";
 import { ContactsCallBuilder } from "./contacts_call_builder";
 import { ContactRequestCallBuilder } from './contact_request_call_builder';
-import { AssetCallBuilder } from "./asset_call_builder";
-import { BalanceCallBuilder } from "./balance_call_builder";
-import { ExchangeCallBuilder } from "./exchange_call_builder";
-import { TrustCallBuilder } from "./trust_call_builder";
+import { DefaultLimitsCallBuilder } from "./default_limits_call_builder";
+import { DocumentCallBuilder } from "./document_call_builder";
+import { FeeCallBuilder } from "./fee_call_builder";
+import { FeesOverviewCallBuilder } from "./fees_overview_call_builder";
+import { ForfeitRequestCallBuilder } from "./forfeit_request_call_builder";
+import { LedgerCallBuilder } from "./ledger_call_builder";
 import { NotificationsCallBuilder } from "./notifications_call_builder";
 import { OfferCallBuilder } from "./offer_call_builder";
+import { OperationCallBuilder } from "./operation_call_builder";
 import { OrderBookCallBuilder } from "./order_book_call_builder";
-import { PublicInfoCallBuilder } from "./public_info_call_builder";
-import { TradeCallBuilder } from "./trade_call_builder";
+import { PaymentCallBuilder } from "./payment_call_builder";
+import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
+import { PublicInfoCallBuilder } from "./public_info_call_builder";
+import { RecoveryRequestCallBuilder } from "./recovery_request_call_builder";
+import { TradeCallBuilder } from "./trade_call_builder";
+import { TransactionCallBuilder } from "./transaction_call_builder";
+import { UserCallBuilder } from "./user_call_builder";
+import { SalesCallBuilder } from "./sales_call_builder";
+import { Config } from "./config";
+import { ReviewableRequestsHelper } from "./reviewable_requests/reviewable_requests_helper";
+
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
+import isUndefined from 'lodash/isUndefined';
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;
@@ -49,13 +51,13 @@ export class Server {
         this.serverURL = URI(serverURL);
         try{
             Config.setURLPrefix(this.serverURL.path());
-            // it is necessary to delete the prefix after saving for the correct signature, 
+            // it is necessary to delete the prefix after saving for the correct signature,
             // the prefix will be added before the call
             this.serverURL.segment([]);
         } catch(err) {
             console.log(err);
         }
-        
+
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
@@ -67,7 +69,16 @@ export class Server {
         }
     }
 
+    /**
+     * Create {@link Base.Transaction} and submit to the Horizon server.
+     *
+     * @param {Base.Operation} op - The operation to submit.
+     * @param {string} sourceID - The accountID of the transaction initiator (source).
+     * @param {Base.Keypair} signerKP - The keypair of the source account signer.
+     * @return {Promise}
+     */
     submitOperation(op, sourceID, signerKP, multiSigTx = false) {
+        console.warn('DeprecationWarning: submitOperation is deprecated. Consider using submitOperationGroup instead');
         let source = new stellarBase.Account(sourceID);
         let tx = new stellarBase.TransactionBuilder(source)
           .addOperation(op)
@@ -79,6 +90,29 @@ export class Server {
         return this.submitTransaction(tx);
     }
 
+    /**
+     * Create {@link Base.Transaction} and submit to the Horizon server.
+     *
+     * @param {Array} operations - The operation to submit.
+     * @param {string} sourceID - The accountID of the transaction initiator (source).
+     * @param {Base.Keypair} signerKP - The keypair of the source account signer.
+     * @return {Promise}
+     */
+    submitOperationGroup (operations, sourceID, signerKP) {
+      const source = new stellarBase.Account(sourceID);
+      const transactionBuilder = new stellarBase.TransactionBuilder(source);
+      operations.forEach(operation => transactionBuilder.addOperation(operation));
+      const transaction = transactionBuilder.build();
+      transaction.sign(signerKP);
+      return this.submitTransaction(transaction);
+    }
+
+    /**
+     * Submit transaction to the Horizon server.
+     *
+     * @param {Base.Transaction} transaction - The transaction to submit.
+     * @return {Promise}
+     */
     submitTransaction(transaction, multiSigTx, keypair) {
         // proper call is submitTransactions(tx),
         // backend will handle pending flow auto-magically.
@@ -90,31 +124,30 @@ export class Server {
         }
         let path = "transactions";
         let tx = transaction.toEnvelope().toXDR().toString("base64");
-        
+
         let config = {
             timeout: SUBMIT_TRANSACTION_TIMEOUT,
             headers: {
                 'content-type': 'application/json',
             }
         };
-        
+
+        const repeatDetails = {
+            config: config,
+            tx: tx
+        };
+
         let promise = axios.post(this._getURL(path), { tx }, config)
             .then(response => response.data)
-            .catch(response => {
-                if (response instanceof Error) {
-                    const details = response.response;
-                    if (details.status === 403 && details.request.response.indexOf('Two factor verification') !== -1) {
-                        response.tfaData = {
-                          config: config,
-                          tx: response.config.data,
-                          token: details.data.extras.token
-                        };
-                        return Promise.reject(response);
+            .catch(error => {
+                if (error instanceof Error) {
+                    const details = error.response;
+                    if (!isUndefined(details) && details.status === 403) {
+                        error.repeatDetails = repeatDetails;
                     }
-                    return Promise.reject(response);
-                } else {
-                    return Promise.reject(response.data);
+                    return Promise.reject(error);
                 }
+                return Promise.reject(error.data);
             });
         return toBluebird(promise);
     }
@@ -123,7 +156,7 @@ export class Server {
       var path = 'transactions';
 
       let promise = axios.post(
-        this._getURL(path), tx, config)
+        this._getURL(path), { tx }, config)
             .then(function(response) {
               return response.data;
             })
@@ -170,11 +203,19 @@ export class Server {
     }
 
     /**
-     * Returns new {@link ReviewableRequestCallBuilder} object configured by a current Horizon server configuration.
+     * Returns new {@link SalesCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {SalesCallBuilder}
+     */
+    sales() {
+        return new SalesCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link ReviewableRequestsHelper} helper object to build specific reviewable requests call builders
      * @returns {ReviewableRequestCallBuilder}
      */
-    reviewableRequests() {
-        return new ReviewableRequestCallBuilder(URI(this.serverURL));
+    reviewableRequestsHelper() {
+        return new ReviewableRequestsHelper(URI(this.serverURL));
     }
 
     /**
@@ -186,14 +227,6 @@ export class Server {
     }
 
     /**
-     * Returns new {@link PendingTransactionCallBuilder} object configured by a current Horizon server configuration.
-     * and account id
-     * @returns {PendingTransactionCallBuilder}
-     */
-    pendingTransactions(accountId) {
-        return new PendingTransactionCallBuilder(URI(this.serverURL), accountId);
-    }
-    /**
      * Returns new {@link OperationCallBuilder} object configured by a current Horizon server configuration.
      * @returns {OperationCallBuilder}
      */
@@ -201,56 +234,92 @@ export class Server {
         return new OperationCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link ForfeitRequestCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {ForfeitRequestCallBuilder}
+     */
     forfeitRequests() {
         return new ForfeitRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link RecoveryRequestCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {RecoveryRequestCallBuilder}
+     */
     recoveryRequests() {
         return new RecoveryRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link PaymentRequestCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {PaymentRequestCallBuilder}
+     */
     paymentRequests() {
         return new PaymentRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link AssetCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {AssetCallBuilder}
+     */
     assets() {
         return new AssetCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link AssetPairCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {AssetPairCallBuilder}
+     */
+    assetPairs () {
+        return new AssetPairCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link BalanceCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {BalanceCallBuilder}
+     */
     balances() {
         return new BalanceCallBuilder(URI(this.serverURL));
     }
 
-    exchanges() {
-        return new ExchangeCallBuilder(URI(this.serverURL));
-    }
-
-    trusts() {
-        return new TrustCallBuilder(URI(this.serverURL));
-    }
-
+    /**
+     * Returns new {@link OrderBookCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {OrderBookCallBuilder}
+     */
     orderBooks() {
         return new OrderBookCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link OfferCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {OfferCallBuilder}
+     */
     offers() {
         return new OfferCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link NotificationsCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {NotificationsCallBuilder}
+     */
     notifications () {
         return new NotificationsCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link TradeCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {TradeCallBuilder}
+     */
     trades() {
         return new TradeCallBuilder(URI(this.serverURL));
     }
-    
+
+    /**
+     * Returns new {@link PriceCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {PriceCallBuilder}
+     */
     prices() {
         return new PriceCallBuilder(URI(this.serverURL));
-    }
-
-    publicInfo() {
-        return new PublicInfoCallBuilder(URI(this.serverURL));
     }
 
     /**
@@ -262,28 +331,13 @@ export class Server {
     }
 
     /**
-     * Returns new {@link EffectCallBuilder} object configured with the current Horizon server configuration.
-     * @returns {EffectCallBuilder}
-     */
-    effects() {
-        return new EffectCallBuilder(URI(this.serverURL));
-    }
-
-    /**
-     * Returns new {@link AbxUserCallBuilder} object configured with the current Horizon server configuration.
-     * @returns {AbxUserCallBuilder}
-     */
-    abxUsers() {
-        return new AbxUserCallBuilder(URI(this.serverURL));
-    }
-
-    /**
-     * Returns new {@link RegRequestCallBuilder} object configured with the current Horizon server configuration.
+     * Returns new {@link UserCallBuilder} object configured with the current Horizon server configuration.
      * @returns {UserCallBuilder}
      */
     users() {
         return new UserCallBuilder(URI(this.serverURL));
     }
+
      /**
      * Returns new {@link FeeCallBuilder} object configured with the current Horizon server configuration.
      * @returns {FeeCallBuilder}
@@ -291,6 +345,7 @@ export class Server {
     fees() {
         return new FeeCallBuilder(URI(this.serverURL));
     }
+
      /**
      * Returns new {@link FeesOverviewCallBuilder} object configured with the current Horizon server configuration.
      * @returns {FeesOverviewCallBuilder}
@@ -299,6 +354,10 @@ export class Server {
        return new FeesOverviewCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link DefaultLimitsCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {DefaultLimitsCallBuilder}
+     */
     defaultLimits() {
         return new DefaultLimitsCallBuilder(URI(this.serverURL));
     }
@@ -324,6 +383,13 @@ export class Server {
                 return new AccountResponse(res);
             });
     }
+
+    /**
+     * Fetches an account's most current state in the ledger and then creates and returns an {@link Account} object.
+     * @param {string} accountId - The account to load.
+     * @param {Keypair} keypair - The keypair for signing the request.
+     * @returns {Promise} Returns a promise to the {@link AccountResponse} object with populated sequence number.
+     */
     loadAccountWithSign(accountId, keypair) {
         return this.accounts()
             .accountId(accountId)
@@ -332,7 +398,7 @@ export class Server {
                 return new AccountResponse(res);
             });
     }
-    
+
     /* User POST Requests to the Horizon */
     // TODO: Add JsDoc
     approveRegistration(userData, transaction, keypair) {
@@ -399,7 +465,7 @@ export class Server {
         let prefix = `users/${params.accountId}/documents/${params.type}`;
         return this._sendUserPostRequest(params, prefix, keypair);
     }
-    
+
     deleteWallet(username, keypair) {
         let prefix = "users/unverified/delete";
         return this._sendUserPostRequest({ username: username }, prefix, keypair);
@@ -435,7 +501,7 @@ export class Server {
             });
         return toBluebird(promise);
     }
-    
+
     /**
      * Store user verification document
      * @param {object} params

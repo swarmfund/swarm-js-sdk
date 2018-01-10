@@ -21,4 +21,9 @@ export class OfferCallBuilder extends CallBuilder {
         this.url.addQuery('is_buy', isBuy);
         return this;
     }
+
+    orderBookID(orderBookID) {
+        this.url.addQuery('order_book_id', orderBookID);
+        return this;
+    }
 }

@@ -1,36 +1,25 @@
-import {CallBuilder} from "./call_builder";
+import {CallBuilder} from "../call_builder";
 
 export class ReviewableRequestCallBuilder extends CallBuilder {
     /**
      * Creates a new {@link ReviewableRequestCallBuilder} pointed to server defined by serverUrl.
      *
-     * Do not create this object directly, use {@link Server#reviewableRequests}.
+     * Do not create this object directly, use ReviewableRequests subclasses.
      * @constructor
      * @extends CallBuilder
      * @param {string} serverUrl Horizon server URL.
      */
     constructor(serverUrl) {
         super(serverUrl);
-        this.url.segment('requests');
     }
 
     /**
-     * Provides information on a single reviewable request.
+     * Provides information on a single reviewable request. Note: does not check request type.
      * @param id Reviewable request ID
      * @returns {LedgerCallBuilder}
      */
     reviewableRequest(id) {
         this.filter.push(['requests', id.toString()]);
-        return this;
-    }
-
-    /**
-     * Filters reviewable requests by asset
-     * @param {string} asset For example: `USD`
-     * @returns {ReviewableRequestCallBuilder}
-     */
-    forAsset(asset) {
-        this.url.addQuery('asset', asset);
         return this;
     }
 
@@ -61,20 +50,6 @@ export class ReviewableRequestCallBuilder extends CallBuilder {
      */
     forState(state) {
         this.url.addQuery('state', state);
-        return this;
-    }
-
-    /**
-     * Filters reviewable requests by type
-     * @param {number} requestTypes xdr.ReviewableRequestType
-     * @returns {ReviewableRequestCallBuilder}
-     */
-    forType(...requestTypes) {
-        let typeMask = 0;
-        requestTypes.forEach(el => {
-            typeMask += 1 << el;
-        });
-        this.url.addQuery('type_mask', typeMask);
         return this;
     }
 

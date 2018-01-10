@@ -12,4 +12,9 @@ export class OrderBookCallBuilder extends CallBuilder {
         this.url.addQuery('is_buy', isBuy);
         return this;
     }
+
+    forOrderBookID(orderBookID) {
+        this.url.addQuery('order_book_id', orderBookID);
+        return this;
+    }
 }

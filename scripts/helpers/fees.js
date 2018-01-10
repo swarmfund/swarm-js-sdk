@@ -1,4 +1,4 @@
-export function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset) {
+function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset) {
     return testHelper.server.loadAccountWithSign(testHelper.master.accountId(), testHelper.master)
         .then(source => {
             let opts = {
@@ -21,4 +21,8 @@ export function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseA
 
             return testHelper.server.submitTransaction(tx);
         });
+}
+
+module.exports = {
+  setFees
 }
