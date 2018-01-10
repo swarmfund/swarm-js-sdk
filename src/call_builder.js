@@ -222,28 +222,28 @@ export class CallBuilder {
     for (var i = 0; i < json._embedded.records.length; i++) {
       json._embedded.records[i] = this._parseRecord(json._embedded.records[i]);
     }
+    if (json._links.self.href === '') {
+      return { records: json._embedded.records };
+    }
+
     return {
       records: json._embedded.records,
-      next: (keypair) => {
-        if (keypair) {
-          var config = this._getRequestConfig(URI(json._links.next.href), keypair);
-          return this._sendNormalRequest(URI(json._links.next.href), config)
-            .then(r => this._toCollectionPage(r));
-        } else {
-          return this._sendNormalRequest(URI(json._links.next.href))
-            .then(r => this._toCollectionPage(r));
-        }
-      },
-      prev: (keypair) => {
-        if (keypair) {
-          var config = this._getRequestConfig(URI(json._links.next.href), keypair);
-          return this._sendNormalRequest(URI(json._links.prev.href), config)
-            .then(r => this._toCollectionPage(r));
-        } else {
-          return this._sendNormalRequest(URI(json._links.prev.href))
-            .then(r => this._toCollectionPage(r));
-        }
+      next: _pageSwitch(json._links, 'next'),
+      prev: _pageSwitch(json._links, 'prev')
+    };
+  }
+
+  _pageSwitch(links, direction) {
+    return (keypair) => {
+      let config;
+      var link = links[direction].href;
+
+      if (keypair) {
+        config = this._getRequestConfig(URI(link), keypair); 
       }
+
+      return this._sendNormalRequest(URI(link), config)
+        .then(r => this._toCollectionPage(r));
     };
   }
 

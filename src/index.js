@@ -1,6 +1,7 @@
 require('es6-promise').polyfill();
 
 // stellar-sdk classes to expose
+export * from "./enums";
 export * from "./errors";
 export {Config} from "./config";
 export {Server} from "./server";

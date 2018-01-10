@@ -131,5 +131,18 @@ export class SalesCallBuilder extends CallBuilder {
     this.url.addQuery('sort_by', 3);
     return this;
   }
-  
+  /**
+   * 
+   * @param {String} sortTypeName - value from `JsSDK.enums.salesSortTypes`
+   */
+  sortBy(sortTypeName) {
+    this.url.addQuery('sort_by', sortTypes[sortTypeName]);
+    return this;
+  }
 }
+
+var sortTypes = {
+  'most_founded': 1,
+  'end_type': 2,
+  'popularity': 3,
+};
