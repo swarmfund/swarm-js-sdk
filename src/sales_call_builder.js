@@ -67,16 +67,6 @@ export class SalesCallBuilder extends CallBuilder {
   }
 
   /**
-   * Filter sales in which the current сap exceeds soft cap.
-   * @param {boolean} reachedSoftCap
-   * @return {SalesCallBuilder}
-   */
-  reachedSoftCap(reachedSoftCap = true) {
-    this.url.addQuery('reached_soft_cap', reachedSoftCap);
-    return this;
-  }
-
-  /**
    * Filters sales by name
    * @param {string} name For example: `awesome sale`
    * @returns {SalesCallBuilder}
@@ -91,12 +81,12 @@ export class SalesCallBuilder extends CallBuilder {
    * the specified percentage `bound` of the soft cap.
    * @param {Number} bound - percent value from 0 to 100
    */
-  softCapPercentGot(bound = 90) {
+  currentSoftCapsRatio(bound = 90) {
     if (bound < 0 || bound > 100) {
       throw new Error("bound value is out of range 0 <= x <= 100");
     }
 
-    this.url.addQuery('scap_percent_got', bound);
+    this.url.addQuery('current_soft_caps_ratio', bound);
     return this;
   }
 
