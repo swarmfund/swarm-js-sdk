@@ -66362,29 +66362,29 @@ var StellarSdk =
 	     * @param {Number} bound - percent value from 0 to 100
 	     */
 	  }, {
-	    key: 'nearlyFunded',
-	    value: function nearlyFunded() {
+	    key: 'softCapPercentGot',
+	    value: function softCapPercentGot() {
 	      var bound = arguments.length <= 0 || arguments[0] === undefined ? 90 : arguments[0];
 
 	      if (bound < 0 || bound > 100) {
 	        throw new Error("bound value is out of range 0 <= x <= 100");
 	      }
 
-	      this.url.addQuery('nearly_funded', bound);
+	      this.url.addQuery('scap_percent_got', bound);
 	      return this;
 	    }
 
 	    /**
-	     * Filter sales in which the current сap exceeds `goalValue`.
-	     * @param {number} goalValue - lower bound of the current cap.
+	     * Filter sales in which the current сap exceeds `collectedValueBound`.
+	     * @param {number} collectedValueBound - lower bound of the current cap.
 	     * @returns {SalesCallBuilder}
 	     */
 	  }, {
-	    key: 'withGoalValue',
-	    value: function withGoalValue() {
-	      var goalValue = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+	    key: 'withCollectedValueBound',
+	    value: function withCollectedValueBound() {
+	      var collectedValueBound = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
-	      this.url.addQuery('goal_value', goalValue);
+	      this.url.addQuery('collected_value_bound', collectedValueBound);
 	      return this;
 	    }
 
