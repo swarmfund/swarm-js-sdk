@@ -16,7 +16,10 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, quoteAsset, sta
         details: {
             short_description: "short description",
             description: "Token sale description",
-            logo: "logo",
+            logo: {
+                url: "logo_url",
+                type: "logo_type",
+            },
             name: "sale name",
         },
     };
