@@ -2,19 +2,23 @@ var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
 
-function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy=0, maxIssuanceAmount="100000000", initialPreissuedAmount = "0") {
-    console.log(assetCode,maxIssuanceAmount)
+function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy = 0, maxIssuanceAmount = "100000000", initialPreissuedAmount = "0") {
+    console.log(assetCode, maxIssuanceAmount)
     let opts = {
         requestID: "0",
         code: assetCode,
-        name: assetCode + " name",
         preissuedAssetSigner: issuer,
-        description: "Description",
-        externalResourceLink: "https://myasset.com",
         maxIssuanceAmount: maxIssuanceAmount,
         policies: policy,
-        logoId: assetCode + " Logo",
         initialPreissuedAmount: initialPreissuedAmount,
+        details: {
+            name: assetCode + " name",
+            documents: ["asd1", "asd2"],
+            logo: {
+                url: "logo_url",
+                type: "logo_type",
+            },
+        },
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
