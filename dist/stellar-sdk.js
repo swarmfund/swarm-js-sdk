@@ -66345,16 +66345,12 @@ var StellarSdk =
 	    /**
 	     * Filter sales in which the current сap exceeds 
 	     * the specified percentage `bound` of the soft cap.
-	     * @param {Number} bound - percent value from 0 to 100
+	     * @param {Number} bound - percent value
 	     */
 	  }, {
 	    key: 'currentSoftCapsRatio',
 	    value: function currentSoftCapsRatio() {
 	      var bound = arguments.length <= 0 || arguments[0] === undefined ? 90 : arguments[0];
-
-	      if (bound < 0 || bound > 100) {
-	        throw new Error("bound value is out of range 0 <= x <= 100");
-	      }
 
 	      this.url.addQuery('current_soft_caps_ratio', bound);
 	      return this;
