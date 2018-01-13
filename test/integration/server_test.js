@@ -114,8 +114,6 @@ describe("Integration test", function () {
 
     it("Update limits for account", function (done) {
         var accountKP = StellarSdk.Keypair.random();
-        var syndicateKP = StellarSdk.Keypair.random();
-        var asset = "BTC" + Math.floor(Math.random() * 1000);
         var documentData = "Some data in document";
         var newLimits = {
             dailyOut: "100",
@@ -125,8 +123,6 @@ describe("Integration test", function () {
         };
 
         accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
-            .then(() => accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0))
-            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), asset, 0, "5000"))
             .then(() => {
                 return limitsUpdateHelper.createLimitsUpdateRequest(testHelper, accountKP, documentData)
             })
