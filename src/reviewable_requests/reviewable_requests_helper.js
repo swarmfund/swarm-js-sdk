@@ -3,6 +3,7 @@ import {PreissuanceRequestsCallBuilder} from "./preissuance_requests_call_builde
 import {IssuanceRequestsCallBuilder} from "./issuance_requests_call_builder";
 import {WithdrawalRequestsCallBuilder} from "./withdrawal_requests_call_builder";
 import {SaleRequestsCallBuilder} from "./sales_requests_call_builder";
+import {LimitsUpdateRequestsCallBuilder} from "./limits_update_requests_call_builder";
 let URI = require("urijs");
 
 
@@ -57,6 +58,14 @@ export class ReviewableRequestsHelper {
      */
     sales() {
         return new SaleRequestsCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link LimitsUpdateRequestsCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {LimitsUpdateRequestsCallBuilder}
+     */
+    limits_updates() {
+        return new LimitsUpdateRequestsCallBuilder(URI(this.serverURL));
     }
     
 }
