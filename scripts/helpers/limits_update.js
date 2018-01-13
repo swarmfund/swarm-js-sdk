@@ -1,14 +1,15 @@
 var reviewableRequestHelper = require('./review_request');
 const StellarSdk = require('../../lib/index');
+var _swarmJsBase = require("swarm-js-base");
+var hash = _swarmJsBase.hash;
 
-
-function createLimitsUpdateRequest(testHelper, source, documentHash) {
+function createLimitsUpdateRequest(testHelper, source, documentData) {
     const opts = {
         limitsUpdateRequestData: {
-        documentHash: documentHash
+        documentHash: hash(documentData)
     }
     };
-    const operation = StellarSdk.Operation.setOptions(opts);
+    const operation = StellarSdk.SetOptionsBuilder.setOptions(opts);
     return testHelper.server.submitOperation(operation, source.accountId(), source)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));

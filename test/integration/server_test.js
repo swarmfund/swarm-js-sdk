@@ -26,9 +26,6 @@ describe("Integration test", function () {
         server: server,
     };
 
-    var _swarmJsBase = require("swarm-js-base");
-    var hash = _swarmJsBase.hash;
-
     before(function (done) {
         this.timeout(60 * 1000);
         checkConnection(done);
@@ -120,7 +117,6 @@ describe("Integration test", function () {
         var syndicateKP = StellarSdk.Keypair.random();
         var asset = "BTC" + Math.floor(Math.random() * 1000);
         var documentData = "Some data in document";
-        var documentHash = hash(documentData);
         var newLimits = {
             dailyOut: "100",
             weeklyOut: "200",
@@ -132,7 +128,7 @@ describe("Integration test", function () {
             .then(() => accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0))
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), asset, 0, "5000"))
             .then(() => {
-                return limitsUpdateHelper.createLimitsUpdateRequest(testHelper, accountKP, documentHash)
+                return limitsUpdateHelper.createLimitsUpdateRequest(testHelper, accountKP, documentData)
             })
             .then(requestID =>  {
                 return reviewableRequestHelper.reviewLimitsUpdateRequest(testHelper, requestID, master, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
