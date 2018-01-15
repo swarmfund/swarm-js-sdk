@@ -40,7 +40,7 @@ function reviewWithdrawRequest(testHelper, requestID, reviewerKP, action, reject
             requestType: request.details.request_type_i,
             action: action,
             reason: rejectReason,
-            externalDetails: JSON.stringify(externalDetails),
+            externalDetails: externalDetails,
         };
         let operation = StellarSdk.ReviewRequestBuilder.reviewWithdrawRequest(opts);
         return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
