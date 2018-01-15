@@ -72,7 +72,7 @@ describe("Integration test", function () {
                     })
                     .then(requestID => {
                         return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
-                            "", "Updated external details")
+                            "", { a : "Updated external details" })
                     })
             })
             .then(() => done())
