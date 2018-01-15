@@ -47,7 +47,7 @@ describe("Integration test", function () {
     it("Create asset and perform issuance", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
         var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value;
-        var preIssuedAmount = "10000.0000";
+        var preIssuedAmount = "10000.000000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
         console.log("Creating new account for issuance " + syndicateKP.accountId());
