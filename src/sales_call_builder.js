@@ -136,4 +136,11 @@ export class SalesCallBuilder extends CallBuilder {
     return this;
   }
   
+  /**
+   *  Sort sales with provided type
+   */
+  sortBy (type) {
+    this.url.addQuery('sort_by', type);
+    return this;
+  }
 }
