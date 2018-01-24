@@ -81,7 +81,7 @@ export class SalesCallBuilder extends CallBuilder {
    * the specified percentage `bound` of the soft cap.
    * @param {Number} bound - percent value from 0 to 100
    */
-  currentSoftCapsRatio(bound = 90) {
+  currentSoftCapsRatio(bound = 0) {
     if (bound < 0 || bound > 100) {
       throw new Error("bound value is out of range 0 <= x <= 100");
     }
@@ -136,4 +136,11 @@ export class SalesCallBuilder extends CallBuilder {
     return this;
   }
   
+  /**
+   *  Sort sales with provided type
+   */
+  sortBy (type) {
+    this.url.addQuery('sort_by', type);
+    return this;
+  }
 }

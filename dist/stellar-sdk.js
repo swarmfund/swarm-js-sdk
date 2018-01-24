@@ -6375,6 +6375,12 @@ var StellarSdk =
 	            return this;
 	        }
 	    }, {
+	        key: 'details',
+	        value: function details(accountId) {
+	            this.filter.push(['accounts', accountId, 'balances', 'details']);
+	            return this;
+	        }
+	    }, {
 	        key: 'referrals',
 	        value: function referrals(accountId) {
 	            this.filter.push(['accounts', accountId, 'referrals']);
@@ -65379,10 +65385,9 @@ var StellarSdk =
 	    _inherits(BalanceCallBuilder, _CallBuilder);
 
 	    /**
-	     * Creates a new {@link PaymentCallBuilder} pointed to server defined by serverUrl.
+	     * Creates a new {@link BalanceCallBuilder} pointed to server defined by serverUrl.
 	     *
-	     * Do not create this object directly, use {@link Server#payments}.
-	     * @see [All Payments](https://www.stellar.org/developers/horizon/reference/payments-all.html)
+	     * Do not create this object directly, use {@link Server#balances}.
 	     * @constructor
 	     * @extends CallBuilder
 	     * @param {string} serverUrl Horizon server URL.
@@ -65417,6 +65422,18 @@ var StellarSdk =
 	        key: 'account',
 	        value: function account(balanceId) {
 	            this.filter.push(['balances', balanceId, 'account']);
+	            return this;
+	        }
+
+	        /**
+	         * This endpoint represents balances filtered by asset code
+	         * @param {string} like USD
+	         * @returns {AssetCallBuilder}
+	         */
+	    }, {
+	        key: 'assetHolders',
+	        value: function assetHolders(assetCode) {
+	            this.filter.push(['assets', assetCode, 'holders']);
 	            return this;
 	        }
 	    }]);
@@ -66867,7 +66884,7 @@ var StellarSdk =
 	  }, {
 	    key: 'currentSoftCapsRatio',
 	    value: function currentSoftCapsRatio() {
-	      var bound = arguments.length <= 0 || arguments[0] === undefined ? 90 : arguments[0];
+	      var bound = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
 	      if (bound < 0 || bound > 100) {
 	        throw new Error("bound value is out of range 0 <= x <= 100");
@@ -66930,6 +66947,16 @@ var StellarSdk =
 	    key: 'sortByPopularity',
 	    value: function sortByPopularity() {
 	      this.url.addQuery('sort_by', 3);
+	      return this;
+	    }
+
+	    /**
+	     *  Sort sales with provided type
+	     */
+	  }, {
+	    key: 'sortBy',
+	    value: function sortBy(type) {
+	      this.url.addQuery('sort_by', type);
 	      return this;
 	    }
 	  }]);
