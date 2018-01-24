@@ -45,12 +45,18 @@ var admins = {
         'GAR47OMBKHXZ55CEODNBG6L34LJRSFJ7QRBL7MTCFFCK6CGLHUWZ246N': {
             identity: 11,
             weight: 51,
+            type: 16,
             name: `Withdraw signer 1`
         },
         'GAJHBDSVNMZVBJP24TMULBXK5VNJQEMCQKNWA2NRZ7HNA7OVJXLTKGZD': {
             identity: 12,
             weight: 51,
+            type: 16,
             name: `Withdraw signer 2`
+        },
+        'GBUNYKBS45LXOFQV3TMYJ36IPLGK3K7AS2ORETANGA7C5SOOGRWBUTMA': {
+            identity: 1,
+            name: "Secure Vote",
         },
     }, details => ({
         identity: details.identity,

@@ -1,11 +1,14 @@
 const StellarSdk = require('../../lib/index');
 
 function createNewAccount(testHelper, accountId, accountType, accountPolicies = undefined) {
+    let recoverKP = StellarSdk.Keypair.random();
     const opts = {
         destination: accountId,
+        recoveryKey: recoverKP.accountId(),
         accountType: accountType,
         source: testHelper.master.accountId(),
         accountPolicies: accountPolicies,
+        recoveryKey: StellarSdk.Keypair.random().accountId(),
     };
     const operation = StellarSdk.Operation.createAccount(opts);
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
@@ -35,6 +38,24 @@ function findBalanceByAsset(balances, asset) {
             return balances[i]
         }
     }
+}
+
+function isExternalSystemAccountIDAlreadyExists(tesstHelper, accountId, externalSystemType) {
+    return testHelper.server.loadAccountWithSign(accountId, testHelper.master).then(source => {
+        for (var i in source.external_system_accounts) {
+            var id = source.external_system_accounts[i];
+            if (id.type.value === externalSystemType) {
+                return true;
+            }
+        }
+
+        return false;
+    }).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            return false;
+        }
+        throw err;
+    });
 }
 
 function loadBalanceForAsset(testHelper, accountId, asset) {

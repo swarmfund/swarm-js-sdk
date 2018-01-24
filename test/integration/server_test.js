@@ -6,6 +6,7 @@ import * as accountHelper from '../../scripts/helpers/accounts'
 import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
+import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
 
 let config = require('../../scripts/config');
 
@@ -43,10 +44,11 @@ describe("Integration test", function () {
             });
     }
 
-    it("Create asset and perform issuance", function (done) {
+
+    it("Create and withdraw asset", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
-        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value;
-        var preIssuedAmount = "10000.0000";
+        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
+        var preIssuedAmount = "10000.000000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
         console.log("Creating new account for issuance " + syndicateKP.accountId());
@@ -67,11 +69,14 @@ describe("Integration test", function () {
                     .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
                     .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
                     .then(balanceID => {
-                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
+                        return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
                     })
                     .then(requestID => {
-                        return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
-                            "", "Updated external details")
+                        return reviewableRequestHelper.reviewTwoStepWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                            "", { two_step_details: "Updated two step external details" }).then(() => {
+                                return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                                    "", { one_step_withdrawal: "Updated external details" }, StellarSdk.xdr.ReviewableRequestType.withdraw().value)
+                            });
                     })
             })
             .then(() => done())
@@ -109,5 +114,27 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper))
             .then(() => done())
             .catch(err => done(err));
+    });
+
+    it("Update limits for account", function (done) {
+        var accountKP = StellarSdk.Keypair.random();
+        var documentData = "Some data in document";
+        var newLimits = {
+            dailyOut: "100",
+            weeklyOut: "200",
+            monthlyOut: "300",
+            annualOut: "500"
+        };
+
+        accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
+            .then(() => {
+                return limitsUpdateHelper.createLimitsUpdateRequest(testHelper, accountKP, documentData)
+            })
+            .then(requestID =>  {
+                return reviewableRequestHelper.reviewLimitsUpdateRequest(testHelper, requestID, master, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                    "", newLimits);
+            })
+            .then(() => done())
+            .catch(err => { done(err) });
     });
 })
