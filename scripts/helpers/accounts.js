@@ -1,8 +1,10 @@
 const StellarSdk = require('../../lib/index');
 
 function createNewAccount(testHelper, accountId, accountType, accountPolicies = undefined) {
+    let recoverKP = StellarSdk.Keypair.random();
     const opts = {
         destination: accountId,
+        recoveryKey: recoverKP.accountId(),
         accountType: accountType,
         source: testHelper.master.accountId(),
         accountPolicies: accountPolicies,

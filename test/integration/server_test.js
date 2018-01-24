@@ -6,6 +6,7 @@ import * as accountHelper from '../../scripts/helpers/accounts'
 import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
+import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
 
 let config = require('../../scripts/config');
 
@@ -113,5 +114,27 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper))
             .then(() => done())
             .catch(err => done(err));
+    });
+
+    it("Update limits for account", function (done) {
+        var accountKP = StellarSdk.Keypair.random();
+        var documentData = "Some data in document";
+        var newLimits = {
+            dailyOut: "100",
+            weeklyOut: "200",
+            monthlyOut: "300",
+            annualOut: "500"
+        };
+
+        accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
+            .then(() => {
+                return limitsUpdateHelper.createLimitsUpdateRequest(testHelper, accountKP, documentData)
+            })
+            .then(requestID =>  {
+                return reviewableRequestHelper.reviewLimitsUpdateRequest(testHelper, requestID, master, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                    "", newLimits);
+            })
+            .then(() => done())
+            .catch(err => { done(err) });
     });
 })

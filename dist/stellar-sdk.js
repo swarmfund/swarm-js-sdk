@@ -5621,14 +5621,14 @@ var StellarSdk =
 
 	var _swarmJsBase2 = _interopRequireDefault(_swarmJsBase);
 
-	var _lodashIsUndefined = __webpack_require__(577);
+	var _lodashIsUndefined = __webpack_require__(578);
 
 	var _lodashIsUndefined2 = _interopRequireDefault(_lodashIsUndefined);
 
 	var axios = __webpack_require__(481);
 	var toBluebird = __webpack_require__(508).resolve;
 	var URI = __webpack_require__(477);
-	var querystring = __webpack_require__(578);
+	var querystring = __webpack_require__(579);
 
 	var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 
@@ -66965,6 +66965,8 @@ var StellarSdk =
 
 	var _reviewable_request_call_builder = __webpack_require__(572);
 
+	var _limits_update_requests_call_builder = __webpack_require__(577);
+
 	var URI = __webpack_require__(477);
 
 	var ReviewableRequestsHelper = (function () {
@@ -67042,6 +67044,16 @@ var StellarSdk =
 	        key: "request",
 	        value: function request() {
 	            return new _reviewable_request_call_builder.ReviewableRequestCallBuilder(URI(this.serverURL));
+	        }
+
+	        /**
+	         * Returns new {@link LimitsUpdateRequestsCallBuilder} object configured by a current Horizon server configuration.
+	         * @returns {LimitsUpdateRequestsCallBuilder}
+	         */
+	    }, {
+	        key: "limits_updates",
+	        value: function limits_updates() {
+	            return new _limits_update_requests_call_builder.LimitsUpdateRequestsCallBuilder(URI(this.serverURL));
 	        }
 	    }]);
 
@@ -67421,7 +67433,7 @@ var StellarSdk =
 	    }
 
 	    /**
-	     * Filters withdrawals by base asset.
+	     * Filters sales by base asset.
 	     * @param {string} asset For example: `BTC`
 	     * @returns {SaleRequestsCallBuilder}
 	     */
@@ -67441,6 +67453,64 @@ var StellarSdk =
 
 /***/ }),
 /* 577 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(572);
+
+	var LimitsUpdateRequestsCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(LimitsUpdateRequestsCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link LimitsUpdateRequestsCallBuilder} pointed to server defined by serverUrl.
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#limits_updates}.
+	     * @constructor
+	     * @extends ReviewableRequestCallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function LimitsUpdateRequestsCallBuilder(serverUrl) {
+	        _classCallCheck(this, LimitsUpdateRequestsCallBuilder);
+
+	        _get(Object.getPrototypeOf(LimitsUpdateRequestsCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/limits_updates');
+	    }
+
+	    /**
+	     * Filters limits_updates by documentHash.
+	     * @param {string} documentHash
+	     * @returns {LimitsUpdateRequestsCallBuilder}
+	     */
+
+	    _createClass(LimitsUpdateRequestsCallBuilder, [{
+	        key: 'forDocumentHash',
+	        value: function forDocumentHash(documentHash) {
+	            this.url.addQuery('document_hash', documentHash);
+	            return this;
+	        }
+	    }]);
+
+	    return LimitsUpdateRequestsCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.LimitsUpdateRequestsCallBuilder = LimitsUpdateRequestsCallBuilder;
+
+/***/ }),
+/* 578 */
 /***/ (function(module, exports) {
 
 	/**
@@ -67468,17 +67538,17 @@ var StellarSdk =
 
 
 /***/ }),
-/* 578 */
+/* 579 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.decode = exports.parse = __webpack_require__(579);
-	exports.encode = exports.stringify = __webpack_require__(580);
+	exports.decode = exports.parse = __webpack_require__(580);
+	exports.encode = exports.stringify = __webpack_require__(581);
 
 
 /***/ }),
-/* 579 */
+/* 580 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -67564,7 +67634,7 @@ var StellarSdk =
 
 
 /***/ }),
-/* 580 */
+/* 581 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
