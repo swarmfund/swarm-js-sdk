@@ -43,10 +43,11 @@ describe("Integration test", function () {
             });
     }
 
-    it("Create asset and perform issuance", function (done) {
+
+    it("Create and withdraw asset", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
-        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value;
-        var preIssuedAmount = "10000.0000";
+        var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
+        var preIssuedAmount = "10000.000000";
         var syndicateKP = StellarSdk.Keypair.random();
         var newAccountKP = StellarSdk.Keypair.random();
         console.log("Creating new account for issuance " + syndicateKP.accountId());
@@ -67,11 +68,14 @@ describe("Integration test", function () {
                     .then(() => assetHelper.createAssetPair(testHelper, assetCode, autoConversionAsset))
                     .then(() => accountHelper.loadBalanceIDForAsset(testHelper, newAccountKP.accountId(), assetCode))
                     .then(balanceID => {
-                    return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
+                        return withdrawHelper.withdraw(testHelper, newAccountKP, balanceID, preIssuedAmount, autoConversionAsset)
                     })
                     .then(requestID => {
-                        return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
-                            "", "Updated external details")
+                        return reviewableRequestHelper.reviewTwoStepWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                            "", { two_step_details: "Updated two step external details" }).then(() => {
+                                return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                                    "", { one_step_withdrawal: "Updated external details" }, StellarSdk.xdr.ReviewableRequestType.withdraw().value)
+                            });
                     })
             })
             .then(() => done())
