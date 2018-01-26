@@ -7,6 +7,7 @@ import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
+import * as payoutHelper from '../../scripts/helpers/payout'
 
 let config = require('../../scripts/config');
 
@@ -137,4 +138,40 @@ describe("Integration test", function () {
             .then(() => done())
             .catch(err => { done(err) });
     });
-})
+
+    it("Perform payout", function (done) {
+        let syndicateKP = StellarSdk.Keypair.random();
+        let assetCode = "EUR" + Math.floor(Math.random() * 1000);
+        let assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value;
+        let maxIssuanceAmount = 2000;
+        let preIssuedAmount = maxIssuanceAmount / 2;
+
+        // ants
+        let ant1KP = StellarSdk.Keypair.random();
+        let ant2KP = StellarSdk.Keypair.random();
+
+        // holders
+        let holder1KP = StellarSdk.Keypair.random();
+        let holder2KP = StellarSdk.Keypair.random();
+
+
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            .then(() => accountHelper.createNewAccount(testHelper, ant1KP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
+            .then(() => accountHelper.createNewAccount(testHelper, ant2KP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
+            .then(() => accountHelper.createNewAccount(testHelper, holder1KP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
+            .then(() => accountHelper.createNewAccount(testHelper, holder2KP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy,
+                maxIssuanceAmount.toString(), preIssuedAmount.toString()))
+            .then(() => issuanceHelper.fundAccount(testHelper, syndicateKP, assetCode, syndicateKP, "699"))
+            .then(() => issuanceHelper.fundAccount(testHelper, ant1KP, assetCode, syndicateKP, "0.1"))
+            .then(() => issuanceHelper.fundAccount(testHelper, ant2KP, assetCode, syndicateKP, "0.9"))
+            .then(() => issuanceHelper.fundAccount(testHelper, holder1KP, assetCode, syndicateKP, "100"))
+            .then(() => issuanceHelper.fundAccount(testHelper, holder2KP, assetCode, syndicateKP, "200"))
+            .then(() => accountHelper.loadBalanceIDForAsset(testHelper, syndicateKP.accountId(), assetCode))
+            .then(balanceID => {
+                return payoutHelper.performPayout(testHelper, syndicateKP, assetCode, balanceID, "100")
+            })
+            .then(() => done())
+            .catch(err => { done(err) });
+    });
+});

@@ -16,6 +16,7 @@ import { OfferCallBuilder } from "./offer_call_builder";
 import { OperationCallBuilder } from "./operation_call_builder";
 import { OrderBookCallBuilder } from "./order_book_call_builder";
 import { PaymentCallBuilder } from "./payment_call_builder";
+import {PayoutCallBuilder} from "./payout _call_builder";
 import { PaymentRequestCallBuilder } from "./payment_request_call_builder";
 import { PriceCallBuilder } from "./price_call_builder";
 import { PublicInfoCallBuilder } from "./public_info_call_builder";
@@ -328,6 +329,14 @@ export class Server {
      */
     payments() {
         return new PaymentCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link PayoutCallBuilder} object configured with the current Horizon server configuration.
+     * @returns {PayoutCallBuilder}
+     */
+    payouts() {
+        return new PayoutCallBuilder(URI(this.serverURL));
     }
 
     /**

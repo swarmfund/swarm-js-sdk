@@ -51,6 +51,10 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
 
 // fundAccount - creates new balance and issues funds to it
 function fundAccount(testHelper, accountToBeFundedKP, assetCode, assetOwnerKP, amount) {
+    if (accountToBeFundedKP.accountId() == assetOwnerKP.accountId()) {
+        return accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode)
+            .then(balanceID => issue(testHelper, assetOwnerKP, balanceID, assetCode, amount))
+    }
     return accountHelper.createBalanceForAsset(testHelper, accountToBeFundedKP, assetCode)
         .then(() => accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode))
         .then(balanceID => issue(testHelper, assetOwnerKP, balanceID, assetCode, amount))
