@@ -38,6 +38,8 @@ function findBalanceByAsset(balances, asset) {
             return balances[i]
         }
     }
+
+    throw new Error("Failed to find balance for asset: " + asset);
 }
 
 function isExternalSystemAccountIDAlreadyExists(tesstHelper, accountId, externalSystemType) {
@@ -76,7 +78,7 @@ function addSuperAdmin(testHelper, sourceAccId, keypair, address, details) {
     console.log("Add SuperAdmin: ", address)
     var source = new StellarSdk.Account(sourceAccId)
     var tx = new StellarSdk.TransactionBuilder(source)
-        .addOperation(StellarSdk.Operation.setOptions({
+        .addOperation(StellarSdk.SetOptionsBuilder.setOptions({
             signer: {
                 pubKey: address,
                 weight: details.weight,
@@ -93,7 +95,7 @@ function addSuperAdmin(testHelper, sourceAccId, keypair, address, details) {
 
 function setThresholds(helper, source, kp, thresholds) {
     var tx = new StellarSdk.TransactionBuilder(new StellarSdk.Account(source))
-        .addOperation(StellarSdk.Operation.setOptions({
+        .addOperation(StellarSdk.SetOptionsBuilder.setOptions({
             masterWeight: thresholds.master || undefined,
             highThreshold: thresholds.high || undefined,
             mediumThreshold: thresholds.medium || undefined,

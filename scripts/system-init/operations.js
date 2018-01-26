@@ -3,7 +3,7 @@ const helpers = require('./../helpers')
 const StellarSdk = require('../../lib/index');
 const _ = require('lodash');
 
-let env = 'staging';
+let env = 'dev';
 let currentConfig = config.getConfig(env);
 
 const accounts = [
@@ -27,20 +27,17 @@ const accounts = [
     },
 ]
 
-const baseAssetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value |
-    StellarSdk.xdr.AssetPolicy.baseAsset().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
+const baseAssetPolicy = StellarSdk.xdr.AssetPolicy.baseAsset().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
 
 const tokensForIssuance = [
-    {code: 'SUN', policy: baseAssetPolicy, maxAmount: "100000000", amount: '10000000', emit: '1500'},
-    {code: 'USD', policy: 0, maxAmount: "0"},
-    {code: 'BTC', policy: 0, maxAmount: "0"},
-    {code: 'ETH', policy: 0, maxAmount: "0"},
+    {code: 'SUN', policy: 0, maxAmount: "0", amount: "0", emit: "0"},
+    {code: 'BTC', policy: baseAssetPolicy, maxAmount: "100000000", amount: '10000000', emit: '1500'},
+    {code: 'ETH', policy: baseAssetPolicy, maxAmount: "100000000", amount: '10000000', emit: '1500'},
 ]
 
 const assetPairs = [
     {base: 'BTC', quote: 'SUN', policy: 0, price: "19842"},
     {base: 'ETH', quote: 'SUN', policy: 0, price: "842"},
-    {base: 'SUN', quote: 'USD', policy: 0, price: "1"},
 ]
 
 module.exports = {
