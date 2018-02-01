@@ -2,17 +2,17 @@ var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
 
-function createSaleCreationRequest(testHelper, owner, baseAsset, quoteAsset, startTime, endTime, price, softCap, hardCap) {
+function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets) {
     let opts = {
         requestID: "0",
         baseAsset: baseAsset,
-        quoteAsset: quoteAsset,
-        name: baseAsset + quoteAsset,
+        defaultQuoteAsset: defaultQuoteAsset,
+        name: baseAsset + defaultQuoteAsset,
         startTime: startTime,
         endTime: endTime,
-        price: price,
         softCap: softCap,
         hardCap: hardCap,
+        quoteAssets: quoteAssets,
         details: {
             short_description: "short description",
             description: "Token sale description",
@@ -27,23 +27,27 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, quoteAsset, sta
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-function createSale(testHelper, owner, baseAsset, quoteAsset, startTime, endTime, price, softCap, hardCap) {
-    return createSaleCreationRequest(testHelper, owner, baseAsset, quoteAsset, startTime, endTime, price, softCap, hardCap)
+function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets) {
+    return createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var success = result.result().results()[0].tr().createSaleCreationRequestResult().success();
             var id = success.requestId().toString();
             return reviewableRequestHelper.reviewRequest(testHelper, id, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "");
         }).then(res => {
-            console.log(baseAsset, quoteAsset, ' <-- Sale successfully created');
+            console.log(baseAsset, defaultQuoteAsset, ' <-- Sale successfully created');
             return res;
         });
 }
 
 
-function checkSaleState(testHelper) {
-    let operation = StellarSdk.SaleRequestBuilder.checkSaleState({});
+function checkSaleState(testHelper, baseAsset) {
+    return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(testHelper.master).then(sales => {
+        return sales.records[0];
+    }).then(sale => {
+       let operation = StellarSdk.SaleRequestBuilder.checkSaleState({saleID: sale.id});
     return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
+    });
 }
 
 module.exports = {

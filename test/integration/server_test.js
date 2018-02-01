@@ -106,35 +106,14 @@ describe("Integration test", function () {
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount.toString(), maxIssuanceAmount.toString()))
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), quoteAsset, 0, hardCap.toString(), hardCap.toString()))
-            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60 * 10 + "", price.toString(), softCap.toString(), hardCap.toString()))
+            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(), hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }]))
             .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, syndicateKP, hardCap.toString()))
             .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
-            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, hardCap.toString()))
-            .then(() => saleHelper.checkSaleState(testHelper))
+            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, hardCap.toString(), quoteAsset))
+            .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             .then(() => done())
             .catch(err => done(err));
     });
 
-    it("Update limits for account", function (done) {
-        var accountKP = StellarSdk.Keypair.random();
-        var documentData = "Some data in document";
-        var newLimits = {
-            dailyOut: "100",
-            weeklyOut: "200",
-            monthlyOut: "300",
-            annualOut: "500"
-        };
-
-        accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
-            .then(() => {
-                return limitsUpdateHelper.createLimitsUpdateRequest(testHelper, accountKP, documentData)
-            })
-            .then(requestID =>  {
-                return reviewableRequestHelper.reviewLimitsUpdateRequest(testHelper, requestID, master, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
-                    "", newLimits);
-            })
-            .then(() => done())
-            .catch(err => { done(err) });
-    });
-})
+});
