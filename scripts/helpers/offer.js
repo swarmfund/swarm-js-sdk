@@ -40,7 +40,8 @@ function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsse
         return sales.records[0];
     }).then(sale => {
         let saleQuoteAsset = findQuoteAssetForAsset(sale, quoteAsset);
-        let baseAmount = Number.parseFloat(quoteAmount)/Number.parseFloat(saleQuoteAsset.price);
+        let baseAmount = Math.round(Number.parseFloat(quoteAmount)/Number.parseFloat(saleQuoteAsset.price) * StellarSdk.Operation.ONE) /StellarSdk.Operation.ONE;
+        console.log(baseAmount);
         return createOffer(testHelper, source, sale.base_asset, quoteAsset, saleQuoteAsset.price, baseAmount.toString(), true, sale.id);
     });
 }
