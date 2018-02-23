@@ -43,17 +43,19 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
 
     const op = StellarSdk.CreateIssuanceRequestBuilder.createIssuanceRequest(opts);
     return testHelper.server.submitOperation(op, requestor.accountId(), requestor)
-      .then(res => {
-        console.log('Issued: ', amount, asset, 'to', receiverBalanceID)
-        return res
-      });
+        .then(res => {
+            console.log('Issued: ', amount, asset, 'to', receiverBalanceID)
+            return res
+        });
 }
 
 // fundAccount - creates new balance and issues funds to it
 function fundAccount(testHelper, accountToBeFundedKP, assetCode, assetOwnerKP, amount) {
-    return accountHelper.createBalanceForAsset(testHelper, accountToBeFundedKP, assetCode)
-        .then(() => accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode))
-        .then(balanceID => issue(testHelper, assetOwnerKP, balanceID, assetCode, amount))
+    return accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode).catch(() => {
+        return accountHelper.createBalanceForAsset(testHelper, accountToBeFundedKP, assetCode).then(() => {
+            accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode)
+        })
+    }).then(balanceID => issue(testHelper, assetOwnerKP, balanceID, assetCode, amount))
 }
 
 module.exports = {

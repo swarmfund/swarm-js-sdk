@@ -35,12 +35,14 @@ function findQuoteAssetForAsset(sale, quoteAsset) {
     throw new Error("Failed to find quote asset of the sale for asset: " + quoteAsset);
 }
 
-function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsset) {
+function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsset, baseAmount) {
     return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(source).then(sales => {
         return sales.records[0];
     }).then(sale => {
         let saleQuoteAsset = findQuoteAssetForAsset(sale, quoteAsset);
-        let baseAmount = Number.parseFloat(quoteAmount)/Number.parseFloat(saleQuoteAsset.price);
+        if (!!quoteAmount) {
+            baseAmount = Math.round(Number.parseFloat(quoteAmount)/Number.parseFloat(saleQuoteAsset.price) * StellarSdk.Operation.ONE) /StellarSdk.Operation.ONE;
+        }
         return createOffer(testHelper, source, sale.base_asset, quoteAsset, saleQuoteAsset.price, baseAmount.toString(), true, sale.id);
     });
 }
