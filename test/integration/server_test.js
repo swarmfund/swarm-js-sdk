@@ -45,10 +45,10 @@ describe("Integration test", function () {
                 setTimeout(() => checkConnection(done), 20000);
             });
     }
-    
 
 
-    /*it("Create and withdraw asset", function (done) {
+
+    it("Create and withdraw asset", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
         var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
         var preIssuedAmount = "10000.000000";
@@ -94,9 +94,9 @@ describe("Integration test", function () {
             })
             .then(() => done())
             .catch(err => done(err));
-});*/
+    });
 
-    /*it("Create sale for asset", function (done) {
+    it("Create sale for asset", function (done) {
         var syndicateKP = StellarSdk.Keypair.random();
         var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
         var quoteAsset = "USD" + Math.floor(Math.random() * 1000);
@@ -117,7 +117,7 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             .then(() => done())
             .catch(err => done(err));
-});*/
+    });
 
 
 
@@ -138,13 +138,13 @@ describe("Integration test", function () {
             .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), defaultQuoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, MAX_INT64_AMOUNT, MAX_INT64_AMOUNT))
             .then(() => assetHelper.createAssetPair(testHelper, quoteAsset, defaultQuoteAsset, "1"))
             .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, defaultQuoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(),
-                 hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }], true))
+                hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }], true))
             .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, testHelper.master, MAX_INT64_AMOUNT))
             .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
             .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, undefined, quoteAsset, '0.000001'))
             .then(() => assetHelper.updateAssetPrice(testHelper, quoteAsset, defaultQuoteAsset, "0.000001"))
-            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, (hardCap/0.000001).toString(), quoteAsset))
+            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, (hardCap / 0.000001).toString(), quoteAsset))
             // first not remove offers with 0 base amount
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             // close sale

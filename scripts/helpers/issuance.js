@@ -53,7 +53,7 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
 function fundAccount(testHelper, accountToBeFundedKP, assetCode, assetOwnerKP, amount) {
     return accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode).catch(() => {
         return accountHelper.createBalanceForAsset(testHelper, accountToBeFundedKP, assetCode).then(() => {
-            accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode)
+            return accountHelper.loadBalanceIDForAsset(testHelper, accountToBeFundedKP.accountId(), assetCode)
         })
     }).then(balanceID => issue(testHelper, assetOwnerKP, balanceID, assetCode, amount))
 }
