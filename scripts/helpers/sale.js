@@ -2,7 +2,7 @@ var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
 
-function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets) {
+function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding) {
     let opts = {
         requestID: "0",
         baseAsset: baseAsset,
@@ -13,6 +13,7 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAss
         softCap: softCap,
         hardCap: hardCap,
         quoteAssets: quoteAssets,
+        isCrowdfunding: isCrowdfunding,
         details: {
             short_description: "short description",
             description: "Token sale description",
@@ -27,8 +28,8 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAss
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets) {
-    return createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets)
+function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding) {
+    return createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var success = result.result().results()[0].tr().createSaleCreationRequestResult().success();
@@ -47,6 +48,8 @@ function checkSaleState(testHelper, baseAsset) {
     }).then(sale => {
        let operation = StellarSdk.SaleRequestBuilder.checkSaleState({saleID: sale.id});
     return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
+    }).then(response => {
+        return response;
     });
 }
 
