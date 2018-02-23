@@ -43,6 +43,11 @@ export class AccountCallBuilder extends CallBuilder {
       return this;
     }
 
+    signers(accountId) {
+      this.filter.push(['accounts', accountId, 'signers']);
+      return this;
+    }
+
     signer(accountId, signerId) {
       this.filter.push(['accounts', accountId, 'signers', signerId]);
       return this;
