@@ -7,6 +7,8 @@ import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
+import * as manageExternalSystemAccountIdPoolEntryHelper from '../../scripts/helpers/manage_external_system_account_id_pool_entry'
+import * as bindExternalSystemAccountIdHelper from '../../scripts/helpers/bind_external_system_account_id'
 
 let config = require('../../scripts/config');
 
@@ -149,6 +151,23 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             // close sale
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+
+    it("Creates new external system account id pool entry", function (done) {
+        let data = "Some data";
+        manageExternalSystemAccountIdPoolEntryHelper.createExternalSystemAccountIdPoolEntry(testHelper, StellarSdk.xdr.ExternalSystemType.erc20Token().value, data)
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+    it("Binds external system account id", function (done) {
+        let accountKP = StellarSdk.Keypair.random();
+        manageExternalSystemAccountIdPoolEntryHelper.createExternalSystemAccountIdPoolEntry(testHelper, StellarSdk.xdr.ExternalSystemType.erc20Token().value, "Some more data")
+            .then(() => accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
+            .then(() => bindExternalSystemAccountIdHelper.bindExternalSystemAccountId(testHelper, accountKP, StellarSdk.xdr.ExternalSystemType.erc20Token().value))
             .then(() => done())
             .catch(err => done(err));
     });
