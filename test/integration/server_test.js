@@ -49,7 +49,6 @@ describe("Integration test", function () {
     }
 
 
-
     it("Create and withdraw asset", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
         var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
@@ -121,8 +120,6 @@ describe("Integration test", function () {
             .catch(err => done(err));
     });
 
-
-
     it("Create fundrasing for asset", function (done) {
         var syndicateKP = StellarSdk.Keypair.random();
         var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
@@ -155,17 +152,9 @@ describe("Integration test", function () {
             .catch(err => done(err));
     });
 
-
-    it("Creates new external system account id pool entry", function (done) {
-        let data = "Some data";
-        manageExternalSystemAccountIdPoolEntryHelper.createExternalSystemAccountIdPoolEntry(testHelper, StellarSdk.xdr.ExternalSystemType.erc20Token().value, data)
-            .then(() => done())
-            .catch(err => done(err));
-    });
-
-    it("Binds external system account id", function (done) {
+    it("Creates and binds new external system account id", function (done) {
         let accountKP = StellarSdk.Keypair.random();
-        manageExternalSystemAccountIdPoolEntryHelper.createExternalSystemAccountIdPoolEntry(testHelper, StellarSdk.xdr.ExternalSystemType.erc20Token().value, "Some more data")
+        manageExternalSystemAccountIdPoolEntryHelper.createExternalSystemAccountIdPoolEntry(testHelper, StellarSdk.xdr.ExternalSystemType.erc20Token().value, "Some data")
             .then(() => accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
             .then(() => bindExternalSystemAccountIdHelper.bindExternalSystemAccountId(testHelper, accountKP, StellarSdk.xdr.ExternalSystemType.erc20Token().value))
             .then(() => done())
