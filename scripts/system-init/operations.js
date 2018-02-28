@@ -3,7 +3,7 @@ const helpers = require('./../helpers')
 const StellarSdk = require('../../lib/index');
 const _ = require('lodash');
 
-let env = 'dev';
+let env = 'local';
 let currentConfig = config.getConfig(env);
 
 const accounts = [
