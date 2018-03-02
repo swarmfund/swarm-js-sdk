@@ -75,5 +75,13 @@ export class ReviewableRequestsHelper {
     limits_updates() {
         return new LimitsUpdateRequestsCallBuilder(URI(this.serverURL));
     }
-    
+
+    /**
+     * Returns new {@link ChangeKYCRequestCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {ChangeKYCRequestCallBuilder}
+     */
+    change_kyc() {
+        return new ChangeKYCRequestCallBuilder(URI(this.serverURL));
+    }
+
 }
