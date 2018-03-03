@@ -54,8 +54,32 @@ function createAssetPair(testHelper, baseAsset, quoteAsset, physicalPrice = "1")
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
 }
 
+
+function changePreIssuerSigner(testHelper, code, newPreIssuer, owner, preIssuerKP) {
+    let operation = StellarSdk.ManageAssetBuilder.changeAssetPreIssuer({
+        code: code,
+        accountID: newPreIssuer,
+    });
+    return testHelper.server.submitOperation(operation, owner.accountId(), preIssuerKP);
+}
+
+function updateAssetPrice(testHelper, baseAsset, quoteAsset, physicalPrice = "1") {
+    let operation = StellarSdk.Operation.manageAssetPair({
+        action: StellarSdk.xdr.ManageAssetPairAction.updatePrice(),
+        base: baseAsset,
+        quote: quoteAsset,
+        policies: 0,
+        physicalPriceCorrection: "0",
+        maxPriceStep: "0",
+        physicalPrice: physicalPrice,
+    });
+    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
+}
+
 module.exports = {
     createAssetCreationRequest,
     createAsset,
-    createAssetPair
+    createAssetPair,
+    updateAssetPrice,
+    changePreIssuerSigner
 }

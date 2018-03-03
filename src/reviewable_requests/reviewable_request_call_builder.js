@@ -53,4 +53,9 @@ export class ReviewableRequestCallBuilder extends CallBuilder {
         return this;
     }
 
+    forType(requestType) {
+        this.url.addQuery('request_type', requestType);
+        return this;
+    }
+
 }

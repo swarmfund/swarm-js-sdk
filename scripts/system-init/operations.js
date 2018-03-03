@@ -3,7 +3,7 @@ const helpers = require('./../helpers')
 const StellarSdk = require('../../lib/index');
 const _ = require('lodash');
 
-let env = 'dev';
+let env = 'local';
 let currentConfig = config.getConfig(env);
 
 const accounts = [
@@ -27,26 +27,23 @@ const accounts = [
     },
 ]
 
-const baseAssetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value +
-    StellarSdk.xdr.AssetPolicy.baseAsset().value
+const baseAssetPolicy = StellarSdk.xdr.AssetPolicy.baseAsset().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
 
 const tokensForIssuance = [
-    {code: 'SUN', policy: baseAssetPolicy, maxAmount: "100000000", amount: '100000', emit: '1500'},
-    {code: 'USD', policy: baseAssetPolicy, maxAmount: "0"},
-    {code: 'BTC', policy: 0, maxAmount: "0"},
-    {code: 'ETH', policy: 0, maxAmount: "0"},
+    {code: 'SUN', policy: 0, maxAmount: "0", amount: "0", emit: "0", issuer: "GBKCQ3JTQI652LHNB3YRR75K3CXQFQ77T7MOMG47NJ6PREIVJ26VWU6L"},
+    {code: 'BTC', policy: baseAssetPolicy, maxAmount: "9223372036854.775807", amount: '0', emit: '0', issuer: "GBKCQ3JTQI652LHNB3YRR75K3CXQFQ77T7MOMG47NJ6PREIVJ26VWU6L"},
+    {code: 'ETH', policy: baseAssetPolicy, maxAmount: "9223372036854.775807", amount: '0', emit: '0', issuer: "GBKCQ3JTQI652LHNB3YRR75K3CXQFQ77T7MOMG47NJ6PREIVJ26VWU6L"},
 ]
 
 const assetPairs = [
-    {base: 'BTC', quote: 'SUN', policy: 0, price: "19842"},
-    {base: 'ETH', quote: 'SUN', policy: 0, price: "842"},
-    {base: 'SUN', quote: 'USD', policy: 0, price: "1"},
+    {base: 'BTC', quote: 'SUN', policy: 0, price: "11583.44"},
+    {base: 'ETH', quote: 'SUN', policy: 0, price: "1228.77"},
 ]
 
 module.exports = {
     createAssets: () => {
         return tokensForIssuance.map(asset =>
-            helpers.assets.createAsset(currentConfig, currentConfig.master, currentConfig.master.accountId(), asset.code, asset.policy, asset.maxAmount)
+            helpers.assets.createAsset(currentConfig, currentConfig.master, asset.issuer, asset.code, asset.policy, asset.maxAmount)
         )
     },
 

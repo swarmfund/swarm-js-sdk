@@ -15,7 +15,7 @@ export class SaleRequestsCallBuilder extends ReviewableRequestCallBuilder {
     }
 
     /**
-     * Filters withdrawals by base asset.
+     * Filters sales by base asset.
      * @param {string} asset For example: `BTC`
      * @returns {SaleRequestsCallBuilder}
      */

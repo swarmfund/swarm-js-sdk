@@ -2,7 +2,9 @@ const helpers = require('./../helpers');
 const operations = require('./operations');
 
 Promise.resolve()
-    .then(_ => operations.createAssets())
+    .then(_ => {
+        return Promise.all(operations.createAssets());
+    })
     .then(_ => {
         console.log('Assets created')
         return Promise.all(operations.createAssetPairs())})

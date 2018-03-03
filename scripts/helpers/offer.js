@@ -25,12 +25,25 @@ function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmoun
     });
 }
 
-function participateInSale(testHelper, source, baseAsset, quoteAmount) {
+function findQuoteAssetForAsset(sale, quoteAsset) {
+    for (var i = 0; i < sale.quote_assets.quote_assets.length; i++) {
+        if (sale.quote_assets.quote_assets[i].asset == quoteAsset) {
+            return sale.quote_assets.quote_assets[i];
+        }
+    }
+
+    throw new Error("Failed to find quote asset of the sale for asset: " + quoteAsset);
+}
+
+function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsset, baseAmount) {
     return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(source).then(sales => {
         return sales.records[0];
     }).then(sale => {
-        let baseAmount = Number.parseFloat(quoteAmount)/Number.parseFloat(sale.price);
-        return createOffer(testHelper, source, sale.base_asset, sale.quote_asset, sale.price, baseAmount.toString(), true, sale.id);
+        let saleQuoteAsset = findQuoteAssetForAsset(sale, quoteAsset);
+        if (!!quoteAmount) {
+            baseAmount = Math.round(Number.parseFloat(quoteAmount)/Number.parseFloat(saleQuoteAsset.price) * StellarSdk.Operation.ONE) /StellarSdk.Operation.ONE;
+        }
+        return createOffer(testHelper, source, sale.base_asset, quoteAsset, saleQuoteAsset.price, baseAmount.toString(), true, sale.id);
     });
 }
 

@@ -2,8 +2,12 @@ const isUndefined = require('lodash/isUndefined');
 const StellarSdk = require('../../lib/index');
 
 
-function loadRequestWithRetry (testHelper, requestID, reviewerKP) {
-    return testHelper.server.reviewableRequestsHelper().assets().reviewableRequest(requestID).callWithSignature(reviewerKP).catch(err => {
+function loadRequestWithRetry (testHelper, requestID, reviewerKP, requestType) {
+    let callBuilder = testHelper.server.reviewableRequestsHelper().request().reviewableRequest(requestID);
+    if (!isUndefined(requestType)) {
+        callBuilder = callBuilder.forType(requestType);
+    }
+    return callBuilder.callWithSignature(reviewerKP).catch(err => {
         if (!isUndefined(err.response) && err.response.status === 404) {
             console.log("received 404 for reviewable request - retrying");
             return new Promise(resolve => setTimeout(resolve, 2000)).then(() => loadRequestWithRetry(testHelper, requestID, reviewerKP));
@@ -12,8 +16,8 @@ function loadRequestWithRetry (testHelper, requestID, reviewerKP) {
     });
 }
 
-function reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason) {
-    return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
+function reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason, requestType) {
+    return loadRequestWithRetry(testHelper, requestID, reviewerKP, requestType).then(request => {
         let opts = {
             requestID: requestID,
             requestHash: request.hash,
@@ -32,8 +36,8 @@ function reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason) 
     });
 }
 
-function reviewWithdrawRequest(testHelper, requestID, reviewerKP, action, rejectReason, externalDetails) {
-    return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
+function reviewWithdrawRequest(testHelper, requestID, reviewerKP, action, rejectReason, externalDetails, requestType) {
+    return loadRequestWithRetry(testHelper, requestID, reviewerKP, requestType).then(request => {
         let opts = {
             requestID: requestID,
             requestHash: request.hash,
@@ -47,6 +51,48 @@ function reviewWithdrawRequest(testHelper, requestID, reviewerKP, action, reject
     }).catch(err => {
         if (!isUndefined(err.response) && err.response.status === 404) {
             console.log("received 404 - retrying");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason, requestType));
+        }
+        throw err;
+    });
+}
+
+function reviewTwoStepWithdrawRequest(testHelper, requestID, reviewerKP, action, rejectReason, externalDetails) {
+    return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
+        let opts = {
+            requestID: requestID,
+            requestHash: request.hash,
+            requestType: request.details.request_type_i,
+            action: action,
+            reason: rejectReason,
+            externalDetails: externalDetails,
+        };
+        let operation = StellarSdk.ReviewRequestBuilder.reviewTwoStepWithdrawRequest(opts);
+        return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
+    }).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            console.log("received 404 - retrying");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason));
+        }
+        throw err;
+    });
+}
+
+function reviewLimitsUpdateRequest(testHelper, requestID, reviewerKP, action, rejectReason, newLimits) {
+    return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
+        let opts = {
+            requestID: requestID,
+            requestHash: request.hash,
+            requestType: request.details.request_type_i,
+            action: action,
+            reason: rejectReason,
+            newLimits: newLimits,
+        };
+        let operation = StellarSdk.ReviewRequestBuilder.reviewLimitsUpdateRequest(opts);
+        return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
+    }).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            console.log("recieved 404 - retrying");
             return new Promise(resolve => setTimeout(resolve, 2000)).then(() => reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason));
         }
         throw err;
@@ -56,5 +102,7 @@ function reviewWithdrawRequest(testHelper, requestID, reviewerKP, action, reject
 module.exports = {
     loadRequestWithRetry,
     reviewRequest,
-    reviewWithdrawRequest
+    reviewWithdrawRequest,
+    reviewTwoStepWithdrawRequest,
+    reviewLimitsUpdateRequest
 }

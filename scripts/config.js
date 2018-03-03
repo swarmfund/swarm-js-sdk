@@ -41,17 +41,27 @@ var admins = {
             identity: 10,
         },
         // withdraw
-        // TODO set proper signer type
         'GAR47OMBKHXZ55CEODNBG6L34LJRSFJ7QRBL7MTCFFCK6CGLHUWZ246N': {
             identity: 11,
             weight: 51,
+            type: 16 | 128,
             name: `Withdraw signer 1`
         },
         'GAJHBDSVNMZVBJP24TMULBXK5VNJQEMCQKNWA2NRZ7HNA7OVJXLTKGZD': {
             identity: 12,
             weight: 51,
+            type: 16 | 128,
             name: `Withdraw signer 2`
         },
+        'GBUNYKBS45LXOFQV3TMYJ36IPLGK3K7AS2ORETANGA7C5SOOGRWBUTMA': {
+            identity: 1,
+            name: "Secure Vote",
+        },
+        'GB6TQCONBUGTZDLORH4YWV3ISGAM3PO3UCGBKH3MTCJO3V6VDQQTHYXL': {
+            identity: 1,
+            name: "admin_1",
+            weight: 255,
+        }
     }, details => ({
         identity: details.identity,
         weight: details.weight || 255,
@@ -86,7 +96,7 @@ const passphrases = {
 
 const urls = {
     local: 'http://127.0.0.1:8000',
-    dev: 'http://18.195.18.3:8000',
+    dev: 'http://18.196.70.215:8000',
     staging: 'http://staging.api.sun.swarm.fund'
 }
 

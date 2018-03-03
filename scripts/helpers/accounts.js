@@ -1,11 +1,14 @@
 const StellarSdk = require('../../lib/index');
 
 function createNewAccount(testHelper, accountId, accountType, accountPolicies = undefined) {
+    let recoverKP = StellarSdk.Keypair.random();
     const opts = {
         destination: accountId,
+        recoveryKey: recoverKP.accountId(),
         accountType: accountType,
         source: testHelper.master.accountId(),
         accountPolicies: accountPolicies,
+        recoveryKey: StellarSdk.Keypair.random().accountId(),
     };
     const operation = StellarSdk.Operation.createAccount(opts);
     return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
@@ -35,6 +38,26 @@ function findBalanceByAsset(balances, asset) {
             return balances[i]
         }
     }
+
+    throw new Error("Failed to find balance for asset: " + asset);
+}
+
+function isExternalSystemAccountIDAlreadyExists(tesstHelper, accountId, externalSystemType) {
+    return testHelper.server.loadAccountWithSign(accountId, testHelper.master).then(source => {
+        for (var i in source.external_system_accounts) {
+            var id = source.external_system_accounts[i];
+            if (id.type.value === externalSystemType) {
+                return true;
+            }
+        }
+
+        return false;
+    }).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            return false;
+        }
+        throw err;
+    });
 }
 
 function loadBalanceForAsset(testHelper, accountId, asset) {
@@ -55,7 +78,7 @@ function addSuperAdmin(testHelper, sourceAccId, keypair, address, details) {
     console.log("Add SuperAdmin: ", address)
     var source = new StellarSdk.Account(sourceAccId)
     var tx = new StellarSdk.TransactionBuilder(source)
-        .addOperation(StellarSdk.Operation.setOptions({
+        .addOperation(StellarSdk.SetOptionsBuilder.setOptions({
             signer: {
                 pubKey: address,
                 weight: details.weight,
@@ -72,7 +95,7 @@ function addSuperAdmin(testHelper, sourceAccId, keypair, address, details) {
 
 function setThresholds(helper, source, kp, thresholds) {
     var tx = new StellarSdk.TransactionBuilder(new StellarSdk.Account(source))
-        .addOperation(StellarSdk.Operation.setOptions({
+        .addOperation(StellarSdk.SetOptionsBuilder.setOptions({
             masterWeight: thresholds.master || undefined,
             highThreshold: thresholds.high || undefined,
             mediumThreshold: thresholds.medium || undefined,
