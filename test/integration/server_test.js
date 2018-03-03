@@ -48,7 +48,7 @@ describe("Integration test", function () {
 
 
 
-    it("Create and withdraw asset", function (done) {
+    /*it("Create and withdraw asset", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
         var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
         var preIssuedAmount = "10000.000000";
@@ -151,6 +151,36 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             .then(() => done())
             .catch(err => done(err));
-    });
+});*/
+
+    it("Create asset and change preissuer", function(done) {
+            var syndicateKP = StellarSdk.Keypair.random();
+            var preissuerKP = StellarSdk.Keypair.random();
+            var newPreissuerKP = StellarSdk.Keypair.random();
+            var code = "MATOKEN" + Math.floor(Math.random() * 1000);
+            console.log("Asset code: " + code);
+            console.log("pre issuer: " + preissuerKP.accountId());
+            var maxIssuance = "101001";
+            accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, preissuerKP.accountId(), code, 0, maxIssuance, "0"))
+            .then(() => accountHelper.addSuperAdmin(testHelper, syndicateKP.accountId(), syndicateKP, preissuerKP.accountId(), {
+                weight: 255,
+                type: StellarSdk.xdr.SignerType.txSender().value,
+                identity: 1,
+                name: "tx sender",
+            }))
+            .then(() => assetHelper.changePreIssuerSigner(testHelper, code, newPreissuerKP.accountId(), syndicateKP, preissuerKP))
+            .then(() => accountHelper.addSuperAdmin(testHelper, syndicateKP.accountId(), syndicateKP, newPreissuerKP.accountId(), {
+                weight: 255,
+                type: StellarSdk.xdr.SignerType.txSender().value,
+                identity: 1,
+                name: "tx sender",
+            }))
+            .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, newPreissuerKP, code, maxIssuance))
+            .then(() => done())
+            .catch(err => {
+                done(err);
+            })
+    })
 
 });
