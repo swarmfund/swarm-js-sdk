@@ -25,7 +25,7 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAss
         },
     };
     let operation = StellarSdk.SaleRequestBuilder.createSaleCreationRequest(opts);
-    return testHelper.server.submitOperation(operation, owner.accountId(), owner);
+    return testHelper.server.submitOperationGroup([operation], owner.accountId(), owner);
 }
 
 function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding) {

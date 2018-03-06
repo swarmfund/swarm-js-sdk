@@ -26,7 +26,7 @@ let operation = StellarSdk.ManageAssetBuilder.assetUpdateRequest({
     },
     policies: 26,
 });
-currentConfig.server.submitOperation(operation, currentConfig.master.accountId(), currentConfig.master).then(() => {
+currentConfig.server.submitOperationGroup([operation], currentConfig.master.accountId(), currentConfig.master).then(() => {
     console.log("Cools");
 }).catch(err => {
     console.log(err);

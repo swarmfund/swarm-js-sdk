@@ -11,7 +11,7 @@ function createNewAccount(testHelper, accountId, accountType, accountPolicies = 
         recoveryKey: StellarSdk.Keypair.random().accountId(),
     };
     const operation = StellarSdk.Operation.createAccount(opts);
-    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master)
         .then(res => {
             console.log('Account created: ', accountId)
             return res
@@ -25,7 +25,7 @@ function createBalanceForAsset(testHelper, sourceKP, assetCode) {
         asset: assetCode,
     };
     const operation = StellarSdk.Operation.manageBalance(opts);
-    return testHelper.server.submitOperation(operation, sourceKP.accountId(), sourceKP)
+    return testHelper.server.submitOperationGroup([operation], sourceKP.accountId(), sourceKP)
         .then(res => {
             console.log('Balance created for ', sourceKP.accountId())
             return res

@@ -22,7 +22,7 @@ function createAssetCreationRequest(testHelper, owner, issuer, assetCode, policy
 
     };
     let operation = StellarSdk.ManageAssetBuilder.assetCreationRequest(opts);
-    return testHelper.server.submitOperation(operation, owner.accountId(), owner);
+    return testHelper.server.submitOperationGroup([operation], owner.accountId(), owner);
 }
 
 function createAsset(testHelper, owner, issuer, assetCode, policy, maxIssuanceAmount, initialPreissuedAmount = "0") {
@@ -51,7 +51,7 @@ function createAssetPair(testHelper, baseAsset, quoteAsset, physicalPrice = "1")
         maxPriceStep: "0",
         physicalPrice: physicalPrice,
     });
-    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
 }
 
 function updateAssetPrice(testHelper, baseAsset, quoteAsset, physicalPrice = "1") {
@@ -64,7 +64,7 @@ function updateAssetPrice(testHelper, baseAsset, quoteAsset, physicalPrice = "1"
         maxPriceStep: "0",
         physicalPrice: physicalPrice,
     });
-    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master);
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
 }
 
 module.exports = {

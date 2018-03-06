@@ -11,7 +11,7 @@ function createPreIssuanceRequest(testHelper, assetOwnerKP, preIssuanceKP, asset
         keyPair: preIssuanceKP,
     });
     let op = StellarSdk.PreIssuanceRequestOpBuilder.createPreIssuanceRequestOp({ request: preIssuanceRequest });
-    return testHelper.server.submitOperation(op, assetOwnerKP.accountId(), assetOwnerKP);
+    return testHelper.server.submitOperationGroup([op], assetOwnerKP.accountId(), assetOwnerKP);
 }
 
 function performPreIssuance(testHelper, assetOwnerKP, preIssuanceKP, assetCode, amount) {
@@ -42,7 +42,7 @@ function issue(testHelper, requestor, receiverBalanceID, asset, amount) {
     };
 
     const op = StellarSdk.CreateIssuanceRequestBuilder.createIssuanceRequest(opts);
-    return testHelper.server.submitOperation(op, requestor.accountId(), requestor)
+    return testHelper.server.submitOperationGroup([op], requestor.accountId(), requestor)
         .then(res => {
             console.log('Issued: ', amount, asset, 'to', receiverBalanceID)
             return res
