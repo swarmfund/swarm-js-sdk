@@ -1,5 +1,5 @@
 const StellarSdk = require('../../lib/index');
-var accountHelper = require('./accounts')
+var accountHelper = require('./accounts');
 
 
 
@@ -22,7 +22,32 @@ function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmoun
 
         let operation = StellarSdk.ManageOfferBuilder.manageOffer(opts);
         return testHelper.server.submitOperationGroup([operation], source.accountId(), source);
-    });
+    }).then(response => {
+            let result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
+            let id = result.result().results()[0].tr().manageOfferResult().success().offer().offer().offerId().toString();
+            console.log("Offer created: " + id);
+            return id
+        })
+}
+
+function cancelOffer(testHelper, source, baseAsset, quoteAsset, offerID, orderBookID) {
+    return accountHelper.loadBalanceIDForAsset(testHelper, source.accountId(), baseAsset)
+        .then(baseBalanceID => {
+            return accountHelper.loadBalanceIDForAsset(testHelper, source.accountId(), quoteAsset).then(quoteBalanceID => {
+                return {baseBalanceID, quoteBalanceID};
+            })
+        })
+        .then(balances => {
+            let opts = {
+                baseBalance: balances.baseBalanceID,
+                quoteBalance: balances.quoteBalanceID,
+                offerID: offerID,
+                orderBookID: orderBookID,
+            };
+
+            let operation = StellarSdk.ManageOfferBuilder.cancelOffer(opts);
+            return testHelper.server.submitOperationGroup([operation], source.accountId(), source);
+        })
 }
 
 function findQuoteAssetForAsset(sale, quoteAsset) {
@@ -47,7 +72,17 @@ function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsse
     });
 }
 
+function cancelSaleParticipation(testHelper, source, baseAsset, quoteAsset, offerID) {
+    return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(source).then(sales => {
+        return sales.records[0];
+    }).then(sale => {
+        return cancelOffer(testHelper, source, sale.base_asset, quoteAsset, offerID, sale.id);
+    });
+}
+
 module.exports = {
     createOffer,
-    participateInSale
-}
+    cancelOffer,
+    participateInSale,
+    cancelSaleParticipation
+};
