@@ -60,7 +60,7 @@ function changePreIssuerSigner(testHelper, code, newPreIssuer, owner, preIssuerK
         code: code,
         accountID: newPreIssuer,
     });
-    return testHelper.server.submitOperation(operation, owner.accountId(), preIssuerKP);
+    return testHelper.server.submitOperationGroup([operation], owner.accountId(), preIssuerKP);
 }
 
 function updateAssetPrice(testHelper, baseAsset, quoteAsset, physicalPrice = "1") {
