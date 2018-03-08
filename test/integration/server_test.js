@@ -191,8 +191,8 @@ describe("Integration test", function () {
         let firstReferralKP = StellarSdk.Keypair.random();
         let secondReferralKP = StellarSdk.Keypair.random();
         accountHelper.createNewAccount(testHelper, referrerKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
-            .then(() => accountHelper.createNewAccountWithReferrer(testHelper, firstReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, referrerKP.accountId(), 0))
-            .then(() => accountHelper.createNewAccountWithReferrer(testHelper, secondReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, referrerKP.accountId(), 0))
+            .then(() => accountHelper.createNewAccount(testHelper, firstReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0, referrerKP.accountId()))
+            .then(() => accountHelper.createNewAccount(testHelper, secondReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0, referrerKP.accountId()))
             .then(() => done())
             .catch(err => {
                 done(err);
