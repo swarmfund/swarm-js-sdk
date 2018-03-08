@@ -47,8 +47,7 @@ describe("Integration test", function () {
     }
 
 
-
-    /*it("Create and withdraw asset", function (done) {
+    it("Create and withdraw asset", function (done) {
         var assetCode = "USD" + Math.floor(Math.random() * 1000);
         var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
         var preIssuedAmount = "10000.000000";
@@ -76,14 +75,16 @@ describe("Integration test", function () {
                     })
                     .then(requestID => {
                         return reviewableRequestHelper.reviewTwoStepWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
-                            "", { two_step_details: "Updated two step external details" }).then(() => {
-                                return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
-                                    "", { one_step_withdrawal: "Updated external details" }, StellarSdk.xdr.ReviewableRequestType.withdraw().value)
-                            });
+                            "", {two_step_details: "Updated two step external details"}).then(() => {
+                            return reviewableRequestHelper.reviewWithdrawRequest(testHelper, requestID, syndicateKP, StellarSdk.xdr.ReviewRequestOpAction.approve().value,
+                                "", {one_step_withdrawal: "Updated external details"}, StellarSdk.xdr.ReviewableRequestType.withdraw().value)
+                        });
                     })
             })
             .then(() => done())
-            .catch(err => { done(err) });
+            .catch(err => {
+                done(err)
+            });
     });
 
     it("Update account from unverified to syndicate", function (done) {
@@ -109,7 +110,10 @@ describe("Integration test", function () {
         accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount.toString(), maxIssuanceAmount.toString()))
             .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), quoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, (hardCap).toString(), (hardCap).toString()))
-            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(), hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }]))
+            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(), hardCap.toString(), [{
+                price: price.toString(),
+                asset: quoteAsset
+            }]))
             .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, testHelper.master, (hardCap).toString()))
             .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
@@ -118,7 +122,6 @@ describe("Integration test", function () {
             .then(() => done())
             .catch(err => done(err));
     });
-
 
 
     it("Create fundrasing for asset", function (done) {
@@ -138,7 +141,7 @@ describe("Integration test", function () {
             .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), defaultQuoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, MAX_INT64_AMOUNT, MAX_INT64_AMOUNT))
             .then(() => assetHelper.createAssetPair(testHelper, quoteAsset, defaultQuoteAsset, "1"))
             .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, defaultQuoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(),
-                hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }], true))
+                hardCap.toString(), [{price: price.toString(), asset: quoteAsset}], true))
             .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
             .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, testHelper.master, MAX_INT64_AMOUNT))
             .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
@@ -151,17 +154,17 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             .then(() => done())
             .catch(err => done(err));
-});*/
+    });
 
-    it("Create asset and change preissuer", function(done) {
-            var syndicateKP = StellarSdk.Keypair.random();
-            var preissuerKP = StellarSdk.Keypair.random();
-            var newPreissuerKP = StellarSdk.Keypair.random();
-            var code = "MATOKEN" + Math.floor(Math.random() * 1000);
-            console.log("Asset code: " + code);
-            console.log("pre issuer: " + preissuerKP.accountId());
-            var maxIssuance = "101001";
-            accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+    it("Create asset and change preissuer", function (done) {
+        var syndicateKP = StellarSdk.Keypair.random();
+        var preissuerKP = StellarSdk.Keypair.random();
+        var newPreissuerKP = StellarSdk.Keypair.random();
+        var code = "MATOKEN" + Math.floor(Math.random() * 1000);
+        console.log("Asset code: " + code);
+        console.log("pre issuer: " + preissuerKP.accountId());
+        var maxIssuance = "101001";
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
             .then(() => assetHelper.createAsset(testHelper, syndicateKP, preissuerKP.accountId(), code, 0, maxIssuance, "0"))
             .then(() => accountHelper.addSuperAdmin(testHelper, syndicateKP.accountId(), syndicateKP, preissuerKP.accountId(), {
                 weight: 255,
@@ -177,6 +180,19 @@ describe("Integration test", function () {
                 name: "tx sender",
             }))
             .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, newPreissuerKP, code, maxIssuance))
+            .then(() => done())
+            .catch(err => {
+                done(err);
+            })
+    })
+
+    it("Create referrer and two referrals", function (done) {
+        let referrerKP = StellarSdk.Keypair.random();
+        let firstReferralKP = StellarSdk.Keypair.random();
+        let secondReferralKP = StellarSdk.Keypair.random();
+        accountHelper.createNewAccount(testHelper, referrerKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
+            .then(() => accountHelper.createNewAccountWithReferrer(testHelper, firstReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, referrerKP.accountId(), 0))
+            .then(() => accountHelper.createNewAccountWithReferrer(testHelper, secondReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, referrerKP.accountId(), 0))
             .then(() => done())
             .catch(err => {
                 done(err);

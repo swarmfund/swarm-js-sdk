@@ -11,9 +11,29 @@ function createNewAccount(testHelper, accountId, accountType, accountPolicies = 
         recoveryKey: StellarSdk.Keypair.random().accountId(),
     };
     const operation = StellarSdk.Operation.createAccount(opts);
-    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master)
         .then(res => {
             console.log('Account created: ', accountId)
+            return res
+        })
+}
+
+function createNewAccountWithReferrer(testHelper, accountId, accountType, referrerId, accountPolicies) {
+    let recoverKP = StellarSdk.Keypair.random();
+    const opts = {
+        destination: accountId,
+        recoveryKey: recoverKP.accountId(),
+        accountType: accountType,
+        referrer: referrerId,
+        source: testHelper.master.accountId(),
+        accountPolicies: accountPolicies,
+        recoveryKey: StellarSdk.Keypair.random().accountId(),
+    };
+    const operation = StellarSdk.Operation.createAccount(opts);
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master)
+        .then(res => {
+            console.log('Account created: ', accountId);
+            console.log('Referrer: ', referrerId);
             return res
         })
 }
@@ -109,6 +129,7 @@ function setThresholds(helper, source, kp, thresholds) {
 
 module.exports = {
     createNewAccount,
+    createNewAccountWithReferrer,
     createBalanceForAsset,
     loadBalanceForAsset,
     loadBalanceIDForAsset,
