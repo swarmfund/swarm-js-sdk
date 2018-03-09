@@ -1,4 +1,5 @@
 var reviewableRequestHelper = require('./review_request')
+const isUndefined = require('lodash/isUndefined');
 const StellarSdk = require('../../lib/index');
 
 
@@ -44,10 +45,37 @@ function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, 
 
 function checkSaleState(testHelper, baseAsset) {
     return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(testHelper.master).then(sales => {
+
         return sales.records[0];
     }).then(sale => {
+        if(isUndefined(sale)){
+            console.log("received 404 for reviewable request - retrying");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => checkSaleState(testHelper, baseAsset));
+        }
+        else {
        let operation = StellarSdk.SaleRequestBuilder.checkSaleState({saleID: sale.id});
-    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);}
+    }).then(response => {
+        return response;
+    });
+}
+
+
+function manageSale(testHelper, action, saleOwner) {
+
+    return testHelper.server.sales().forOwner(saleOwner.accountId())
+        .call()
+        .then(sales => {
+        return sales.records[0];
+    }).then(sale => {
+        /*if(isUndefined(sale)) if(isUndefined(sale)){
+            console.log("received 404 for reviewable request - retrying");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => manageSale(testHelper, action,saleOwner));
+        }
+        else {*/
+            console.log(sale.id);
+        let operation = StellarSdk.SaleRequestBuilder.manageSale({saleId: sale.id, action: action});
+        return testHelper.server.submitOperationGroup([operation], saleOwner.accountId(), saleOwner)
     }).then(response => {
         return response;
     });
@@ -56,5 +84,6 @@ function checkSaleState(testHelper, baseAsset) {
 module.exports = {
     createSaleCreationRequest,
     createSale,
-    checkSaleState
+    checkSaleState,
+    manageSale
 }

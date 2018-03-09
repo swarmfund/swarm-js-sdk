@@ -95,7 +95,7 @@ describe("Integration test", function () {
             .then(() => done())
             .catch(err => done(err));
     });
-
+*/
     it("Create sale for asset", function (done) {
         var syndicateKP = StellarSdk.Keypair.random();
         var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
@@ -119,7 +119,7 @@ describe("Integration test", function () {
             .catch(err => done(err));
     });
 
-
+/*
 
     it("Create fundrasing for asset", function (done) {
         var syndicateKP = StellarSdk.Keypair.random();
@@ -151,7 +151,7 @@ describe("Integration test", function () {
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             .then(() => done())
             .catch(err => done(err));
-});*/
+});
 
     it("Create asset and change preissuer", function(done) {
             var syndicateKP = StellarSdk.Keypair.random();
@@ -181,6 +181,28 @@ describe("Integration test", function () {
             .catch(err => {
                 done(err);
             })
-    })
+    });*/
+    it("Manage Sale",function (done) {
+        let action = StellarSdk.xdr.ManageSaleAction.delete().value;
+        var syndicateKP = StellarSdk.Keypair.random();
+        var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
+        var quoteAsset = "USD" + Math.floor(Math.random() * 1000);
+        var startTime = Math.round((new Date()).getTime() / 1000);
+        var price = 4.5;
+        var softCap = 2250;
+        var hardCap = 4500;
+        var maxIssuanceAmount = hardCap / price
+        var saleParticipantKP = StellarSdk.Keypair.random();
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount.toString(), maxIssuanceAmount.toString()))
+            .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), quoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, (hardCap).toString(), (hardCap).toString()))
+            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, quoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(), hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }]))
+            .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
+            .then(() => saleHelper.manageSale(testHelper,action,syndicateKP))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+
 
 });
