@@ -10,6 +10,7 @@ let axios = require("axios");
 var EventSource = require( "./EventSource.js" );
 let toBluebird = require("bluebird").resolve;
 
+var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 var SIGNATURE_VALID_SEC = 60;
 /**
  * Creates a new {@link CallBuilder} pointed to server defined by serverUrl.
@@ -149,7 +150,8 @@ export class CallBuilder {
         'X-AuthValidUnTillTimestamp': validUntil.toString(),
         'X-AuthPublicKey': keypair.accountId(),
         'X-AuthSignature': signature.toXDR("base64")
-      }
+      },
+      timeout: SUBMIT_TRANSACTION_TIMEOUT
     };
    }
   /**
