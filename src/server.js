@@ -630,7 +630,8 @@ export class Server {
                     'X-AuthValidUnTillTimestamp': validUntil.toString(),
                     'X-AuthPublicKey': keypair.accountId(),
                     'X-AuthSignature': signature.toXDR("base64")
-                    }
+                    },
+            timeout: SUBMIT_TRANSACTION_TIMEOUT
         };
     }
     _getURL(prefix) {

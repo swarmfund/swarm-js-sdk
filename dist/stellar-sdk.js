@@ -6292,7 +6292,8 @@ var StellarSdk =
 	                    'X-AuthValidUnTillTimestamp': validUntil.toString(),
 	                    'X-AuthPublicKey': keypair.accountId(),
 	                    'X-AuthSignature': signature.toXDR("base64")
-	                }
+	                },
+	                timeout: SUBMIT_TRANSACTION_TIMEOUT
 	            };
 	        }
 	    }, {
@@ -6452,6 +6453,7 @@ var StellarSdk =
 	var EventSource = __webpack_require__(507);
 	var toBluebird = __webpack_require__(508).resolve;
 
+	var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 	var SIGNATURE_VALID_SEC = 60;
 	/**
 	 * Creates a new {@link CallBuilder} pointed to server defined by serverUrl.
@@ -6618,7 +6620,8 @@ var StellarSdk =
 	          'X-AuthValidUnTillTimestamp': validUntil.toString(),
 	          'X-AuthPublicKey': keypair.accountId(),
 	          'X-AuthSignature': signature.toXDR("base64")
-	        }
+	        },
+	        timeout: SUBMIT_TRANSACTION_TIMEOUT
 	      };
 	    }
 
