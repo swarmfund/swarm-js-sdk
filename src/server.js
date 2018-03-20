@@ -36,7 +36,7 @@ let toBluebird = require("bluebird").resolve;
 let URI = require("urijs");
 let querystring = require('querystring');
 
-export const SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
+export const SUBMIT_TRANSACTION_TIMEOUT = 60 * 1000;
 
 export class Server {
     /**
