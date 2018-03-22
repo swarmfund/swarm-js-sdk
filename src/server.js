@@ -30,13 +30,12 @@ import { ReviewableRequestsHelper } from "./reviewable_requests/reviewable_reque
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 import isUndefined from 'lodash/isUndefined';
+import constants from './const';
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;
 let URI = require("urijs");
 let querystring = require('querystring');
-
-export const SUBMIT_TRANSACTION_TIMEOUT = 60 * 10000;
 
 export class Server {
     /**
@@ -126,7 +125,7 @@ export class Server {
         let tx = transaction.toEnvelope().toXDR().toString("base64");
 
         let config = {
-            timeout: SUBMIT_TRANSACTION_TIMEOUT,
+            timeout: constants.SUBMIT_TRANSACTION_TIMEOUT,
             headers: {
                 'content-type': 'application/json',
             }
@@ -616,8 +615,7 @@ export class Server {
     }
 
     _getConfig(address, keypair) {
-        let SIGNATURE_VALID_SEC = 60;
-        let validUntil = Math.floor((new Date().getTime() / 1000) + SIGNATURE_VALID_SEC).toString();
+        let validUntil = Math.floor((new Date().getTime() / 1000) + constants.SIGNATURE_VALID_SEC).toString();
         //temporary. should be fixed or refactored
         let signatureBase = "{ uri: '" + address + "', valid_untill: '" + validUntil.toString() + "'}";
         keypair = stellarBase.Keypair.fromRawSeed(keypair._secretSeed);
@@ -631,7 +629,7 @@ export class Server {
                     'X-AuthPublicKey': keypair.accountId(),
                     'X-AuthSignature': signature.toXDR("base64")
                     },
-            timeout: SUBMIT_TRANSACTION_TIMEOUT
+            timeout: constants.SUBMIT_TRANSACTION_TIMEOUT
         };
     }
     _getURL(prefix) {
