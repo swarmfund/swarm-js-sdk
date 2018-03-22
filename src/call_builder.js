@@ -10,8 +10,8 @@ let axios = require("axios");
 var EventSource = require( "./EventSource.js" );
 let toBluebird = require("bluebird").resolve;
 
-var SUBMIT_TRANSACTION_TIMEOUT = 60 * 1000;
-var SIGNATURE_VALID_SEC = 60;
+var SUBMIT_TRANSACTION_TIMEOUT = 60 * 10000;
+var SIGNATURE_VALID_SEC = 60 * 10;
 /**
  * Creates a new {@link CallBuilder} pointed to server defined by serverUrl.
  *
