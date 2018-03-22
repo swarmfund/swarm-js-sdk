@@ -5630,7 +5630,7 @@ var StellarSdk =
 	var URI = __webpack_require__(477);
 	var querystring = __webpack_require__(579);
 
-	var SUBMIT_TRANSACTION_TIMEOUT = 60 * 1000;
+	var SUBMIT_TRANSACTION_TIMEOUT = 60 * 10000;
 
 	exports.SUBMIT_TRANSACTION_TIMEOUT = SUBMIT_TRANSACTION_TIMEOUT;
 
@@ -6453,8 +6453,8 @@ var StellarSdk =
 	var EventSource = __webpack_require__(507);
 	var toBluebird = __webpack_require__(508).resolve;
 
-	var SUBMIT_TRANSACTION_TIMEOUT = 60 * 1000;
-	var SIGNATURE_VALID_SEC = 60;
+	var SUBMIT_TRANSACTION_TIMEOUT = 60 * 10000;
+	var SIGNATURE_VALID_SEC = 60 * 10;
 	/**
 	 * Creates a new {@link CallBuilder} pointed to server defined by serverUrl.
 	 *
