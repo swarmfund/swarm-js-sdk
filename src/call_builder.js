@@ -2,6 +2,7 @@ import {NotFoundError, NetworkError, BadRequestError} from "./errors";
 import forEach from 'lodash/forEach';
 import { xdr, Account, hash } from "swarm-js-base";
 import { Config } from "./config";
+import constants from './const';
 
 let URI = require("urijs");
 let URITemplate = require("urijs").URITemplate;
@@ -10,8 +11,6 @@ let axios = require("axios");
 var EventSource = require( "./EventSource.js" );
 let toBluebird = require("bluebird").resolve;
 
-var SUBMIT_TRANSACTION_TIMEOUT = 60 * 10000;
-var SIGNATURE_VALID_SEC = 60 * 10;
 /**
  * Creates a new {@link CallBuilder} pointed to server defined by serverUrl.
  *
@@ -140,7 +139,7 @@ export class CallBuilder {
     if (!keypair) {
       throw new Error("Need keypair");
     }
-    let validUntil = Math.floor((new Date().getTime() / 1000) + SIGNATURE_VALID_SEC).toString();
+    let validUntil = Math.floor((new Date().getTime() / 1000) + constants.SIGNATURE_VALID_SEC).toString();
     let signatureBase = "{ uri: '" + url.resource() + "', valid_untill: '" + validUntil.toString() + "'}";
     let data = hash(signatureBase);
     let signature = keypair.signDecorated(data);
@@ -151,7 +150,7 @@ export class CallBuilder {
         'X-AuthPublicKey': keypair.accountId(),
         'X-AuthSignature': signature.toXDR("base64")
       },
-      timeout: SUBMIT_TRANSACTION_TIMEOUT
+      timeout: constants.SUBMIT_TRANSACTION_TIMEOUT
     };
    }
   /**
