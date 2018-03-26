@@ -59,6 +59,9 @@ export class Server {
         }
 
         this.currentTime = +opts.currentTimestamp || new Date().getTime();
+        // we need to create singleton's instance here, otherwise it will be created in call builder,
+        // that doesn't know anything about current time
+        new TimeSyncer(this.currentTime);
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
