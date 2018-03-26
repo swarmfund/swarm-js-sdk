@@ -23,7 +23,7 @@ export class TimeSyncer {
    * @return {number}
    */
   now () {
-    return (this._local() - this._diff);
+    return this._local() - this._diff;
   }
 
   /**
