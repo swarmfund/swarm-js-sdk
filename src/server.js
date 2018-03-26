@@ -26,7 +26,7 @@ import { UserCallBuilder } from "./user_call_builder";
 import { SalesCallBuilder } from "./sales_call_builder";
 import { Config } from "./config";
 import { ReviewableRequestsHelper } from "./reviewable_requests/reviewable_requests_helper";
-
+import { TimeSyncer } from './time-syncer';
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 import isUndefined from 'lodash/isUndefined';
@@ -45,6 +45,7 @@ export class Server {
      * @param {string} serverURL Horizon Server URL (ex. `https://horizon-testnet.stellar.org`).
      * @param {object} [opts]
      * @param {boolean} [opts.allowHttp] - Allow connecting to http servers, default: `false`. This must be set to false in production deployments! You can also use {@link Config} class to set this globally.
+     * @param {boolean} [opts.currentTimestamp] - Current times derived somewhere higher, need for time syncing with backend
      */
     constructor(serverURL, opts = {}) {
         this.serverURL = URI(serverURL);
@@ -57,6 +58,7 @@ export class Server {
             console.log(err);
         }
 
+        this.currentTime = +opts.currentTimestamp || new Date().getTime();
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
@@ -615,7 +617,7 @@ export class Server {
     }
 
     _getConfig(address, keypair) {
-        let validUntil = Math.floor((new Date().getTime() / 1000) + constants.SIGNATURE_VALID_SEC).toString();
+        let validUntil = Math.floor(new TimeSyncer(this.currentTime).now() + constants.SIGNATURE_VALID_SEC).toString();
         //temporary. should be fixed or refactored
         let signatureBase = "{ uri: '" + address + "', valid_untill: '" + validUntil.toString() + "'}";
         keypair = stellarBase.Keypair.fromRawSeed(keypair._secretSeed);

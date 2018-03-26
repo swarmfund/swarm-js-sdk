@@ -3,6 +3,7 @@ import forEach from 'lodash/forEach';
 import { xdr, Account, hash } from "swarm-js-base";
 import { Config } from "./config";
 import constants from './const';
+import { TimeSyncer } from './time-syncer';
 
 let URI = require("urijs");
 let URITemplate = require("urijs").URITemplate;
@@ -139,7 +140,7 @@ export class CallBuilder {
     if (!keypair) {
       throw new Error("Need keypair");
     }
-    let validUntil = Math.floor((new Date().getTime() / 1000) + constants.SIGNATURE_VALID_SEC).toString();
+    let validUntil = Math.floor(new TimeSyncer().now() + constants.SIGNATURE_VALID_SEC).toString();
     let signatureBase = "{ uri: '" + url.resource() + "', valid_untill: '" + validUntil.toString() + "'}";
     let data = hash(signatureBase);
     let signature = keypair.signDecorated(data);
