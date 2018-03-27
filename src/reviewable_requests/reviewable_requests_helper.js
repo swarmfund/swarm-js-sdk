@@ -5,12 +5,13 @@ import {WithdrawalRequestsCallBuilder} from "./withdrawal_requests_call_builder"
 import {SaleRequestsCallBuilder} from "./sales_requests_call_builder";
 import {ReviewableRequestCallBuilder} from "./reviewable_request_call_builder";
 import {LimitsUpdateRequestsCallBuilder} from "./limits_update_requests_call_builder";
+
 let URI = require("urijs");
 
 
 export class ReviewableRequestsHelper {
     /**
-     * Creates a new {@link ReviewableRequestsHelper} which provides methods 
+     * Creates a new {@link ReviewableRequestsHelper} which provides methods
      * to build specific reviewable request call builders
      *
      * Do not create this object directly, use {@link Server#reviewableRequestsHelper}.
@@ -29,7 +30,7 @@ export class ReviewableRequestsHelper {
         return new AssetRequestsCallBuilder(URI(this.serverURL));
     }
 
-     /**
+    /**
      * Returns new {@link PreissuanceRequestsCallBuilder} object configured by a current Horizon server configuration.
      * @returns {PreissuanceRequestsCallBuilder}
      */
@@ -45,7 +46,7 @@ export class ReviewableRequestsHelper {
         return new IssuanceRequestsCallBuilder(URI(this.serverURL));
     }
 
-     /**
+    /**
      * Returns new {@link WithdrawalRequestsCallBuilder} object configured by a current Horizon server configuration.
      * @returns {WithdrawalRequestsCallBuilder}
      */
@@ -68,6 +69,7 @@ export class ReviewableRequestsHelper {
     request() {
         return new ReviewableRequestCallBuilder(URI(this.serverURL));
     }
+
     /**
      * Returns new {@link LimitsUpdateRequestsCallBuilder} object configured by a current Horizon server configuration.
      * @returns {LimitsUpdateRequestsCallBuilder}
@@ -77,11 +79,11 @@ export class ReviewableRequestsHelper {
     }
 
     /**
-     * Returns new {@link ChangeKYCRequestCallBuilder} object configured by a current Horizon server configuration.
-     * @returns {ChangeKYCRequestCallBuilder}
+     * Returns new {@link UpdateKYCRequestCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {UpdateKYCRequestCallBuilder}
      */
-    change_kyc() {
-        return new ChangeKYCRequestCallBuilder(URI(this.serverURL));
+    update_kyc() {
+        return new UpdateKYCRequestCallBuilder(URI(this.serverURL));
     }
 
 }
