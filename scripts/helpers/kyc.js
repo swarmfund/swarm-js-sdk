@@ -2,12 +2,12 @@ var reviewableRequestHelper = require('./review_request');
 const StellarSdk = require('../../lib/index');
 
 function createKYCRequest(testHelper, source, requestID, accountToUpdateKYC, accountTypeToSet,
-                          kycLevel, kycData, allTasks) {
+                          kycLevelToSet, kycData, allTasks) {
     const opts = {
         requestID: requestID,
         accountToUpdateKYC: accountToUpdateKYC,
         accountTypeToSet: accountTypeToSet,
-        kycLevel: kycLevel,
+        kycLevelToSet: kycLevelToSet,
         kycData: kycData,
         allTasks: allTasks,
     };
