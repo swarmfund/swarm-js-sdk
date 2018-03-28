@@ -99,7 +99,7 @@ function reviewLimitsUpdateRequest(testHelper, requestID, reviewerKP, action, re
     });
 }
 
-function reviewUpdateKYCRequest(testHelper, requestID, reviewerKP, action, rejectReason, newTasks, externalDetails) {
+function reviewUpdateKYCRequest(testHelper, requestID, reviewerKP, action, rejectReason, tasksToAdd, tasksToRemove, externalDetails) {
     return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
         let opts = {
             requestID: requestID,
@@ -107,7 +107,8 @@ function reviewUpdateKYCRequest(testHelper, requestID, reviewerKP, action, rejec
             requestType: request.details.request_type_i,
             action: action,
             reason: rejectReason,
-            newTasks: newTasks,
+            tasksToAdd: tasksToAdd,
+            tasksToRemove: tasksToRemove,
             externalDetails: externalDetails,
         };
         let operation = StellarSdk.ReviewRequestBuilder.reviewUpdateKYCRequest(opts);
