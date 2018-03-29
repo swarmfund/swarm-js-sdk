@@ -99,10 +99,34 @@ function reviewLimitsUpdateRequest(testHelper, requestID, reviewerKP, action, re
     });
 }
 
+function reviewUpdateKYCRequest(testHelper, requestID, reviewerKP, action, rejectReason, tasksToAdd, tasksToRemove, externalDetails) {
+    return loadRequestWithRetry(testHelper, requestID, reviewerKP).then(request => {
+        let opts = {
+            requestID: requestID,
+            requestHash: request.hash,
+            requestType: request.details.request_type_i,
+            action: action,
+            reason: rejectReason,
+            tasksToAdd: tasksToAdd,
+            tasksToRemove: tasksToRemove,
+            externalDetails: externalDetails,
+        };
+        let operation = StellarSdk.ReviewRequestBuilder.reviewUpdateKYCRequest(opts);
+        return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
+    }).catch(err => {
+        if (!isUndefined(err.response) && err.response.status === 404) {
+            console.log("recieved 404 - retrying");
+            return new Promise(resolve => setTimeout(resolve, 2000)).then(() => reviewRequest(testHelper, requestID, reviewerKP, action, rejectReason));
+        }
+        throw err;
+    });
+}
+
 module.exports = {
     loadRequestWithRetry,
     reviewRequest,
     reviewWithdrawRequest,
     reviewTwoStepWithdrawRequest,
-    reviewLimitsUpdateRequest
+    reviewLimitsUpdateRequest,
+    reviewUpdateKYCRequest
 }

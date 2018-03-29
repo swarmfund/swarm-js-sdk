@@ -7,6 +7,7 @@ import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
+import * as kycHelper from '../../scripts/helpers/kyc'
 
 let config = require('../../scripts/config');
 
@@ -199,4 +200,15 @@ describe("Integration test", function () {
             })
     })
 
+    it("Create KYC request and change KYC", function (done) {
+        let newAccountKP = StellarSdk.Keypair.random();
+        let requestID = "0";
+        let kycLevel = 1;
+        let kycData = {"hash" : "bb36c7c58c4c32d98947c8781c91c7bb797c3647"};
+        accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0)
+            .then(() => kycHelper.createKYCRequest(testHelper, newAccountKP, requestID, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, kycLevel, kycData))
+            .then(requestID => reviewableRequestHelper.reviewUpdateKYCRequest(testHelper, requestID, master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "", 0, 3, {}))
+            .then(() => done())
+            .catch(err => done(err));
+    });
 });
