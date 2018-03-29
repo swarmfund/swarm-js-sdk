@@ -5621,14 +5621,14 @@ var StellarSdk =
 
 	var _swarmJsBase2 = _interopRequireDefault(_swarmJsBase);
 
-	var _lodashIsUndefined = __webpack_require__(580);
+	var _lodashIsUndefined = __webpack_require__(581);
 
 	var _lodashIsUndefined2 = _interopRequireDefault(_lodashIsUndefined);
 
 	var axios = __webpack_require__(483);
 	var toBluebird = __webpack_require__(510).resolve;
 	var URI = __webpack_require__(479);
-	var querystring = __webpack_require__(581);
+	var querystring = __webpack_require__(582);
 
 	var SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 
@@ -46961,7 +46961,7 @@ var StellarSdk =
 /* 333 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
+	var apply = Function.prototype.apply;
 
 	// DOM APIs, for completeness
 
@@ -47012,17 +47012,9 @@ var StellarSdk =
 
 	// setimmediate attaches itself to the global object
 	__webpack_require__(334);
-	// On some exotic environments, it's not clear which object `setimmeidate` was
-	// able to install onto.  Search each possibility in the same order as the
-	// `setimmediate` library.
-	exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
-	                       (typeof global !== "undefined" && global.setImmediate) ||
-	                       (this && this.setImmediate);
-	exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
-	                         (typeof global !== "undefined" && global.clearImmediate) ||
-	                         (this && this.clearImmediate);
+	exports.setImmediate = setImmediate;
+	exports.clearImmediate = clearImmediate;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
 /* 334 */
@@ -67391,6 +67383,8 @@ var StellarSdk =
 
 	var _limits_update_requests_call_builder = __webpack_require__(579);
 
+	var _update_kyc_requests_call_builder = __webpack_require__(580);
+
 	var URI = __webpack_require__(479);
 
 	var ReviewableRequestsHelper = (function () {
@@ -67487,7 +67481,7 @@ var StellarSdk =
 	    }, {
 	        key: "update_kyc",
 	        value: function update_kyc() {
-	            return new UpdateKYCRequestCallBuilder(URI(this.serverURL));
+	            return new _update_kyc_requests_call_builder.UpdateKYCRequestCallBuilder(URI(this.serverURL));
 	        }
 	    }]);
 
@@ -67945,6 +67939,64 @@ var StellarSdk =
 
 /***/ }),
 /* 580 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	    value: true
+	});
+
+	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; desc = parent = undefined; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var _reviewable_request_call_builder = __webpack_require__(574);
+
+	var UpdateKYCRequestCallBuilder = (function (_ReviewableRequestCallBuilder) {
+	    _inherits(UpdateKYCRequestCallBuilder, _ReviewableRequestCallBuilder);
+
+	    /**
+	     * Creates a new {@link UpdateKYCRequestCallBuilder} pointed to server defined by serverUrl
+	     *
+	     * Do not create this object directly, use {@link Server#reviewableRequestsHelper#update_kyc}.
+	     * @constructor
+	     * @extends CallBuilder
+	     * @param {string} serverUrl Horizon server URL.
+	     */
+
+	    function UpdateKYCRequestCallBuilder(serverUrl) {
+	        _classCallCheck(this, UpdateKYCRequestCallBuilder);
+
+	        _get(Object.getPrototypeOf(UpdateKYCRequestCallBuilder.prototype), 'constructor', this).call(this, serverUrl);
+	        this.url.segment('request/update_kyc');
+	    }
+
+	    /**
+	     * Filters KYC changing
+	     * @param {string} updated_account_id For example: `GBBM6BKZPEHWYO3E3YKREDPQXMS4VK35YLNU7NFBRI26RAN7GI5POFBB`
+	     * @returns {UpdateKYCRequestCallBuilder}
+	     */
+
+	    _createClass(UpdateKYCRequestCallBuilder, [{
+	        key: 'forAccount',
+	        value: function forAccount(updated_account_id) {
+	            this.url.addQuery('account_to_update_kyc', updated_account_id);
+	            return this;
+	        }
+	    }]);
+
+	    return UpdateKYCRequestCallBuilder;
+	})(_reviewable_request_call_builder.ReviewableRequestCallBuilder);
+
+	exports.UpdateKYCRequestCallBuilder = UpdateKYCRequestCallBuilder;
+
+/***/ }),
+/* 581 */
 /***/ (function(module, exports) {
 
 	/**
@@ -67972,17 +68024,17 @@ var StellarSdk =
 
 
 /***/ }),
-/* 581 */
+/* 582 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	exports.decode = exports.parse = __webpack_require__(582);
-	exports.encode = exports.stringify = __webpack_require__(583);
+	exports.decode = exports.parse = __webpack_require__(583);
+	exports.encode = exports.stringify = __webpack_require__(584);
 
 
 /***/ }),
-/* 582 */
+/* 583 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -68068,7 +68120,7 @@ var StellarSdk =
 
 
 /***/ }),
-/* 583 */
+/* 584 */
 /***/ (function(module, exports) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
