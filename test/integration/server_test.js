@@ -49,7 +49,7 @@ describe("Integration test", function () {
     }
 
 
-    /*   it("Create and withdraw asset", function (done) {
+      it("Create and withdraw asset", function (done) {
             var assetCode = "USD" + Math.floor(Math.random() * 1000);
             var assetPolicy = StellarSdk.xdr.AssetPolicy.transferable().value | StellarSdk.xdr.AssetPolicy.withdrawable().value | StellarSdk.xdr.AssetPolicy.twoStepWithdrawal().value;
             var preIssuedAmount = "10000.000000";
@@ -199,7 +199,7 @@ describe("Integration test", function () {
                 .catch(err => {
                     done(err);
                 })
-    })*/
+    })
 
     it("Create KYC request and change KYC", function (done) {
         let newAccountKP = StellarSdk.Keypair.random();
