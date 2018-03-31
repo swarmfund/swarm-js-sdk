@@ -1,17 +1,18 @@
 const StellarSdk = require('../../lib/index');
 
-function createNewAccount(testHelper, accountId, accountType, accountPolicies = undefined) {
+function createNewAccount(testHelper, accountId, accountType, accountPolicies = undefined, referrer = undefined) {
     let recoverKP = StellarSdk.Keypair.random();
     const opts = {
         destination: accountId,
         recoveryKey: recoverKP.accountId(),
         accountType: accountType,
+        referrer: referrer,
         source: testHelper.master.accountId(),
         accountPolicies: accountPolicies,
         recoveryKey: StellarSdk.Keypair.random().accountId(),
     };
     const operation = StellarSdk.Operation.createAccount(opts);
-    return testHelper.server.submitOperation(operation, testHelper.master.accountId(), testHelper.master)
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master)
         .then(res => {
             console.log('Account created: ', accountId)
             return res
