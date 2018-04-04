@@ -7,6 +7,8 @@ import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
+import * as amlAlertHelper from '../../scripts/helpers/aml_alert'
+import * as kycHelper from '../../scripts/helpers/kyc'
 
 let config = require('../../scripts/config');
 
@@ -185,6 +187,67 @@ describe("Integration test", function () {
             .catch(err => {
                 done(err);
             })
+    });
+
+    it("Create referrer and two referrals", function (done) {
+        let referrerKP = StellarSdk.Keypair.random();
+        let firstReferralKP = StellarSdk.Keypair.random();
+        let secondReferralKP = StellarSdk.Keypair.random();
+        accountHelper.createNewAccount(testHelper, referrerKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0)
+            .then(() => accountHelper.createNewAccount(testHelper, firstReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0, referrerKP.accountId()))
+            .then(() => accountHelper.createNewAccount(testHelper, secondReferralKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0, referrerKP.accountId()))
+            .then(() => done())
+            .catch(err => {
+                done(err);
+            })
+    })
+
+    it("Create KYC request and change KYC", function (done) {
+        let newAccountKP = StellarSdk.Keypair.random();
+        let requestID = "0";
+        let kycLevel = 1;
+        let kycData = {"hash": "bb36c7c58c4c32d98947c8781c91c7bb797c3647"};
+        accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0)
+            .then(() => kycHelper.createKYCRequest(testHelper, newAccountKP, requestID, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, kycLevel, kycData))
+            .then(requestID => reviewableRequestHelper.reviewUpdateKYCRequest(testHelper, requestID, master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "", 0, 30, {}))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+    it("Create AML alert and approve and reject", function (done) {
+        var assetCode = "ETH" + Math.floor(Math.random() * 1000);
+        var preIssuedAmount = "10000.000000";
+        var syndicateKP = StellarSdk.Keypair.random();
+        var newAccountKP = StellarSdk.Keypair.random();
+        let amlAlertAmount = Number(preIssuedAmount) / 2;
+        console.log("Creating new account for issuance " + syndicateKP.accountId());
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, 0))
+            .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
+            .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
+            .then(() => issuanceHelper.fundAccount(testHelper, newAccountKP, assetCode, syndicateKP, preIssuedAmount))
+            .then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
+            .then(balance => {
+                expect(balance.balance).to.be.equal(preIssuedAmount);
+                return amlAlertHelper.createAMLAlert(testHelper, balance.balance_id, amlAlertAmount.toString())
+            }).then(requestID => {
+            return reviewableRequestHelper.reviewAmlAlertRequest(testHelper, requestID, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, "",
+                "Testing AML requests");
+        }).then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
+            .then(balance => {
+                expect(Number(balance.balance)).to.be.equal(amlAlertAmount);
+                return amlAlertHelper.createAMLAlert(testHelper, balance.balance_id, amlAlertAmount.toString())
+            }).then(requestID => {
+            return reviewableRequestHelper.reviewAmlAlertRequest(testHelper, requestID, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.permanentReject().value, "Already processed",
+                "Testing AML requests");
+        }).then(() => accountHelper.loadBalanceForAsset(testHelper, newAccountKP.accountId(), assetCode))
+            .then(balance => {
+                expect(Number(balance.balance)).to.be.equal(amlAlertAmount);
+                done();
+            })
+            .catch(err => {
+                done(err)
+            });
     });
 
 });

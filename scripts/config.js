@@ -90,13 +90,13 @@ var admins = {
 
 const passphrases = {
     local: 'Test SDF Network ; September 2015',
-    dev: 'Test SDF Network ; September 2015',
+    dev: 'Swarm New Dev; Feb 18',
     staging: 'SUN Staging Network ; December 2017'
 }
 
 const urls = {
     local: 'http://127.0.0.1:8000',
-    dev: 'http://18.196.70.215:8000',
+    dev: 'https://api-dev.swarm.fund',
     staging: 'http://staging.api.sun.swarm.fund'
 }
 
