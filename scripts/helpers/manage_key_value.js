@@ -1,9 +1,17 @@
+//const StellarSdk = require('../lib/index');
 
+function manageKeyValue(testHelper,key, action, value, source) {
 
-function manageKeyValue(ley, action, vlue) {
-        let opts = {
-            key: key,
-            action: action
-        }
-        if(action === ManageKeyValue)
+    const opts = {
+        key: key,
+        action: action,
+        value: xdr.void(),
+        source: source
+    };
+
+    if (action === xdr.toInt(StellarSdk.put)) {
+        opts.value = value;
+    }
+    const operation = StellarSdk.Operation.manageKeyValueOp(opts);
+    return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
 }

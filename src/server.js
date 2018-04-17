@@ -31,6 +31,7 @@ import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 import isUndefined from 'lodash/isUndefined';
 import constants from './const';
+import {KeyValueCallBuilder} from "./key_value_call_builder";
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;
@@ -180,6 +181,14 @@ export class Server {
      */
     accounts() {
         return new AccountCallBuilder(URI(this.serverURL));
+    }
+
+    /**
+     * Returns new {@link KeyValueCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {KeyValueCallBuilder}
+     */
+    keyValues() {
+        return new KeyValueCallBuilder(URI(this.serverURL));
     }
 
     /**
@@ -388,6 +397,14 @@ export class Server {
             });
     }
 
+    loadKeyValue(key) {
+        return this.keyValues()
+            .keyValueByKey(key)
+            .call()
+            .then(function(res) {
+                return new KeyValueResponse(res);
+            });
+    }
     /**
      * Fetches an account's most current state in the ledger and then creates and returns an {@link Account} object.
      * @param {string} accountId - The account to load.
