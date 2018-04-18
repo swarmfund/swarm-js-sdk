@@ -121,7 +121,8 @@ describe("Integration test", function () {
             .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
             .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, softCap.toString(), quoteAsset))
             .then(offerID => offerHelper.cancelSaleParticipation(testHelper, saleParticipantKP, baseAsset, quoteAsset, offerID))
-            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, hardCap.toString(), quoteAsset))
+            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, softCap.toString(), quoteAsset))
+            .then(offerID => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, hardCap.toString(), quoteAsset, undefined, offerID))
             .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
             .then(() => done())
             .catch(err => done(err));

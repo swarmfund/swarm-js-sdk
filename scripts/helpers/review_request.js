@@ -110,7 +110,7 @@ function reviewAmlAlertRequest(testHelper, requestID, reviewerKP, action, reject
             comment: comment,
         };
         let operation = StellarSdk.ReviewRequestBuilder.reviewAmlAlertRequest(opts);
-        return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
+        return testHelper.server.submitOperationGroup([operation], reviewerKP.accountId(), reviewerKP);
     }).catch(err => {
         if (!isUndefined(err.response) && err.response.status === 404) {
             console.log("recieved 404 - retrying");
@@ -133,7 +133,7 @@ function reviewUpdateKYCRequest(testHelper, requestID, reviewerKP, action, rejec
             externalDetails: externalDetails,
         };
         let operation = StellarSdk.ReviewRequestBuilder.reviewUpdateKYCRequest(opts);
-        return testHelper.server.submitOperation(operation, reviewerKP.accountId(), reviewerKP);
+        return testHelper.server.submitOperationGroup([operation], reviewerKP.accountId(), reviewerKP);
     }).catch(err => {
         if (!isUndefined(err.response) && err.response.status === 404) {
             console.log("recieved 404 - retrying");

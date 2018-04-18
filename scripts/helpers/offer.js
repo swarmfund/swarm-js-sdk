@@ -1,9 +1,10 @@
+const isUndefined = require('lodash/isUndefined');
 const StellarSdk = require('../../lib/index');
 var accountHelper = require('./accounts');
 
 
-
-function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmount, isBuy, orderBookID) {
+// If offerID is defined - update offer
+function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmount, isBuy, orderBookID, offerID) {
     return accountHelper.loadBalanceIDForAsset(testHelper, source.accountId(), baseAsset)
     .then(baseBalanceID => {
         return accountHelper.loadBalanceIDForAsset(testHelper, source.accountId(), quoteAsset).then(quoteBalanceID => {
@@ -13,6 +14,7 @@ function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmoun
         let opts = {
             baseBalance: balances.baseBalanceID,
             quoteBalance: balances.quoteBalanceID,
+            offerID: offerID,
             isBuy: isBuy,
             amount: baseAmount,
             price: price,
@@ -25,7 +27,11 @@ function createOffer(testHelper, source, baseAsset, quoteAsset, price, baseAmoun
     }).then(response => {
             let result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             let id = result.result().results()[0].tr().manageOfferResult().success().offer().offer().offerId().toString();
-            console.log("Offer created: " + id);
+            if (isUndefined(offerID)) {
+                console.log("Offer created: " + id);
+            } else {
+                console.log("Offer updated: " + id);
+            }
             return id
         })
 }
@@ -60,7 +66,8 @@ function findQuoteAssetForAsset(sale, quoteAsset) {
     throw new Error("Failed to find quote asset of the sale for asset: " + quoteAsset);
 }
 
-function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsset, baseAmount) {
+// If offerID is defined - update sale participation
+function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsset, baseAmount, offerID) {
     return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(source).then(sales => {
         return sales.records[0];
     }).then(sale => {
@@ -68,7 +75,7 @@ function participateInSale(testHelper, source, baseAsset, quoteAmount, quoteAsse
         if (!!quoteAmount) {
             baseAmount = Math.round(Number.parseFloat(quoteAmount)/Number.parseFloat(saleQuoteAsset.price) * StellarSdk.Operation.ONE) /StellarSdk.Operation.ONE;
         }
-        return createOffer(testHelper, source, sale.base_asset, quoteAsset, saleQuoteAsset.price, baseAmount.toString(), true, sale.id);
+        return createOffer(testHelper, source, sale.base_asset, quoteAsset, saleQuoteAsset.price, baseAmount.toString(), true, sale.id, offerID);
     });
 }
 
