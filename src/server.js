@@ -402,7 +402,7 @@ export class Server {
             .keyValueByKey(key)
             .call()
             .then(function(res) {
-                return new KeyValueResponse(res);
+                return new key_value_response(res);
             });
     }
     /**
