@@ -26,4 +26,9 @@ export class OfferCallBuilder extends CallBuilder {
         this.url.addQuery('order_book_id', orderBookID);
         return this;
     }
+
+    onlyPrimary(onlyPrimary) {
+        this.url.addQuery('only_primary', onlyPrimary);
+        return this;
+    }
 }
