@@ -1,4 +1,4 @@
-import {KeyValue as BaseKeyValue} from "swarm-js-base";
+import {KeyValue as BaseKeyValue} from "swarm-js-base/src/key_value";
 import forIn from "lodash/forIn";
 
 export class key_value_response {
@@ -14,4 +14,4 @@ export class key_value_response {
     keyValueKey() {
         return this._baseKeyValue.keyValueKey();
     }
-};
+}

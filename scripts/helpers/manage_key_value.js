@@ -1,12 +1,11 @@
 const StellarSdk = require('../lib/index');
 
-function manageKeyValue(testHelper,key, action, value, source) {
+function manageKeyValue(testHelper, key, action, KVType, source, value) {
 
     const opts = {
-        key: key,
-        action: action,
-        value: xdr.void(),
-        source: source
+        key             : key,
+        keyValueAction  : action,
+        kvType          : KVType,
     };
 
     if (action === xdr.toInt(StellarSdk.ManageKvAction.put)) {
