@@ -4,7 +4,7 @@ function manageKeyValue(testHelper, key, action, KVType, source, value) {
 
     const opts = {
         key             : key,
-        keyValueAction  : action,
+        action          : action,
         kvType          : KVType,
     };
 

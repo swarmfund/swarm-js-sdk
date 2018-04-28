@@ -11,11 +11,11 @@ export class KeyValueCallBuilder extends CallBuilder{
      */
     constructor(serverUrl) {
         super(serverUrl);
-        this.url.segment('keyValue');
+        this.url.segment('keyvalue');
     }
 
     keyValueByKey(key) {
-        this.filter.push(['keyValue', key]);
+        this.filter.push(['keyvalue', key]);
         return this;
     }
 }

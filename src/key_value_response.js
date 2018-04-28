@@ -8,7 +8,7 @@ export class key_value_response {
         // Extract response fields
         forIn(response,(value,key) =>{
             this[key] = value;
-        })
+        });
     }
 
     keyValueKey() {
