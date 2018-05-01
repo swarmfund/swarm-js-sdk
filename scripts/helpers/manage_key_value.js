@@ -1,4 +1,4 @@
-const StellarSdk = require('../lib/index');
+const StellarSdk = require('../../lib/index');
 
 function manageKeyValue(testHelper, key, action, KVType, source, value) {
 
@@ -8,10 +8,20 @@ function manageKeyValue(testHelper, key, action, KVType, source, value) {
         kvType          : KVType,
     };
 
-    if (action === xdr.toInt(StellarSdk.ManageKvAction.put)) {
+    if (action === 1) {
         opts.value = value;
     }
 
-    const operation = StellarSdk.ManageKeyValueOpBuilder.manageKeyValueOp(opts);
+    const operation = StellarSdk.ManageKeyValueOpBuilder.createManageKeyValueOp(opts);
     return testHelper.server.submitOperationGroup([operation], testHelper.master.accountId(), testHelper.master);
+}
+
+function createKYCRuleKey(accountType,kyclvl,typeToSet,kycLvlToSet)
+{
+    return "kyc_lvlup_rule:"+accountType+":"+kyclvl+":"+typeToSet+":"+kycLvlToSet;
+}
+
+module.exports = {
+    manageKeyValue,
+    createKYCRuleKey
 }

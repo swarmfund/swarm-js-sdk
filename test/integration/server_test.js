@@ -9,6 +9,7 @@ import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
 import * as amlAlertHelper from '../../scripts/helpers/aml_alert'
 import * as kycHelper from '../../scripts/helpers/kyc'
+import * as manageKYCHelper from '../../scripts/helpers/manage_key_value'
 
 let config = require('../../scripts/config');
 
@@ -48,6 +49,15 @@ describe("Integration test", function () {
             });
     }
 
+      it("Create KYC Rule from notVerified to General", function (done) {
+          var key = manageKYCHelper.createKYCRuleKey(StellarSdk.xdr.AccountType.notVerified().value,0,StellarSdk.xdr.AccountType.general().value,0);
+          manageKYCHelper.manageKeyValue(testHelper,key,StellarSdk.xdr.ManageKvAction.put().value,
+             1,testHelper.master,30)
+              .then(() => done())
+              .catch(err => {
+                  done(err)
+              });
+      });
 
       it("Create and withdraw asset", function (done) {
             var assetCode = "USD" + Math.floor(Math.random() * 1000);
@@ -56,7 +66,7 @@ describe("Integration test", function () {
             var syndicateKP = StellarSdk.Keypair.random();
             var newAccountKP = StellarSdk.Keypair.random();
             console.log("Creating new account for issuance " + syndicateKP.accountId());
-            accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0)
                 .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
                 .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
                 .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
