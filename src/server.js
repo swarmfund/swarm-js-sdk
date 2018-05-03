@@ -26,17 +26,16 @@ import { UserCallBuilder } from "./user_call_builder";
 import { SalesCallBuilder } from "./sales_call_builder";
 import { Config } from "./config";
 import { ReviewableRequestsHelper } from "./reviewable_requests/reviewable_requests_helper";
-
+import { TimeSyncer } from './time-syncer';
 import { Account, hash, Operation, xdr } from "swarm-js-base";
 import stellarBase from 'swarm-js-base';
 import isUndefined from 'lodash/isUndefined';
+import constants from './const';
 
 let axios = require("axios");
 let toBluebird = require("bluebird").resolve;
 let URI = require("urijs");
 let querystring = require('querystring');
-
-export const SUBMIT_TRANSACTION_TIMEOUT = 20 * 1000;
 
 export class Server {
     /**
@@ -46,6 +45,7 @@ export class Server {
      * @param {string} serverURL Horizon Server URL (ex. `https://horizon-testnet.stellar.org`).
      * @param {object} [opts]
      * @param {boolean} [opts.allowHttp] - Allow connecting to http servers, default: `false`. This must be set to false in production deployments! You can also use {@link Config} class to set this globally.
+     * @param {boolean} [opts.currentTimestamp] - Current times derived somewhere higher, need for time syncing with backend
      */
     constructor(serverURL, opts = {}) {
         this.serverURL = URI(serverURL);
@@ -58,6 +58,10 @@ export class Server {
             console.log(err);
         }
 
+        this.currentTime = +opts.currentTimestamp || new Date().getTime();
+        // we need to create singleton's instance here, otherwise it will be created in call builder,
+        // that doesn't know anything about current time
+        new TimeSyncer(this.currentTime);
 
         let allowHttp = Config.isAllowHttp();
         if (typeof opts.allowHttp !== 'undefined') {
@@ -126,7 +130,7 @@ export class Server {
         let tx = transaction.toEnvelope().toXDR().toString("base64");
 
         let config = {
-            timeout: SUBMIT_TRANSACTION_TIMEOUT,
+            timeout: constants.SUBMIT_TRANSACTION_TIMEOUT,
             headers: {
                 'content-type': 'application/json',
             }
@@ -616,8 +620,7 @@ export class Server {
     }
 
     _getConfig(address, keypair) {
-        let SIGNATURE_VALID_SEC = 60;
-        let validUntil = Math.floor((new Date().getTime() / 1000) + SIGNATURE_VALID_SEC).toString();
+        let validUntil = Math.floor(new TimeSyncer(this.currentTime).now() + constants.SIGNATURE_VALID_SEC).toString();
         //temporary. should be fixed or refactored
         let signatureBase = "{ uri: '" + address + "', valid_untill: '" + validUntil.toString() + "'}";
         keypair = stellarBase.Keypair.fromRawSeed(keypair._secretSeed);
@@ -631,7 +634,7 @@ export class Server {
                     'X-AuthPublicKey': keypair.accountId(),
                     'X-AuthSignature': signature.toXDR("base64")
                     },
-            timeout: SUBMIT_TRANSACTION_TIMEOUT,
+            timeout: constants.SUBMIT_TRANSACTION_TIMEOUT
         };
     }
     _getURL(prefix) {
