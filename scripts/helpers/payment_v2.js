@@ -1,24 +1,9 @@
 const StellarSdk = require('../../lib/index');
 
-function paymentV2ForAccount(testHelper, sourceKP, sourceBalanceID, destAccountID, amount, sourceFeeAsset, destFeeAsset, sourcePaysForDest) {
-    let opts = _prepareOpts(sourceBalanceID, amount, sourceFeeAsset, destFeeAsset, sourcePaysForDest);
-    opts.destination = destAccountID;
-
-    let op = StellarSdk.PaymentV2Builder.paymentV2ForAccount(opts);
-    return testHelper.server.submitOperation(op, sourceKP.accountId(), sourceKP);
-}
-
-function paymentV2ForBalance(testHelper, sourceKP, sourceBalanceID, destBalanceID, amount, sourceFeeAsset, destFeeAsset, sourcePaysForDest) {
-    let opts = _prepareOpts(sourceBalanceID, amount, sourceFeeAsset, destFeeAsset, sourcePaysForDest);
-    opts.destination = destBalanceID;
-
-    let op = StellarSdk.PaymentV2Builder.paymentV2ForBalance(opts);
-    return testHelper.server.submitOperation(op, sourceKP.accountId(), sourceKP);
-}
-
-function _prepareOpts(sourceBalanceID, amount, sourceFeeAsset, destFeeAsset, sourcePaysForDest) {
+function paymentV2(testHelper, sourceKP, sourceBalanceID, destination, amount, sourceFeeAsset, destFeeAsset, sourcePaysForDest) {
     let opts = {
         sourceBalanceId: sourceBalanceID,
+        destination: destination,
         amount: amount,
         feeData: {
             sourceFee: {
@@ -37,10 +22,10 @@ function _prepareOpts(sourceBalanceID, amount, sourceFeeAsset, destFeeAsset, sou
         reference: "",
     };
 
-    return opts;
+    let op = StellarSdk.PaymentV2Builder.paymentV2(opts);
+    return testHelper.server.submitOperation(op, sourceKP.accountId(), sourceKP);
 }
 
 module.exports = {
-    paymentV2ForAccount,
-    paymentV2ForBalance
+    paymentV2
 };

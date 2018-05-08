@@ -269,7 +269,7 @@ describe("Integration test", function () {
             .then(balanceID => {sourceBalanceID = balanceID})
             .then(() => accountHelper.loadBalanceIDForAsset(testHelper, recipientKP.accountId(), paymentAssetCode))
             .then(balanceID => {
-                return paymentV2Helper.paymentV2ForBalance(testHelper, payerKP, sourceBalanceID, balanceID, "100", feeAssetCode, paymentAssetCode, true);
+                return paymentV2Helper.paymentV2(testHelper, payerKP, sourceBalanceID, balanceID, "100", feeAssetCode, paymentAssetCode, true);
             })
             .then(() => done())
             .catch(err =>done(err));
