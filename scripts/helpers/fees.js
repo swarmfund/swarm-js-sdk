@@ -1,4 +1,4 @@
-function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset) {
+function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset, subtype = '0', feeAsset = undefined) {
     return testHelper.server.loadAccountWithSign(testHelper.master.accountId(), testHelper.master)
         .then(source => {
             let opts = {
@@ -7,8 +7,9 @@ function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset) {
                     asset,
                     fixedFee,
                     percentFee,
-                    subtype: '0',
-                    upperBound: "10000000"
+                    subtype: subtype,
+                    upperBound: "10000000",
+                    feeAsset: feeAsset,
                 }
             };
 
@@ -25,4 +26,4 @@ function setFees(testHelper, feeType, fixedFee, percentFee, asset = baseAsset) {
 
 module.exports = {
   setFees
-}
+};
