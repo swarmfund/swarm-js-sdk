@@ -11,6 +11,7 @@ import * as manageExternalSystemAccountIdPoolEntryHelper from '../../scripts/hel
 import * as bindExternalSystemAccountIdHelper from '../../scripts/helpers/bind_external_system_account_id'
 import * as amlAlertHelper from '../../scripts/helpers/aml_alert'
 import * as kycHelper from '../../scripts/helpers/kyc'
+import * as paymentV2Helper from '../../scripts/helpers/payment_v2'
 
 let config = require('../../scripts/config');
 
@@ -246,6 +247,34 @@ describe("Integration test", function () {
                 done();
             })
             .catch(err => { done(err) });
+    });
+    it("Perform cross asset payment V2", function (done) {
+        var paymentAssetCode = "USD" + Math.floor(Math.random() * 1000);
+        var feeAssetCode = "ETH" + Math.floor(Math.random() * 1000);
+        var price = "5";
+        var payerKP = StellarSdk.Keypair.random();
+        var recipientKP = StellarSdk.Keypair.random();
+        var sourceBalanceID;
+        assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), paymentAssetCode,
+            StellarSdk.xdr.AssetPolicy.baseAsset().value | StellarSdk.xdr.AssetPolicy.transferable().value |
+            StellarSdk.xdr.AssetPolicy.statsQuoteAsset().value, "10000", "5000")
+            .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), feeAssetCode,
+                StellarSdk.xdr.AssetPolicy.baseAsset().value, "10000", "5000"))
+            .then(() => accountHelper.createNewAccount(testHelper, payerKP.accountId(), StellarSdk.xdr.AccountType.general().value))
+            .then(() => accountHelper.createNewAccount(testHelper, recipientKP.accountId(), StellarSdk.xdr.AccountType.general().value))
+            .then(() => assetHelper.createAssetPair(testHelper, paymentAssetCode, feeAssetCode, price))
+            .then(() => feesHelper.setFees(testHelper, StellarSdk.xdr.FeeType.paymentFee(), "10", "10", paymentAssetCode, StellarSdk.xdr.PaymentFeeType.outgoing().value.toString(), feeAssetCode))
+            .then(() => feesHelper.setFees(testHelper, StellarSdk.xdr.FeeType.paymentFee(), "5", "0", paymentAssetCode, StellarSdk.xdr.PaymentFeeType.incoming().value.toString(), paymentAssetCode))
+            .then(() => issuanceHelper.fundAccount(testHelper, payerKP, paymentAssetCode, testHelper.master, "1000"))
+            .then(() => issuanceHelper.fundAccount(testHelper, payerKP, feeAssetCode, testHelper.master, "1000"))
+            .then(() => accountHelper.loadBalanceIDForAsset(testHelper, payerKP.accountId(), paymentAssetCode))
+            .then(balanceID => {sourceBalanceID = balanceID})
+            .then(() => accountHelper.loadBalanceIDForAsset(testHelper, recipientKP.accountId(), paymentAssetCode))
+            .then(balanceID => {
+                return paymentV2Helper.paymentV2(testHelper, payerKP, sourceBalanceID, balanceID, "100", feeAssetCode, paymentAssetCode, true);
+            })
+            .then(() => done())
+            .catch(err =>done(err));
     });
 
 
