@@ -117,6 +117,8 @@ describe("Integration test", function () {
                     price: price.toString(),
                     asset: quoteAsset
                 }]))
+                .then(saleID => saleHelper.createUpdateSaleDetailsRequest(testHelper, syndicateKP, "1"))
+                .then(requestID => reviewableRequestHelper.reviewRequest(testHelper, requestID, testHelper.master, StellarSdk.xdr.ReviewRequestOpAction.approve().value, ""))
                 .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
                 .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, testHelper.master, (hardCap).toString()))
                 .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
