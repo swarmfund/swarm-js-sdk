@@ -6,6 +6,7 @@ import {SaleRequestsCallBuilder} from "./sales_requests_call_builder";
 import {ReviewableRequestCallBuilder} from "./reviewable_request_call_builder";
 import {LimitsUpdateRequestsCallBuilder} from "./limits_update_requests_call_builder";
 import {UpdateKYCRequestCallBuilder} from './update_kyc_requests_call_builder';
+import {UpdateSaleDetailsRequestCallBuilder} from './update_sale_details_requests_call_builder';
 
 let URI = require("urijs");
 
