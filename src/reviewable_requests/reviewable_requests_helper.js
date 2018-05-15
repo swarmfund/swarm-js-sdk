@@ -87,4 +87,12 @@ export class ReviewableRequestsHelper {
         return new UpdateKYCRequestCallBuilder(URI(this.serverURL));
     }
 
+    /**
+     * Returns new {@link UpdateSaleDetailsRequestCallBuilder} object configured by a current Horizon server configuration.
+     * @returns {UpdateSaleDetailsRequestCallBuilder}
+     */
+    update_sale_details() {
+        return new UpdateSaleDetailsRequestCallBuilder(URI(this.serverURL));
+    }
+
 }

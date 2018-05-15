@@ -1,7 +1,6 @@
 var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
-
 function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding) {
     let opts = {
         requestID: "0",
@@ -41,7 +40,6 @@ function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, 
         });
 }
 
-
 function checkSaleState(testHelper, baseAsset) {
     return testHelper.server.sales().forBaseAsset(baseAsset).callWithSignature(testHelper.master).then(sales => {
         return sales.records[0];
@@ -53,8 +51,35 @@ function checkSaleState(testHelper, baseAsset) {
     });
 }
 
+function createUpdateSaleDetailsRequest(testHelper, owner, saleID) {
+    let opts = {
+        requestID: "0",
+        saleID: saleID,
+        newDetails: {
+            short_description: "updated short description",
+            description: "Token sale description",
+            logo: {
+                url: "logo_url",
+                type: "logo_type",
+            },
+            name: "updated sale name",
+        },
+    };
+
+    let operation = StellarSdk.ManageSaleBuilder.createUpdateSaleDetailsRequest(opts);
+    return testHelper.server.submitOperation(operation, owner.accountId(), owner)
+        .then(response => {
+            let result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
+            console.log(JSON.stringify(result.result().results()[0].tr().manageSaleResult().success()));
+            let id = result.result().results()[0].tr().manageSaleResult().success().response().requestId().toString();
+            console.log("UpdateSaleDetailsRequest created: " + id);
+            return id;
+        });
+}
+
 module.exports = {
     createSaleCreationRequest,
     createSale,
-    checkSaleState
-}
+    checkSaleState,
+    createUpdateSaleDetailsRequest
+};
