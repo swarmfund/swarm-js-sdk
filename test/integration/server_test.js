@@ -59,7 +59,7 @@ describe("Integration test", function () {
             var syndicateKP = StellarSdk.Keypair.random();
             var newAccountKP = StellarSdk.Keypair.random();
             console.log("Creating new account for issuance " + syndicateKP.accountId());
-            accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0)
+            accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
                 .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), assetCode, assetPolicy))
                 .then(() => issuanceHelper.performPreIssuance(testHelper, syndicateKP, syndicateKP, assetCode, preIssuedAmount))
                 .then(() => accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0))
