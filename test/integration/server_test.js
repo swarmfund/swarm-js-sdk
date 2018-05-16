@@ -7,6 +7,10 @@ import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
+
+import * as manageExternalSystemAccountIdPoolEntryHelper from '../../scripts/helpers/manage_external_system_account_id_pool_entry'
+import * as manageKeyValueHelper from '../../scripts/helpers/key_value'
+import * as bindExternalSystemAccountIdHelper from '../../scripts/helpers/bind_external_system_account_id'
 import * as amlAlertHelper from '../../scripts/helpers/aml_alert'
 import * as kycHelper from '../../scripts/helpers/kyc'
 import * as manageKYCHelper from '../../scripts/helpers/manage_key_value'
@@ -254,6 +258,63 @@ describe("Integration test", function () {
                 done();
             })
             .catch(err => { done(err) });
+    });
+
+    it("Create fundrasing for asset", function (done) {
+        var syndicateKP = StellarSdk.Keypair.random();
+        var baseAsset = "BTC" + Math.floor(Math.random() * 1000);
+        var quoteAsset = "ETH" + Math.floor(Math.random() * 1000);
+        var defaultQuoteAsset = "USD" + Math.floor(Math.random() * 1000);
+        var startTime = Math.round((new Date()).getTime() / 1000);
+        var price = 1;
+        var softCap = 2250;
+        var hardCap = 4500;
+        var maxIssuanceAmount = hardCap / price;
+        var saleParticipantKP = StellarSdk.Keypair.random();
+        accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
+            .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount.toString(), maxIssuanceAmount.toString()))
+            .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), quoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, MAX_INT64_AMOUNT, MAX_INT64_AMOUNT))
+            .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), defaultQuoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, MAX_INT64_AMOUNT, MAX_INT64_AMOUNT))
+            .then(() => assetHelper.createAssetPair(testHelper, quoteAsset, defaultQuoteAsset, "1"))
+            .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, defaultQuoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(),
+                hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }], true))
+            .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
+            .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, testHelper.master, MAX_INT64_AMOUNT))
+            .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
+            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, undefined, quoteAsset, '0.000001'))
+            .then(() => assetHelper.updateAssetPrice(testHelper, quoteAsset, defaultQuoteAsset, "0.000001"))
+            .then(() => offerHelper.participateInSale(testHelper, saleParticipantKP, baseAsset, (hardCap / 0.000001).toString(), quoteAsset))
+            // first not remove offers with 0 base amount
+            .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
+            // close sale
+            .then(() => saleHelper.checkSaleState(testHelper, baseAsset))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+    it("Creates, binds and delete pool entry", function (done) {
+        let accountKP = StellarSdk.Keypair.random();
+        let poolEntryId;
+        manageExternalSystemAccountIdPoolEntryHelper.createExternalSystemAccountIdPoolEntry(testHelper, 4, "Some data", "12")
+            .then(poolId => {
+                poolEntryId = poolId;
+                return accountHelper.createNewAccount(testHelper, accountKP.accountId(), StellarSdk.xdr.AccountType.general().value, 0);
+            })
+            .then(() => bindExternalSystemAccountIdHelper.bindExternalSystemAccountId(testHelper, accountKP, 4))
+            .then(() => manageExternalSystemAccountIdPoolEntryHelper.deleteExternalSystemAccountIdPoolEntry(testHelper, poolEntryId))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+    it("Creates, change and delete key value", function (done) {
+        let first_key = "123";
+        let second_key = "222";
+        let first_value = "1234";
+        let second_value = "2222";
+        manageKeyValueHelper.putKeyValue(testHelper, testHelper.master, first_key, first_value)
+            .then(() => manageKeyValueHelper.putKeyValue(testHelper, testHelper.master, second_key, second_value))
+            .then(() => manageKeyValueHelper.deleteKeyValue(testHelper, testHelper.master, second_key))
+            .then(() => done())
+            .catch(err => done(err));
     });
 
 });
