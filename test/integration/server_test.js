@@ -140,15 +140,16 @@ describe("Integration test", function () {
             var price = 1;
             var softCap = 2250;
             var hardCap = 4500;
-            var maxIssuanceAmount = hardCap / price;
+            var maxIssuanceAmount = hardCap * 2;
             var saleParticipantKP = StellarSdk.Keypair.random();
+            var baseAssetForHardCap = hardCap;
             accountHelper.createNewAccount(testHelper, syndicateKP.accountId(), StellarSdk.xdr.AccountType.syndicate().value, 0)
                 .then(() => assetHelper.createAsset(testHelper, syndicateKP, syndicateKP.accountId(), baseAsset, 0, maxIssuanceAmount.toString(), maxIssuanceAmount.toString()))
                 .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), quoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, MAX_INT64_AMOUNT, MAX_INT64_AMOUNT))
                 .then(() => assetHelper.createAsset(testHelper, testHelper.master, testHelper.master.accountId(), defaultQuoteAsset, StellarSdk.xdr.AssetPolicy.baseAsset().value, MAX_INT64_AMOUNT, MAX_INT64_AMOUNT))
                 .then(() => assetHelper.createAssetPair(testHelper, quoteAsset, defaultQuoteAsset, "1"))
                 .then(() => saleHelper.createSale(testHelper, syndicateKP, baseAsset, defaultQuoteAsset, startTime + "", startTime + 60 * 10 + "", softCap.toString(),
-                    hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }], true))
+                    hardCap.toString(), [{ price: price.toString(), asset: quoteAsset }], true, baseAssetForHardCap.toString()))
                 .then(() => accountHelper.createNewAccount(testHelper, saleParticipantKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0))
                 .then(() => issuanceHelper.fundAccount(testHelper, saleParticipantKP, quoteAsset, testHelper.master, MAX_INT64_AMOUNT))
                 .then(() => accountHelper.createBalanceForAsset(testHelper, saleParticipantKP, baseAsset))
