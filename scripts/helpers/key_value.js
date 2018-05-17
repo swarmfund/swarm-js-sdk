@@ -6,8 +6,6 @@ function putKeyValue(testHelper, source, key, value) {
         value: value
     };
     let operation = StellarSdk.ManageKeyValueBuilder.putKeyValue(opts);
-    console.log("After create operation put");
-    console.log(operation);
     return testHelper.server.submitOperation(operation, source.accountId(), source);
 }
 
