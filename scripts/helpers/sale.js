@@ -1,7 +1,7 @@
 var reviewableRequestHelper = require('./review_request')
 const StellarSdk = require('../../lib/index');
 
-function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding) {
+function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding, baseAssetForHardCap) {
     let opts = {
         requestID: "0",
         baseAsset: baseAsset,
@@ -13,6 +13,7 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAss
         hardCap: hardCap,
         quoteAssets: quoteAssets,
         isCrowdfunding: isCrowdfunding,
+        baseAssetForHardCap: baseAssetForHardCap,
         details: {
             short_description: "short description",
             description: "Token sale description",
@@ -27,8 +28,8 @@ function createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAss
     return testHelper.server.submitOperation(operation, owner.accountId(), owner);
 }
 
-function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding) {
-    return createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding)
+function createSale(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding, baseAssetForHardCap) {
+    return createSaleCreationRequest(testHelper, owner, baseAsset, defaultQuoteAsset, startTime, endTime, softCap, hardCap, quoteAssets, isCrowdfunding, baseAssetForHardCap)
         .then(response => {
             var result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
             var success = result.result().results()[0].tr().createSaleCreationRequestResult().success();
@@ -70,7 +71,6 @@ function createUpdateSaleDetailsRequest(testHelper, owner, saleID) {
     return testHelper.server.submitOperation(operation, owner.accountId(), owner)
         .then(response => {
             let result = StellarSdk.xdr.TransactionResult.fromXDR(new Buffer(response.result_xdr, "base64"));
-            console.log(JSON.stringify(result.result().results()[0].tr().manageSaleResult().success()));
             let id = result.result().results()[0].tr().manageSaleResult().success().response().requestId().toString();
             console.log("UpdateSaleDetailsRequest created: " + id);
             return id;
