@@ -7,6 +7,7 @@ import * as withdrawHelper from '../../scripts/helpers/withdraw'
 import * as saleHelper from '../../scripts/helpers/sale'
 import * as offerHelper from '../../scripts/helpers/offer'
 import * as limitsUpdateHelper from '../../scripts/helpers/limits_update'
+import * as manageKeyValueHelper from '../../scripts/helpers/key_value'
 import * as manageExternalSystemAccountIdPoolEntryHelper from '../../scripts/helpers/manage_external_system_account_id_pool_entry'
 import * as bindExternalSystemAccountIdHelper from '../../scripts/helpers/bind_external_system_account_id'
 import * as amlAlertHelper from '../../scripts/helpers/aml_alert'
@@ -280,7 +281,6 @@ describe("Integration test", function () {
             .catch(err =>done(err));
     });
 
-
     it("Update account from unverified to syndicate", function (done) {
         var newAccountKP = StellarSdk.Keypair.random();
         accountHelper.createNewAccount(testHelper, newAccountKP.accountId(), StellarSdk.xdr.AccountType.notVerified().value, 0)
@@ -356,6 +356,18 @@ describe("Integration test", function () {
             })
             .then(() =>  bindExternalSystemAccountIdHelper.bindExternalSystemAccountId(testHelper, accountKP, 4))
             .then(() => manageExternalSystemAccountIdPoolEntryHelper.deleteExternalSystemAccountIdPoolEntry(testHelper, poolEntryId))
+            .then(() => done())
+            .catch(err => done(err));
+    });
+
+    it("Creates, change and delete key value", function (done) {
+        let first_key = "123";
+        let second_key = "222";
+        let first_value = "1234";
+        let second_value = "2222";
+        manageKeyValueHelper.putKeyValue(testHelper, testHelper.master, first_key, first_value)
+            .then(() => manageKeyValueHelper.putKeyValue(testHelper, testHelper.master, second_key, second_value))
+            .then(() => manageKeyValueHelper.deleteKeyValue(testHelper, testHelper.master, second_key))
             .then(() => done())
             .catch(err => done(err));
     });
